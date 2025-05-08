@@ -1,12 +1,27 @@
 <aside id="sidebar" class="sidebar hiden">
     <ul class="sidebar-nav" id="sidebar-nav">
-        <li class="nav-heading">Master Data</li>
+        <li class="nav-heading">Inventory List</li>
 
         <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('parts.index') ? 'active' : 'collapsed' }}"
+            <a class="nav-link {{ request()->routeIs('sto.index','sto.create.get') ? 'active' : 'collapsed' }}"
+                href="{{ route('sto.index') }}">
+                <i class="bi bi-box-seam-fill"></i>
+                <span>List STO</span>
+            </a>
+        </li>
+        <li class="nav-heading">Master Data</li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('parts.index', 'parts.create', 'parts.edit') ? 'active' : 'collapsed' }}"
                 href="{{ route('parts.index') }}">
                 <i class="bi bi-archive"></i>
                 <span>Part</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ request()->routeIs('detail-lokasi.index', 'create.detail-lokasi', 'edit.detail-lokasi') ? 'active' : 'collapsed' }}"
+                href="{{ route('detail-lokasi.index') }}">
+                <i class="bi bi-pin-map"></i>
+                <span>Detail Lokasi</span>
             </a>
         </li>
 

@@ -16,16 +16,22 @@ return new class extends Migration
             $table->string('Inv_id');
             $table->string('Part_name')->nullable();
             $table->string('Part_number')->nullable();
-            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->unsignedBigInteger('id_customer')->nullable();
             $table->unsignedBigInteger('id_plan')->nullable();
+            $table->unsignedBigInteger('id_area')->nullable();
+            $table->unsignedBigInteger('id_rak')->nullable();
 
             // index
             $table->index('Inv_id');
-            $table->index('customer_id');
+            $table->index('id_customer');
             $table->index('id_plan');
+            $table->index('id_area');
+            $table->index('id_rak');
             // Foreign key constraints
-            $table->foreign('customer_id')->references('id')->on('tbl_customer')->onDelete('cascade');
+            $table->foreign('id_customer')->references('id')->on('tbl_customer')->onDelete('cascade');
             $table->foreign('id_plan')->references('id')->on('tbl_plan')->onDelete('cascade');
+            $table->foreign('id_area')->references('id')->on('tbl_area')->onDelete('cascade');
+            $table->foreign('id_rak')->references('id')->on('tbl_rak')->onDelete('cascade');
             $table->timestamps();
         });
     }

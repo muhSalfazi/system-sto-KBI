@@ -7,6 +7,8 @@ use App\Models\Package;
 use App\Models\Plant;
 use App\Models\Area;
 use App\Models\Rak;
+use App\Imports\PartsImport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
 class PartController extends Controller
@@ -27,14 +29,15 @@ class PartController extends Controller
         ]);
     }
 
+
     public function store(Request $request)
     {
         $validated = $request->validate([
             'inv_id' => 'required',
             'part_name' => 'required',
             'part_number' => 'required',
-            'id_customer' => 'required|exists:customers,id',
-            'id_plant' => 'required|exists:tbl_plant,id',
+            'id_customer' => 'required|exists:tbl_customer,id',
+            'id_plan' => 'required|exists:tbl_plan,id',
             'id_area' => 'required|exists:tbl_area,id',
             'id_rak' => 'required|exists:tbl_rak,id',
             'type_pkg' => 'required',
@@ -48,7 +51,7 @@ class PartController extends Controller
             'id_part' => $part->id
         ]);
 
-        return redirect()->route('Part.index')->with('success', 'Part created successfully.');
+        return redirect()->route('parts.index')->with('success', 'Part created successfully.');
     }
 
     public function edit(Part $part)
@@ -65,24 +68,26 @@ class PartController extends Controller
     public function update(Request $request, Part $part)
     {
         $validated = $request->validate([
-            'inv_id' => 'required',
-            'part_name' => 'required',
-            'part_number' => 'required',
-            'id_customer' => 'required|exists:customers,id',
-            'id_plant' => 'required|exists:tbl_plant,id',
-            'id_area' => 'required|exists:tbl_area,id',
-            'id_rak' => 'required|exists:tbl_rak,id',
-            'type_pkg' => 'required',
-            'qty' => 'required|integer'
+            'id_customer' => 'sometimes|exists:tbl_customer,id',
+            'id_plan' => 'sometimes|exists:tbl_plan,id',
+            'id_area' => 'sometimes|exists:tbl_area,id',
+            'id_rak' => 'sometimes|exists:tbl_rak,id',
+            'type_pkg' => 'sometimes',
+            'qty' => 'sometimes|integer'
+        ]);
+        $part->update([
+            'id_customer' => $validated['id_customer'],
+            'id_plan' => $validated['id_plan'],
+            'id_area' => $validated['id_area'],
+            'id_rak' => $validated['id_rak'],
         ]);
 
-        $part->update($validated);
         $part->package()->update([
             'type_pkg' => $validated['type_pkg'],
             'qty' => $validated['qty'],
         ]);
 
-        return redirect()->route('Part.index')->with('success', 'Part updated successfully.');
+        return redirect()->route('parts.index')->with('success', 'Part updated successfully.');
     }
 
     public function destroy(Part $part)
@@ -92,5 +97,32 @@ class PartController extends Controller
 
         return redirect()->route('parts.index')->with('success', 'Part deleted successfully.');
     }
+
+
+    // select part area
+    public function getAreas($plantId)
+    {
+        $areas = Area::where('id_plan', $plantId)->get();
+        return response()->json($areas);
+    }
+
+    public function getRaks($areaId)
+    {
+        $raks = Rak::where('id_area', $areaId)->get();
+        return response()->json($raks);
+    }
+
+    // excel
+    public function import(Request $request)
+{
+    $request->validate([
+       'file' => 'required|mimes:csv,txt,text/plain,text/csv'
+    ]);
+    Excel::import(new PartsImport, $request->file('file'));
+
+
+    return redirect()->route('parts.index')->with('success', 'Import Berhasil.');
+}
+
 }
 

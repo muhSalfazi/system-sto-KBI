@@ -1,129 +1,157 @@
 @extends('layouts.app')
 
-@section('title', 'Create User')
+@section('title', 'Create Part')
 
 @section('content')
     <div class="pagetitle">
-        <h1>Create User</h1>
-
+        <h1>Create Part</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Data User</a></li>
-                <li class="breadcrumb-item active">Create User</li>
+                <li class="breadcrumb-item"><a href="{{ route('sto.index') }}">Data Part</a></li>
+                <li class="breadcrumb-item active">Create Part</li>
             </ol>
         </nav>
-    </div><!-- End Page Title -->
+    </div>
+
     <section class="section">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Create User</h5>
-                <form class="row g-3 needs-validation" novalidate method="POST" action="{{ route('users.store') }}">
+                <h5 class="card-title">Form Input Part</h5>
+                <form method="POST" action="{{ route('parts.store') }}" class="row g-3 needs-validation" novalidate>
                     @csrf
-                    <div class="col-md-4">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" name="username" id="username"
-                            class="form-control @error('username') is-invalid @enderror"
-                            value="{{ old('username') }}" placeholder="Silahkan inputkan username">
-                        @error('username')
+                    <div class="col-md-6">
+                        <label for="inv_id" class="form-label">Inventory ID</label>
+                        <input type="text" name="inv_id" id="inv_id"
+                            class="form-control @error('inv_id') is-invalid @enderror" value="{{ old('inv_id') }}" required>
+                        @error('inv_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="first_name" class="form-label">First Name</label>
-                        <input type="text" name="first_name" id="first_name"
-                            class="form-control @error('first_name') is-invalid @enderror"
-                            value="{{ old('first_name') }}" placeholder="Input nama depan">
-                        @error('first_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="last_name" class="form-label">Last Name</label>
-                        <input type="text" name="last_name" id="last_name"
-                            class="form-control @error('last_name') is-invalid @enderror"
-                            value="{{ old('last_name') }}" placeholder="Input nama belakang">
-                        @error('last_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="ID-card" class="form-label">ID Card</label>
-                        <input type="text" name="ID-card" id="ID-card"
-                            class="form-control @error('ID-card') is-invalid @enderror"
-                            value="{{ old('ID-card') }}" placeholder="Silahkan inputkan ID-card">
-                        @error('ID-card')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="role" class="form-label">Role</label>
-                        <select name="role" id="role" class="form-select mb-3 @error('role') is-invalid @enderror"
+                    <div class="col-md-6">
+                        <label for="part_name" class="form-label">Part Name</label>
+                        <input type="text" name="part_name" id="part_name"
+                            class="form-control @error('part_name') is-invalid @enderror" value="{{ old('part_name') }}"
                             required>
-                            <option value="" disabled {{ old('role') ? '' : 'selected' }}>Pilih Role</option>
-                            @foreach ($roles as $role)
-                                <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
-                                    {{ ucfirst($role->name) }}
-                                </option>
+                        @error('part_name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="part_number" class="form-label">Part Number</label>
+                        <input type="text" name="part_number" id="part_number"
+                            class="form-control @error('part_number') is-invalid @enderror" value="{{ old('part_number') }}"
+                            required>
+                        @error('part_number')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="id_customer" class="form-label">Customer</label>
+                        <select name="id_customer" id="id_customer"
+                            class="form-select @error('id_customer') is-invalid @enderror" required>
+                            <option value="" disabled selected>Pilih Customer</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}">{{ $customer->username }}</option>
                             @endforeach
                         </select>
-                        @error('role')
+                        @error('id_customer')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+                    {{-- Plant, Area, Rak --}}
                     <div class="col-md-4">
-                        <label for="yourPassword" class="form-label">Password</label>
-                        <div class="input-group has-validation">
-                            <input type="password" name="password"
-                            class="form-control @error('password') is-invalid @enderror"
-                            id="yourPassword" value="{{ old('password') }}">
-                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                                <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
-                            </button>
-                            <small class="text-muted">*Password default otomatis sesuai ID Card</small>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
+                        <label for="id_plan" class="form-label">Plant</label>
+                        <select name="id_plan" id="id_plan" class="form-select" required>
+                            <option value="">Pilih Plant</option>
+                            @foreach ($plants as $plant)
+                                <option value="{{ $plant->id }}">{{ $plant->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="col-6">
-                        <button class="btn btn-primary" type="submit">Create User</button>
+
+                    <div class="col-md-4">
+                        <label for="id_area" class="form-label">Area</label>
+                        <select name="id_area" id="id_area" class="form-select" required>
+                            <option value="">Pilih Area</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="id_rak" class="form-label">Rak</label>
+                        <select name="id_rak" id="id_rak" class="form-select" required>
+                            <option value="">Pilih Rak</option>
+                        </select>
+                    </div>
+                    {{-- end --}}
+                    {{-- Package --}}
+                    <div class="col-md-6">
+                        <label for="type_pkg" class="form-label">Type Package</label>
+                        <input type="text" name="type_pkg" id="type_pkg"
+                            class="form-control @error('type_pkg') is-invalid @enderror" value="{{ old('type_pkg') }}"
+                            required>
+                        @error('type_pkg')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="qty" class="form-label">Qty Package</label>
+                        <input type="number" name="qty" id="qty"
+                            class="form-control @error('qty') is-invalid @enderror" value="{{ old('qty') }}" required>
+                        @error('qty')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-12">
+                        <button class="btn btn-primary" type="submit">Simpan Part</button>
+                        <a href="{{ route('parts.index') }}" class="btn btn-secondary">Kembali</a>
                     </div>
                 </form>
-
             </div>
         </div>
     </section>
-
-    {{-- js hidden+show PW --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const idCardInput = document.getElementById('ID-card');
-            const passwordInput = document.getElementById('yourPassword');
+            $('#id_plan').on('change', function() {
+                const plantId = $(this).val();
+                $('#id_area').html('<option value="">Loading...</option>');
+                $('#id_rak').html('<option value="">Pilih Rak</option>');
 
-            idCardInput.addEventListener('input', function() {
-                passwordInput.value = idCardInput.value;
+                if (plantId) {
+                    fetch(`/get-areas/${plantId}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            let options = '<option value="">Pilih Area</option>';
+                            data.forEach(area => {
+                                options +=
+                                    `<option value="${area.id}">${area.nama_area}</option>`;
+                            });
+                            $('#id_area').html(options);
+                        });
+                }
             });
 
-            // Toggle Password Visibility
-            document.getElementById('togglePassword').addEventListener('click', function() {
-                const passwordIcon = document.getElementById('togglePasswordIcon');
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    passwordIcon.classList.remove('bi-eye-slash');
-                    passwordIcon.classList.add('bi-eye');
-                } else {
-                    passwordInput.type = 'password';
-                    passwordIcon.classList.remove('bi-eye');
-                    passwordIcon.classList.add('bi-eye-slash');
+            $('#id_area').on('change', function() {
+                const areaId = $(this).val();
+                $('#id_rak').html('<option value="">Loading...</option>');
+
+                if (areaId) {
+                    fetch(`/get-raks/${areaId}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            let options = '<option value="">Pilih Rak</option>';
+                            data.forEach(rak => {
+                                options += `<option value="${rak.id}">${rak.nama_rak}</option>`;
+                            });
+                            $('#id_rak').html(options);
+                        });
                 }
             });
         });
     </script>
-
 
 @endsection

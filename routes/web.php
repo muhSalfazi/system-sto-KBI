@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PartController;
+use App\Http\Controllers\DetailLokasiController;
+use App\Http\Controllers\StoController;
+use App\Http\Controllers\convertExcelToCsv;
 
 
 /*
@@ -36,7 +39,29 @@ Route::post('/parts', [PartController::class, 'store'])->name('parts.store');
 Route::get('/parts/{part}/edit', [PartController::class, 'edit'])->name('parts.edit');
 Route::put('/parts/{part}', [PartController::class, 'update'])->name('parts.update');
 Route::delete('/parts/{part}', [PartController::class, 'destroy'])->name('parts.destroy');
+Route::post('/parts/import', [PartController::class, 'import'])->name('parts.import');
 
+Route::get('/detail-lokasi', [DetailLokasiController::class, 'index'])->name('detail-lokasi.index');
+Route::get('/create', [DetailLokasiController::class, 'create'])->name('create.detail-lokasi');
+Route::post('/detail-lokasi-post', [DetailLokasiController::class, 'store'])->name('detail-lokasi.store');
+Route::get('/{rak}/edit', [DetailLokasiController::class, 'edit'])->name('edit.detail-lokasi');
+Route::put('/{rak}', [DetailLokasiController::class, 'update'])->name('update.detail-lokasi');
+Route::delete('/{rak}', [DetailLokasiController::class, 'destroy'])->name('destroy.detail-lokasi');
+
+// sto
+Route::get('/sto', [StoController::class, 'index'])->name('sto.index');
+Route::get('/sto/create', [StoController::class, 'create'])->name('sto.create.get');
+Route::post('/sto/store', [StoController::class, 'store'])->name('sto.store');
+Route::get('/sto/edit/{id}', [StoController::class, 'edit'])->name('sto.edit');
+Route::put('/sto/update/{id}', [StoController::class, 'update'])->name('sto.update');
+
+
+// select part area
+Route::get('/get-areas/{plantId}', [PartController::class, 'getAreas']);
+Route::get('/get-raks/{areaId}', [PartController::class, 'getRaks']);
+
+// convert excel to csv
+Route::post('/convert', [convertExcelToCsv::class, 'convert'])->name('convert.excel');
 
 
 

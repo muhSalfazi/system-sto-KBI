@@ -40,6 +40,15 @@
                             <a href="{{ route('parts.create') }}" class="btn btn-primary btn-sm">
                                 <i class="bi bi-plus-square"></i> Tambah Part
                             </a>
+                            <button type="button" class="btn btn-success btn-sm "
+                                    data-bs-toggle="modal"data-bs-target="#importModal">
+                                    <i class="bi bi-file-earmark-excel"></i> Import Csv
+                            </button>
+                                <button type="button" class="btn btn-info btn-sm "
+                                data-bs-toggle="modal"data-bs-target="#exceltocsv">
+                                <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
+                            </button>
+
                         </div>
 
                         <div class="table-responsive animate__animated animate__fadeInUp">
@@ -63,21 +72,21 @@
                                     @foreach ($parts as $part)
                                         <tr>
                                             <td class="text-center">{{ $loop->iteration }}</td>
-                                            <td class="text-center">{{ $part->inv_id }}</td>
-                                            <td class="text-center">{{ $part->part_name }}</td>
-                                            <td class="text-center">{{ $part->part_number }}</td>
+                                            <td class="text-center">{{ $part->Inv_id }}</td>
+                                            <td class="text-center">{{ $part->Part_name }}</td>
+                                            <td class="text-center">{{ $part->Part_number }}</td>
                                             <td class="text-center">{{ $part->customer->username ?? '-' }}</td>
                                             <td class="text-center">{{ $part->package->type_pkg ?? '-' }}</td>
                                             <td class="text-center">{{ $part->package->qty ?? '-' }}</td>
                                             <td class="text-center">{{ $part->plant->name ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->area->label ?? '-' }}</td>
+                                            <td class="text-center">{{ $part->area->nama_area ?? '-' }}</td>
                                             <td class="text-center">{{ $part->rak->nama_rak ?? '-' }}</td>
                                             <td class="text-center">
-                                                <a href="{{ route('parts.edit', $part->id) }}" class="btn btn-success btn-sm">
+                                                <a href="{{ route('parts.edit', $part->id) }}" class="btn btn-success btn-sm" style="font-size: 0.875rem; padding: 4px 8px;">
                                                     <i class="bi bi-pencil-square"></i> Edit
                                                 </a>
                                                 <form action="{{ route('parts.destroy', $part->id) }}" method="POST"
-                                                      style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus part ini?')">
+                                                    style="font-size: 0.875rem; padding: 4px 8px;"     onsubmit="return confirm('Yakin ingin menghapus part ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
@@ -95,4 +104,57 @@
             </div>
         </div>
     </section>
+    {{-- modal import excel --}}
+        <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importModalLabel">Import Parts from Excel</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ route('parts.import') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="file" class="form-label">Upload Excel File</label>
+                                <input type="file" name="file" class="form-control" id="file" required
+                                    accept=".csv">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-success">Import</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- end --}}
+        {{-- modal excel to csv --}}
+    <div class="modal fade" id="exceltocsv" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importModalLabel">Convert Excel To Csv </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('convert.excel') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Upload Excel File</label>
+                            <input type="file" name="file" class="form-control" id="file" required
+                                accept=".xls,.xlsx">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success">Import</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- end --}}
+
 @endsection

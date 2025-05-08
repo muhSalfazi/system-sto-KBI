@@ -12,12 +12,12 @@ class Area extends Model
     protected $table = 'tbl_area';
     protected $fillable = [
         'id',
-        'id_plant',
+        'id_plan',
         'nama_area',
     ];
     public function plant()
     {
-        return $this->belongsTo(Plant::class, 'id_plant');
+        return $this->belongsTo(Plant::class, 'id_plan');
     }
     public function raks()
     {

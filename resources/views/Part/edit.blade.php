@@ -1,132 +1,140 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Data User')
+@section('title', 'Edit Part')
 
 @section('content')
     <div class="pagetitle">
-        <h1>Edit User</h1>
+        <h1>Edit Part</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Data User</a></li>
-                <li class="breadcrumb-item active">Edit User</li>
+                <li class="breadcrumb-item"><a href="{{ route('parts.index') }}">Data Part</a></li>
+                <li class="breadcrumb-item active">Edit Part</li>
             </ol>
         </nav>
-    </div><!-- End Page Title -->
-
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+    </div>
 
     <section class="section">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Edit User</h5>
-                <form class="row g-3 needs-validation" novalidate method="POST"
-                    action="{{ route('users.update', $user->id) }}">
+                <h5 class="card-title">Form Edit Part</h5>
+                <form method="POST" action="{{ route('parts.update', $part->id) }}" class="row g-3 needs-validation"
+                    novalidate>
                     @csrf
                     @method('PUT')
-
-                    <div class="col-md-4">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" name="username" id="username"
-                            class="form-control @error('username') is-invalid @enderror"
-                            value="{{ old('username', $user->username) }}" placeholder="Silahkan inputkan username">
-                        @error('username')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="first_name" class="form-label">First Name</label>
-                        <input type="text" name="first_name" id="first_name"
-                            class="form-control @error('first_name') is-invalid @enderror"
-                            value="{{ old('first_name', $user->first_name) }}" placeholder="Input nama depan">
-                        @error('first_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="last_name" class="form-label">Last Name</label>
-                        <input type="text" name="last_name" id="last_name"
-                            class="form-control @error('last_name') is-invalid @enderror"
-                            value="{{ old('last_name', $user->last_name) }}" placeholder="Input nama belakang">
-                        @error('last_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="col-md-6">
+                        <label for="Inv_id" class="form-label">Inventory ID</label>
+                        <input type="text" name="Inv_id" id="Inv_id" class="form-control"
+                            value="{{ old('Inv_id', $part->Inv_id) }}" disabled>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="ID-card" class="form-label">ID Card</label>
-                        <input type="text" name="ID-card" id="ID-card"
-                            class="form-control @error('ID-card') is-invalid @enderror"
-                            value="{{ old('ID-card', $user->nik) }}" placeholder="Silahkan inputkan ID-card">
-                        @error('ID-card')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <label for="Part_name" class="form-label">Part Name</label>
+                        <input type="text" name="Part_name" id="part_name" class="form-control"
+                            value="{{ old('Part_name', $part->Part_name) }}" disabled>
                     </div>
 
                     <div class="col-md-6">
-                        <label for="yourPassword" class="form-label">Password</label>
-                        <small class="text-muted">*Biarkan kosong jika tidak ingin mengganti</small>
-                        <div class="input-group has-validation">
-                            <input type="password" name="password"
-                                class="form-control @error('password') is-invalid @enderror" id="yourPassword">
-                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
-                                <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
-                            </button>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                        <label for="Part_number" class="form-label">Part Number</label>
+                        <input type="text" name="Part_number" id="part_number" class="form-control"
+                            value="{{ old('Part_number', $part->Part_number) }}" disabled>
                     </div>
 
-                    <div class="col-6">
-                        <button class="btn btn-primary" type="submit">Update User</button>
+                    <div class="col-md-6">
+                        <label for="id_customer" class="form-label">Customer</label>
+                        <select name="id_customer" id="id_customer" class="form-select" required>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}"
+                                    {{ $part->id_customer == $customer->id ? 'selected' : '' }}>{{ $customer->username }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="id_plan" class="form-label">Plant</label>
+                        <select name="id_plan" id="id_plan" class="form-select" required>
+                            <option value="">Pilih Plant</option>
+                            @foreach ($plants as $plant)
+                                <option value="{{ $plant->id }}" {{ $part->id_plan == $plant->id ? 'selected' : '' }}>
+                                    {{ $plant->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="id_area" class="form-label">Area</label>
+                        <select name="id_area" id="id_area" class="form-select" required>
+                            <option value="{{ $part->id_area }}">{{ $part->area->nama_area ?? '-' }}</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="id_rak" class="form-label">Rak</label>
+                        <select name="id_rak" id="id_rak" class="form-select" required>
+                            <option value="{{ $part->id_rak }}">{{ $part->rak->nama_rak ?? '-' }}</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="type_pkg" class="form-label">Type Package</label>
+                        <input type="text" name="type_pkg" id="type_pkg" class="form-control"
+                            value="{{ old('type_pkg', $part->package->type_pkg ?? '') }}" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="qty" class="form-label">Qty Package</label>
+                        <input type="number" name="qty" id="qty" class="form-control"
+                            value="{{ old('qty', $part->package->qty ?? '') }}" required>
+                    </div>
+
+                    <div class="col-12">
+                        <button class="btn btn-primary" type="submit">Update Part</button>
+                        <a href="{{ route('parts.index') }}" class="btn btn-secondary">Kembali</a>
                     </div>
                 </form>
-
             </div>
         </div>
     </section>
 
-    {{-- js hidden+show PW --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const idCardInput = document.querySelector('input[name="ID-card"]');
-            const passwordInput = document.getElementById('yourPassword');
+            const planSelect = document.getElementById('id_plan');
+            const areaSelect = document.getElementById('id_area');
+            const rakSelect = document.getElementById('id_rak');
 
-            idCardInput.addEventListener('input', function() {
-                passwordInput.value = idCardInput.value;
+            planSelect.addEventListener('change', function() {
+                const plantId = this.value;
+                areaSelect.innerHTML = '<option value="">Loading...</option>';
+                rakSelect.innerHTML = '<option value="">Pilih Rak</option>';
+
+                if (plantId) {
+                    fetch(`/get-areas/${plantId}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            let options = '<option value="">Pilih Area</option>';
+                            data.forEach(area => {
+                                options +=
+                                    `<option value="${area.id}">${area.nama_area}</option>`;
+                            });
+                            areaSelect.innerHTML = options;
+                        });
+                }
             });
 
-            // Toggle Password Visibility
-            document.getElementById('togglePassword').addEventListener('click', function() {
-                const passwordInput = document.getElementById('yourPassword');
-                const passwordIcon = document.getElementById('togglePasswordIcon');
+            areaSelect.addEventListener('change', function() {
+                const areaId = this.value;
+                rakSelect.innerHTML = '<option value="">Loading...</option>';
 
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    passwordIcon.classList.remove('bi-eye-slash');
-                    passwordIcon.classList.add('bi-eye');
-                } else {
-                    passwordInput.type = 'password';
-                    passwordIcon.classList.remove('bi-eye');
-                    passwordIcon.classList.add('bi-eye-slash');
+                if (areaId) {
+                    fetch(`/get-raks/${areaId}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            let options = '<option value="">Pilih Rak</option>';
+                            data.forEach(rak => {
+                                options += `<option value="${rak.id}">${rak.nama_rak}</option>`;
+                            });
+                            rakSelect.innerHTML = options;
+                        });
                 }
             });
         });

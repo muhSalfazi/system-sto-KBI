@@ -19,6 +19,7 @@ return new class extends Migration
             // index
             $table->index(['id_plan'], 'idx_plan');
             $table->foreign('id_plan')->references('id')->on('tbl_plan')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
