@@ -9,7 +9,7 @@ class PlanSeeder extends Seeder
 {
     public function run()
     {
-        $plans = ['Plan 1', 'Plan 2'];
+        $plans = ['KBI 1', 'KBI 2'];
 
         foreach ($plans as $plan) {
             DB::table('tbl_plan')->updateOrInsert(['name' => $plan]);

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CategorySeeder extends Seeder
 {
@@ -18,7 +19,13 @@ class CategorySeeder extends Seeder
         ];
 
         foreach ($categories as $category) {
-            DB::table('tbl_category')->updateOrInsert(['name' => $category]);
+            DB::table('tbl_category')->updateOrInsert(
+                ['name' => $category],
+                [
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]
+            );
         }
     }
 }

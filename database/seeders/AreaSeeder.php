@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class AreaSeeder extends Seeder
 {
@@ -113,7 +114,12 @@ class AreaSeeder extends Seeder
         foreach ($areaList as $area) {
             $planId = DB::table('tbl_plan')->where('name', $area['plan'])->value('id');
             DB::table('tbl_area')->updateOrInsert(
-                ['nama_area' => $area['label'], 'id_plan' => $planId]
+                ['nama_area' => $area['label'], 'id_plan' => $planId],
+                [
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]
+
             );
         }
     }

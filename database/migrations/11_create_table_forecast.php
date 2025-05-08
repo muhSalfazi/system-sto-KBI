@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_inventory');
             $table->integer('hari_kerja');
-            $table->integer('min');
-            $table->integer('max');
+            $table->integer('min')->default(0);
+            $table->integer('max')->default(0);
 
             // index
             $table->index('id_inventory');

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tbl_package', function (Blueprint $table) {
             $table->id();
             $table->string('type_pkg')->nullable();
-            $table->integer('qty')->nullable();
+            $table->integer('qty')->default(0);
             $table->unsignedBigInteger('id_part')->nullable();
             // index
             $table->index('id_part');

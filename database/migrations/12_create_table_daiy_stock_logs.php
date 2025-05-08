@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_inventory');
             $table->unsignedBigInteger('prepared_by');
             $table->string('status')->nullable();
-            $table->integer('qty');
+            $table->integer('qty')->default(0);
             $table->string('type');
             $table->string('inventory_type');
 

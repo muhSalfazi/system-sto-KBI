@@ -10,6 +10,7 @@ use App\Models\Rak;
 use App\Imports\PartsImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PartController extends Controller
 {
@@ -114,15 +115,25 @@ class PartController extends Controller
 
     // excel
     public function import(Request $request)
-{
-    $request->validate([
-       'file' => 'required|mimes:csv,txt,text/plain,text/csv'
-    ]);
-    Excel::import(new PartsImport, $request->file('file'));
+    {
+        $request->validate([
+           'file' => 'required|mimes:csv,txt,text/plain,text/csv'
+        ]);
 
+        try {
+            // Menjalankan import Excel
+            Excel::import(new PartsImport, $request->file('file'));
 
-    return redirect()->route('parts.index')->with('success', 'Import Berhasil.');
-}
+            // Menampilkan pesan sukses jika berhasil
+            return redirect()->route('parts.index')->with('success', 'Import Berhasil.');
+        } catch (\Exception $e) {
+            // Menangkap error jika ada masalah
+            Log::error('Import gagal: ' . $e->getMessage(), ['exception' => $e]);
+
+            // Mengirimkan pesan error ke user
+            return redirect()->route('parts.index')->with('error', 'Terjadi kesalahan saat melakukan import. Silakan coba lagi.');
+        }
+    }
 
 }
 

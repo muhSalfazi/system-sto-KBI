@@ -15,6 +15,7 @@ class Area extends Model
         'id_plan',
         'nama_area',
     ];
+    
     public function plant()
     {
         return $this->belongsTo(Plant::class, 'id_plan');

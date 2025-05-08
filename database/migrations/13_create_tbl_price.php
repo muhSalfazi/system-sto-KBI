@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tbl_price', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_inventory');
-            $table->integer('price');
+            $table->integer('price')->default(0);
             $table ->date('date_start');
             $table ->date('date_end');
 

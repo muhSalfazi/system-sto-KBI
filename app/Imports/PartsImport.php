@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Imports;
 
 use App\Models\Part;
@@ -25,16 +24,42 @@ class PartsImport implements ToCollection, WithHeadingRow
             Log::info('Row data:', $row->toArray());
 
             // Ambil data relasi berdasarkan NAMA
-            $customer = Customer::where('username', $row['customer'])->first();
-            $plant    = Plant::where('name', $row['plan'])->first();
-            $area     = Area::where('nama_area', $row['area'])
-                            ->where('id_plan', $plant?->id)
-                            ->first();
-            $rak      = Rak::where('nama_rak', $row['rak'])
-                           ->where('id_area', $area?->id)
-                           ->first();
+            if (isset($row['customer'])) {
+                $customer = Customer::where('username', $row['customer'])->first();
+            } else {
+                Log::warning('Kolom customer tidak ditemukan', ['row' => $row->toArray()]);
+            }
+            // plan
+            if (isset($row['plan'])) {
+                $plant = Plant::where('name', $row['plan'])->first();
+            } else {
+                Log::warning('Kolom Plan tidak ditemukan', ['row' => $row->toArray()]);
+            }
 
-            // Jika semua relasi ditemukan, simpan ke DB
+            if (isset($row['area'])) {
+                $area = Area::where('nama_area', $row['area'])->first();
+            } else {
+                Log::warning('Kolom Area tidak ditemukan', ['row' => $row->toArray()]);
+            }
+
+            if (isset($row['rak'])) {
+                $rak = Rak::where('nama_rak', $row['rak'])->first();
+            } else {
+                Log::warning('Kolom Rak tidak ditemukan', ['row' => $row->toArray()]);
+            }
+
+            // Cek apakah data sudah ada di database untuk menghindari duplikat
+            $existingPart = Part::where('inv_id', $row['inv_id'])
+                ->where('part_name', $row['part_name'])
+                ->where('part_number', $row['part_number'])
+                ->first();
+
+            if ($existingPart) {
+                Log::warning('Data duplikat ditemukan, melewatkan baris ini', ['row' => $row->toArray()]);
+                continue; // Melewati baris ini jika data sudah ada
+            }
+
+            // Jika semua relasi ditemukan dan tidak ada duplikat, simpan ke DB
             if ($customer && $plant && $area && $rak) {
                 $part = Part::create([
                     'inv_id'       => $row['inv_id'],
