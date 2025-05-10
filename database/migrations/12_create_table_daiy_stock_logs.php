@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbl_daiy_stock_logs', function (Blueprint $table) {
+        Schema::create('tbl_daily_stock_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_inventory');
             $table->unsignedBigInteger('prepared_by');
-            $table->string('status')->nullable();
-            $table->integer('qty')->default(0);
-            $table->string('type');
-            $table->string('inventory_type');
+            $table->integer('Total_qty')->default(0);
 
             // index
             $table->index('id_inventory');
@@ -35,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbl_daiy_stock_logs');
+        Schema::dropIfExists('tbl_daily_stock_logs');
     }
 };

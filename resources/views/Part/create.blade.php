@@ -20,30 +20,30 @@
                 <form method="POST" action="{{ route('parts.store') }}" class="row g-3 needs-validation" novalidate>
                     @csrf
                     <div class="col-md-6">
-                        <label for="inv_id" class="form-label">Inventory ID</label>
-                        <input type="text" name="inv_id" id="inv_id"
-                            class="form-control @error('inv_id') is-invalid @enderror" value="{{ old('inv_id') }}" required>
-                        @error('inv_id')
+                        <label for="Inv_id" class="form-label">Inventory ID</label>
+                        <input type="text" name="Inv_id" id="inv_id"
+                            class="form-control @error('Inv_id') is-invalid @enderror" value="{{ old('Inv_id') }}" required>
+                        @error('Inv_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6">
-                        <label for="part_name" class="form-label">Part Name</label>
-                        <input type="text" name="part_name" id="part_name"
-                            class="form-control @error('part_name') is-invalid @enderror" value="{{ old('part_name') }}"
+                        <label for="Part_name" class="form-label">Part Name</label>
+                        <input type="text" name="Part_name" id="Part_name"
+                            class="form-control @error('Part_name') is-invalid @enderror" value="{{ old('Part_name') }}"
                             required>
-                        @error('part_name')
+                        @error('Part_name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-md-6">
-                        <label for="part_number" class="form-label">Part Number</label>
-                        <input type="text" name="part_number" id="part_number"
-                            class="form-control @error('part_number') is-invalid @enderror" value="{{ old('part_number') }}"
+                        <label for="Part_number" class="form-label">Part Number</label>
+                        <input type="text" name="Part_number" id="Part_number"
+                            class="form-control @error('Part_number') is-invalid @enderror" value="{{ old('Part_number') }}"
                             required>
-                        @error('part_number')
+                        @error('Part_number')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -70,6 +70,7 @@
                                 <option value="{{ $plant->id }}">{{ $plant->name }}</option>
                             @endforeach
                         </select>
+                        <small class="text-danger">*Pilih Plant sebelum Area dan Rak</small>
                     </div>
 
                     <div class="col-md-4">
@@ -98,7 +99,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label for="qty" class="form-label">Qty Package</label>
+                        <label for="qty" class="form-label">Qty/Kanban</label>
                         <input type="number" name="qty" id="qty"
                             class="form-control @error('qty') is-invalid @enderror" value="{{ old('qty') }}" required>
                         @error('qty')

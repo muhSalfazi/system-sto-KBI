@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +15,9 @@ class Inventory extends Model
         'id_category',
         'plan_stock',
         'status',
+        'act_stock'
     ];
+
 
     // Relasi ke Part
     public function part()

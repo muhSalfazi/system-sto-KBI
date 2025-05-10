@@ -13,10 +13,7 @@ class DailyStockLog extends Model
     protected $fillable = [
         'id_inventory',
         'prepared_by',
-        'status',
-        'qty',
-        'type',
-        'inventory_type',
+        'Total_qty',
         'created_at',
         'updated_at',
     ];

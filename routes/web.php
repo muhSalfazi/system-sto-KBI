@@ -7,6 +7,7 @@ use App\Http\Controllers\PartController;
 use App\Http\Controllers\DetailLokasiController;
 use App\Http\Controllers\StoController;
 use App\Http\Controllers\convertExcelToCsv;
+use App\Http\Controllers\DailyStockLogController;
 
 
 /*
@@ -23,7 +24,7 @@ Route::get('/', [AuthController::class, 'showAdmin'])->name('admin.login');
 Route::post('admin/login', [AuthController::class, 'login'])->name('admin.login.post');
 Route::post('admin/logout', [AuthController::class, 'logout'])->name('logout');
 
-
+// user management
 Route::get('admin/user', [UserController::class, 'index'])->name('users.index');
 Route::get('admin/user/create', [UserController::class, 'create'])->name('users.create');
 Route::post('admin/user/store', [UserController::class, 'store'])->name('users.store');
@@ -54,7 +55,14 @@ Route::get('/sto/create', [StoController::class, 'create'])->name('sto.create.ge
 Route::post('/sto/store', [StoController::class, 'store'])->name('sto.store');
 Route::get('/sto/edit/{id}', [StoController::class, 'edit'])->name('sto.edit');
 Route::put('/sto/update/{id}', [StoController::class, 'update'])->name('sto.update');
+Route::delete('/sto/destroy/{id}', [StoController::class, 'destroy'])->name('sto.destroy');Route::delete('/sto/destroy/{id}', [StoController::class, 'destroy'])->name('sto.destroy');
+Route::post('/sto/import', [StoController::class, 'import'])->name('sto.import');
+Route::get('/sto/export', [StoController::class, 'export'])->name('sto.export');
 
+// daily stock log
+Route::get('/daily-stock', [DailyStockLogController::class, 'index'])->name('daily-stock.index');
+// Route to handle the CSV import
+Route::post('/daily-stock/import', [DailyStockLogController::class, 'import'])->name('daily-stock.import.process');
 
 // select part area
 Route::get('/get-areas/{plantId}', [PartController::class, 'getAreas']);

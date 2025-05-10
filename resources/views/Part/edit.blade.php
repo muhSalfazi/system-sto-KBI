@@ -59,6 +59,7 @@
                                     {{ $plant->name }}</option>
                             @endforeach
                         </select>
+                        <small class="text-danger">*Pilih Plant sebelum Area dan Rak</small>
                     </div>
 
                     <div class="col-md-4">

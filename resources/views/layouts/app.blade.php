@@ -29,142 +29,12 @@
 
     <!-- Template Main CSS File -->
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/font-awesome/css/all.min.css') }}" rel="stylesheet">
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<style>
-    /* Header tetap di atas */
-
-    /* Custom untuk layar besar */
-    @media (min-width: 1920px) {
-        .swal2-popup {
-            font-size: 1.5rem !important;
-            /* Perbesar font untuk layar besar */
-        }
-
-        .swal2-title {
-            font-size: 2rem !important;
-            /* Perbesar judul */
-        }
-
-        .swal2-content {
-            font-size: 1.5rem !important;
-            /* Perbesar konten */
-        }
-
-        .swal2-confirm {
-            font-size: 1.25rem !important;
-            /* Perbesar tombol */
-        }
-    }
-
-    /* Responsif untuk layar kecil */
-    @media (max-width: 768px) {
-        .swal2-popup {
-            font-size: 0.875rem !important;
-        }
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-        margin-top: 15px;
-        border-radius: 4px;
-    }
-
-    /* Tabel styling untuk tampilan yang lebih profesional */
-    .table {
-        border-collapse: collapse;
-        width: 100%;
-        font-size: 0.775rem;
-        /* Ukuran font lebih kecil */
-        border: 1px solid #dee2e6;
-        /* Border tabel lebih halus */
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        /* Bayangan tabel */
-    }
-
-    .table th,
-    .table td {
-        vertical-align: middle;
-        padding: 7px;
-        /* Padding dikurangi untuk tampilan lebih ringkas */
-        text-align: center;
-        border: 1px solid #dee2e6;
-        transition: all 0.3s ease;
-    }
-
-    .table th {
-        background-color: #343a40;
-        /* Warna latar belakang header yang lebih profesional */
-        color: #ffffff;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.02em;
-        font-size: 0.7rem;
-    }
-
-    .table td {
-        background-color: #f8f9fa;
-        /* Latar belakang sel yang lebih lembut */
-        color: #212529;
-    }
-
-    /* Efek hover pada baris tabel */
-    .table tbody tr:hover {
-        background-color: #007bff;
-        color: #ffffff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Tabel bergaris (striped) untuk memudahkan pembacaan */
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #e9ecef;
-    }
-
-    .table-striped tbody tr:nth-of-type(even) {
-        background-color: #ffffff;
-    }
-
-
-    /* Responsif untuk layar kecil */
-    @media (max-width: 768px) {
-        .table td {
-            font-size: 0.75rem;
-            /* Ukuran font lebih kecil untuk layar kecil */
-        }
-
-        .table th {
-            font-size: 0.65rem;
-        }
-
-        .table th,
-        .table td {
-            padding: 8px;
-        }
-    }
-
-    /* Responsif untuk layar besar */
-    @media (min-width: 1920px) {
-        .table {
-            font-size: 1rem;
-        }
-
-        .table th,
-        .table td {
-            padding: 9px;
-        }
-    }
-
-    /* Efek animasi hover */
-    .table-hover tbody tr:hover {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-</style>
 <!-- JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <!-- CSS Select2 -->
@@ -189,6 +59,32 @@
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
 
+    {{-- modal excel to csv --}}
+     <div class="modal fade" id="exceltocsv" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importModalLabel">Convert Excel To Csv </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ route('convert.excel') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Upload Excel File</label>
+                            <input type="file" name="file" class="form-control" id="file" required
+                                accept=".xls,.xlsx">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success">Import</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- end --}}
 
     <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- Template Main JS File -->

@@ -9,7 +9,7 @@ class Part extends Model
     use HasFactory;
 
     protected $table = 'tbl_part';
-    protected $fillable = ['inv_id', 'part_name', 'part_number', 'id_customer', 'id_pkg', 'id_plan', 'id_area', 'id_rak'];
+    protected $fillable = ['Inv_id', 'Part_name', 'Part_number', 'id_customer', 'id_pkg', 'id_plan', 'id_area', 'id_rak'];
 
     public function customer()
     {

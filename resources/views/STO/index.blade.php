@@ -30,6 +30,20 @@
         </div>
     @endif
 
+    @if (session('import_logs'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <ul>
+                <strong>Detail Import:</strong>
+                <ul>
+                    @foreach (session('import_logs') as $log)
+                        <li>{{ $log }}</li>
+                    @endforeach
+                </ul>
+            </ul>
+        </div>
+    @endif
+
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
@@ -37,14 +51,39 @@
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daftar STO</h5>
                         <div class="mb-3">
-                            <a href="{{ route('sto.create.get') }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route('sto.create.get') }}" class="btn btn-primary btn-sm mb-1">
                                 <i class="bi bi-plus-square"></i> Tambah STO
                             </a>
-                            <button type="button" class="btn btn-success btn-sm "
+                            <button type="button" class="btn btn-success btn-sm mb-1"
                                 data-bs-toggle="modal"data-bs-target="#importModal">
-                                <i class="bi bi-file-earmark-excel"></i> Import Csv
+                                <i class="bi bi-filetype-csv"></i></i> Import Csv
+                            </button>
+                            {{-- convert STO --}}
+                            <button type="button" class="btn btn-info btn-sm "
+                                data-bs-toggle="modal"data-bs-target="#exceltocsv">
+                                <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
+                            </button>
+                            {{-- export excel --}}
+                            <button type="button" class="btn btn-warning btn-sm" onclick="window.location='{{ route('sto.export', ['category_id' => request('category_id')]) }}'">
+                                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
                             </button>
 
+                        </div>
+
+                        <div class="mb-3">
+                            <!-- Filter Kategori -->
+                            <form action="{{ route('sto.index') }}" method="GET" class="d-flex">
+                                <select name="category_id" id="category_id" class="form-select form-select-sm" style="width: 200px;">
+                                    <option value="">-- Pilih Kategori --</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}"
+                                            {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-sm ms-2">Filter</button>
+                            </form>
                         </div>
 
                         <div class="table-responsive animate__animated animate__fadeInUp">
@@ -57,7 +96,10 @@
                                         <th class="text-center">Part Name</th>
                                         <th class="text-center">Part No</th>
                                         <th class="text-center">Plan Stok</th>
+                                        <th class="text-center">Act Stok</th>
+                                        <th class="text-center">Kategori</th>
                                         <th class="text-center">Status</th>
+                                        <th class="text-center">STO Priode</th>
                                         <th class="text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -72,16 +114,20 @@
                                             <td class="text-center">{{ $part->part->Part_name ?? '-' }}</td>
                                             <td class="text-center">{{ $part->part->Part_number ?? '-' }}</td>
                                             <td class="text-center">{{ $part->plan_stock ?? '-' }}</td>
+                                            <td class="text-center">{{ $part->act_stock ?? '-' }}</td>
+                                            <td class="text-center">{{ $part->Category->name ?? '-' }}</td>
                                             <td class="text-center">{{ $part->status ?? '-' }}</td>
                                             <td class="text-center">
-                                                <a href="{{ route('sto.edit', $part->id) }}"
-                                                    class="btn btn-success btn-sm"
+                                                {{ $part->updated_at ? $part->updated_at->format('M Y') : '-' }}
+                                            </td>
+                                            <td class="text-center">
+                                                <a href="{{ route('sto.edit', $part->id) }}" class="btn btn-success btn-sm"
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
                                                     <i class="bi bi-pencil-square"></i> Edit
                                                 </a>
-                                                <form action="{{ route('parts.destroy', $part->id) }}" method="POST"
+                                                <form action="{{ route('sto.destroy', $part->id) }}" method="POST"
                                                     style="font-size: 0.875rem; padding: 4px 8px;"
-                                                    onsubmit="return confirm('Yakin ingin menghapus part ini?')">
+                                                    onsubmit="return confirm('Yakin ingin menghapus STO ini?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
@@ -104,16 +150,16 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="importModalLabel">Import Parts from Excel</h5>
+                    <h5 class="modal-title" id="importModalLabel">Import List Sto from Csv</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('parts.import') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('sto.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
-                            <label for="file" class="form-label">Upload Excel File</label>
+                            <label for="file" class="form-label">Upload Csv File</label>
                             <input type="file" name="file" class="form-control" id="file" required
-                                accept=".xls,.xlsx">
+                            accept=".csv">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

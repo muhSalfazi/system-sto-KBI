@@ -11,6 +11,7 @@ class DetailLokasiController extends Controller
 {
     public function index()
     {
+        // $raks = Rak::with('area.plant')->get();
         $raks = Rak::with('area.plant')->get();
         return view('Detail_Lokasi.index', compact('raks'));
     }

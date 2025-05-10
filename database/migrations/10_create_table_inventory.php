@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('id_part');
             $table->unsignedBigInteger('id_category');
             $table->integer('plan_stock')->default(0);
-            $table->enum('status', ['OK', 'NG']);
+            $table->integer('act_stock')->default(0);
+            $table->enum('status', ['OK', 'NG','VIRGIN','FUNSAI']);
 
             // index
             $table->index('id_part');

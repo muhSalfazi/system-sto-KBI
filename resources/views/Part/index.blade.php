@@ -30,21 +30,34 @@
         </div>
     @endif
 
+    @if(session('import_logs'))
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <strong>Detail Import:</strong>
+        <ul>
+            @foreach(session('import_logs') as $log)
+                <li>{{ $log }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daftar Part</h5>
-                        <div class="mb-3">
-                            <a href="{{ route('parts.create') }}" class="btn btn-primary btn-sm">
+                        <div class="mb-2">
+                            <a href="{{ route('parts.create') }}" class="btn btn-primary btn-sm  mb-1">
                                 <i class="bi bi-plus-square"></i> Tambah Part
                             </a>
-                            <button type="button" class="btn btn-success btn-sm "
+                            <button type="button" class="btn btn-success btn-sm  mb-1"
                                     data-bs-toggle="modal"data-bs-target="#importModal">
-                                    <i class="bi bi-file-earmark-excel"></i> Import Csv
+                                    <i class="bi bi-filetype-csv"></i> Import Csv
                             </button>
-                                <button type="button" class="btn btn-info btn-sm "
+                                <button type="button" class="btn btn-info btn-sm"
                                 data-bs-toggle="modal"data-bs-target="#exceltocsv">
                                 <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
                             </button>
@@ -61,7 +74,7 @@
                                         <th class="text-center">Part Number</th>
                                         <th class="text-center">Customer</th>
                                         <th class="text-center">Type Package</th>
-                                        <th class="text-center">Qty Package</th>
+                                        <th class="text-center">Qty/Box</th>
                                         <th class="text-center">Plant</th>
                                         <th class="text-center">Area</th>
                                         <th class="text-center">Rak</th>
@@ -104,19 +117,19 @@
             </div>
         </div>
     </section>
-    {{-- modal import excel --}}
+        {{-- modal import Csv --}}
         <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="importModalLabel">Import Parts from Excel</h5>
+                        <h5 class="modal-title" id="importModalLabel">Import Parts from Csv</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form action="{{ route('parts.import') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="mb-3">
-                                <label for="file" class="form-label">Upload Excel File</label>
+                                <label for="file" class="form-label">Upload Csv File</label>
                                 <input type="file" name="file" class="form-control" id="file" required
                                     accept=".csv">
                             </div>
@@ -130,31 +143,5 @@
             </div>
         </div>
         {{-- end --}}
-        {{-- modal excel to csv --}}
-    <div class="modal fade" id="exceltocsv" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="importModalLabel">Convert Excel To Csv </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ route('convert.excel') }}" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="file" class="form-label">Upload Excel File</label>
-                            <input type="file" name="file" class="form-control" id="file" required
-                                accept=".xls,.xlsx">
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-success">Import</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    {{-- end --}}
 
 @endsection

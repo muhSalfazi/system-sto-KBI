@@ -13,12 +13,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class PartController extends Controller
-{
-    public function index()
+{public function index(Request $request)
     {
-        $parts = Part::with(['customer', 'package', 'plant', 'area', 'rak'])->get();
+        // Gunakan pagination untuk mengurangi beban memori
+        $parts = Part::with(['customer', 'package', 'plant', 'area', 'rak'])
+                    ->paginate(5);  // Atur jumlah data per halaman sesuai kebutuhan
+
+        // Kembalikan view dengan data yang sudah dipaginasi
         return view('Part.index', compact('parts'));
     }
+
 
     public function create()
     {
@@ -34,9 +38,9 @@ class PartController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'inv_id' => 'required',
-            'part_name' => 'required',
-            'part_number' => 'required',
+            'Inv_id' => 'required',
+            'Part_name' => 'required',
+            'Part_number' => 'required',
             'id_customer' => 'required|exists:tbl_customer,id',
             'id_plan' => 'required|exists:tbl_plan,id',
             'id_area' => 'required|exists:tbl_area,id',
@@ -112,28 +116,27 @@ class PartController extends Controller
         $raks = Rak::where('id_area', $areaId)->get();
         return response()->json($raks);
     }
-
-    // excel
     public function import(Request $request)
     {
         $request->validate([
-           'file' => 'required|mimes:csv,txt,text/plain,text/csv'
+            'file' => 'required|mimes:csv,txt,text/plain,text/csv'
         ]);
 
         try {
-            // Menjalankan import Excel
-            Excel::import(new PartsImport, $request->file('file'));
+            $importer = new PartsImport();
+            Excel::import($importer, $request->file('file'));
 
-            // Menampilkan pesan sukses jika berhasil
+            // Menyimpan log hasil ke session
+            session()->flash('import_logs', $importer->getLogs());
+
             return redirect()->route('parts.index')->with('success', 'Import Berhasil.');
         } catch (\Exception $e) {
-            // Menangkap error jika ada masalah
             Log::error('Import gagal: ' . $e->getMessage(), ['exception' => $e]);
 
-            // Mengirimkan pesan error ke user
             return redirect()->route('parts.index')->with('error', 'Terjadi kesalahan saat melakukan import. Silakan coba lagi.');
         }
     }
+
 
 }
 

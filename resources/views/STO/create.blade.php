@@ -4,11 +4,11 @@
 
 @section('content')
 <div class="pagetitle">
-    <h1>Create Part</h1>
+    <h1>Create STO List</h1>
     <nav>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('parts.index') }}">Data Part</a></li>
-            <li class="breadcrumb-item active">Create STO LIST</li>
+            <li class="breadcrumb-item"><a href="{{ route('sto.index') }}">List Data Sto</a></li>
+            <li class="breadcrumb-item active">Create STO List</li>
         </ol>
     </nav>
 </div>
@@ -48,6 +48,8 @@
                         <select name="status" id="status" class="form-select" required>
                             <option value="OK">OK</option>
                             <option value="NG">NG</option>
+                            <option value="VIRGIN">VIRGIN</option>
+                            <option value="FUNSAI">FUNSAI</option>
                         </select>
                     </div>
 
