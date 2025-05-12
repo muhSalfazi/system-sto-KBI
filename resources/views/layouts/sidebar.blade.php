@@ -1,38 +1,39 @@
 <aside id="sidebar" class="sidebar hiden">
     <ul class="sidebar-nav" id="sidebar-nav">
-        <li class="nav-heading">Inventory List</li>
-
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('sto.index','sto.create.get','sto.edit') ? 'active' : 'collapsed' }}"
-                href="{{ route('sto.index') }}">
-                <i class="bi bi-box-seam-fill"></i>
-                <span>List STO</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('daily-stock.index') ? 'active' : 'collapsed' }}"
-                href="{{ route('daily-stock.index') }}">
-                <i class="bi bi-clipboard"></i>
-
-                <span>Daily Stok</span>
-            </a>
-        </li>
-        <li class="nav-heading">Master Data</li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('parts.index', 'parts.create', 'parts.edit') ? 'active' : 'collapsed' }}"
-                href="{{ route('parts.index') }}">
-                <i class="bi bi-archive"></i>
-                <span>Part</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('detail-lokasi.index', 'create.detail-lokasi', 'edit.detail-lokasi') ? 'active' : 'collapsed' }}"
-                href="{{ route('detail-lokasi.index') }}">
-                <i class="bi bi-pin-map"></i>
-                <span>Detail Lokasi</span>
-            </a>
-        </li>
-
+        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin', 'view']))
+            <li class="nav-heading">Inventory List</li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('sto.index', 'sto.create.get', 'sto.edit') ? 'active' : 'collapsed' }}"
+                    href="{{ route('sto.index') }}">
+                    <i class="bi bi-box-seam-fill"></i>
+                    <span>List STO</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('daily-stock.index') ? 'active' : 'collapsed' }}"
+                    href="{{ route('daily-stock.index') }}">
+                    <i class="bi bi-clipboard"></i>
+                    <span>Daily Stok</span>
+                </a>
+            </li>
+        @endif
+        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
+            <li class="nav-heading">Master Data</li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('parts.index', 'parts.create', 'parts.edit') ? 'active' : 'collapsed' }}"
+                    href="{{ route('parts.index') }}">
+                    <i class="bi bi-archive"></i>
+                    <span>Part</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('detail-lokasi.index', 'create.detail-lokasi', 'edit.detail-lokasi') ? 'active' : 'collapsed' }}"
+                    href="{{ route('detail-lokasi.index') }}">
+                    <i class="bi bi-pin-map"></i>
+                    <span>Detail Lokasi</span>
+                </a>
+            </li>
+        @endif
 
         @if (Auth::user()->role->name == 'SuperAdmin')
             <li class="nav-heading">User Management</li>
@@ -83,4 +84,3 @@
         });
     }
 </script>
-

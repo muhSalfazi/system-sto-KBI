@@ -27,6 +27,7 @@
 
     <!-- Template Main CSS File -->
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/custom-auth.css') }}" rel="stylesheet">
 
     <!-- SweetAlert CSS -->
     <script src="{{ asset('assets/js/sweetalert2.min.js') }}"></script>
@@ -43,12 +44,13 @@
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
-                            <div class="d-flex justify-content-center py-4">
-                                <div class="logo d-flex align-items-center w-auto">
-                                    <img src="{{ asset('assets/img/kyoraku-baru.png') }}" type="image/png">
-                                </div>
-                            </div><!-- End Logo -->
+                           <div class="logo-wrapper text-center py-3">
+                            <img src="{{ asset('assets/img/kyoraku-baru.png') }}" alt="Logo Kyoraku" class="logo-auth">
+                        </div>
+                        <!-- End Logo -->
 
+                            {{-- <div class="logo d-flex align-items-center w-auto">
+                            </div> --}}
                             <div class="card mb-3">
 
                                 <div class="card-body">
