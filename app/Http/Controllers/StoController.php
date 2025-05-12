@@ -100,16 +100,25 @@ class StoController extends Controller
             'file' => 'required|file|mimes:csv,txt'
         ]);
 
-        // Jalankan import dan tampung log hasil
-        $importer = new StoImport();
-        Excel::import($importer, $request->file('file'));
+        try {
+            $importer = new StoImport();
+            Excel::import($importer, $request->file('file'));
 
-        // Simpan log ke session agar bisa ditampilkan di Blade
-        Session::flash('import_logs', $importer->getLogs());
+            $logs = $importer->getLogs();
 
-        return redirect()->route('sto.index')->with('success', 'Import Berhasil.');
+            if (count($logs) > 0) {
+                Session::flash('import_logs', $logs);
+            }
+
+            return redirect()->route('sto.index')->with('success', 'Import selesai. Periksa log untuk detailnya.');
+        } catch (\Exception $e) {
+            \Log::error('Import stok gagal', ['error' => $e->getMessage()]);
+
+            return redirect()->route('sto.index')->with([
+                'error' => 'Terjadi kesalahan saat import: ' . $e->getMessage(),
+            ]);
+        }
     }
-
 
     // export
     // Fungsi untuk export ke Excel

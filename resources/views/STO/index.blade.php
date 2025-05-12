@@ -98,7 +98,6 @@
                                         <th class="text-center">Plan Stok</th>
                                         <th class="text-center">Act Stok</th>
                                         <th class="text-center">Kategori</th>
-                                        <th class="text-center">Status</th>
                                         <th class="text-center">STO Priode</th>
                                         <th class="text-center">Aksi</th>
                                     </tr>
@@ -116,7 +115,6 @@
                                             <td class="text-center">{{ $part->plan_stock ?? '-' }}</td>
                                             <td class="text-center">{{ $part->act_stock ?? '-' }}</td>
                                             <td class="text-center">{{ $part->Category->name ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->status ?? '-' }}</td>
                                             <td class="text-center">
                                                 {{ $part->updated_at ? $part->updated_at->format('M Y') : '-' }}
                                             </td>

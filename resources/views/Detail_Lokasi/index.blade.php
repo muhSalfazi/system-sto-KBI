@@ -28,6 +28,18 @@
             </ul>
         </div>
     @endif
+    @if (session('import_logs'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <strong>Detail Import:</strong>
+            <ul>
+                @foreach (session('import_logs') as $log)
+                    <li>{{ $log }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
 
     <section class="section">
         <div class="row">
@@ -44,9 +56,9 @@
                             </button>
                             {{-- convert  --}}
                             <button type="button" class="btn btn-info btn-sm "
-                            data-bs-toggle="modal"data-bs-target="#exceltocsv">
-                            <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
-                        </button>
+                                data-bs-toggle="modal"data-bs-target="#exceltocsv">
+                                <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
+                            </button>
                         </div>
                         <div class="table-responsive animate__animated animate__fadeInUp">
                             <table class="table table-striped table-bordered datatable">
@@ -101,7 +113,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('parts.import') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('detail-lokasi.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
                             <label for="file" class="form-label">Upload Csv File</label>

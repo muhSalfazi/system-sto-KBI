@@ -7,7 +7,7 @@
         <h1>Daily Stok</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item active"> Daily Stok</li>
+                <li class="breadcrumb-item active">Daily Stok</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -30,6 +30,18 @@
         </div>
     @endif
 
+    @if (session('import_logs'))
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <strong>Detail Import:</strong>
+            <ul>
+                @foreach (session('import_logs') as $log)
+                    <li>{{ $log }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
@@ -37,21 +49,39 @@
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daily Stock Logs</h5>
                         <div class="mb-2">
-                            <button type="button" class="btn btn-success btn-sm  mb-1 "
-                                data-bs-toggle="modal"data-bs-target="#importModal">
+                            <button type="button" class="btn btn-success btn-sm  mb-1 " data-bs-toggle="modal"
+                                data-bs-target="#importModal">
                                 <i class="bi bi-filetype-csv"></i> Import Csv
                             </button>
-                            {{-- convert  --}}
-                            <button type="button" class="btn btn-info btn-sm "
-                                data-bs-toggle="modal"data-bs-target="#exceltocsv">
+                            {{-- convert --}}
+                            <button type="button" class="btn btn-info btn-sm " data-bs-toggle="modal"
+                                data-bs-target="#exceltocsv">
                                 <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
                             </button>
 
                             {{-- export excel --}}
-                            <button type="button" class="btn btn-warning btn-sm"
-                                onclick="window.location='{{ route('sto.export', ['category_id' => request('category_id')]) }}'">
+                            <a href="{{ route('daily-stock.export', ['status' => request('status')]) }}"
+                                class="btn btn-warning btn-sm">
                                 <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
-                            </button>
+                            </a>
+
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <form method="GET" action="{{ route('daily-stock.index') }}">
+                                        <label for="statusFilter" class="form-label">Filter Status:</label>
+                                        <select class="form-select" name="status" id="statusFilter"
+                                            onchange="this.form.submit()">
+                                            <option value="">-- Semua Status --</option>
+                                            @foreach ($statuses as $status)
+                                                <option value="{{ $status }}"
+                                                    {{ request('status') == $status ? 'selected' : '' }}>
+                                                    {{ $status }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </form>
+                                </div>
+                            </div>
 
                         </div>
                         <div class="table-responsive animate__animated animate__fadeInUp">
@@ -64,6 +94,7 @@
                                         <th class="text-center">Part No</th>
                                         <th class="text-center">Total Qty</th>
                                         <th class="text-center">Customer</th>
+                                        <th class="text-center">Status</th>
                                         <th class="text-center">Prepared By</th>
                                         <th class="text-center">Aksi</th>
                                     </tr>
@@ -72,15 +103,27 @@
                                     @foreach ($dailyStockLogs as $key => $log)
                                         <tr>
                                             <td class="text-center">{{ $key + 1 }}</td>
-                                            <td class="text-center">{{ $log->inventory->id }}</td>
+                                            <td class="text-center">{{ $log->inventory->part->Inv_id }}</td>
                                             <td class="text-center">{{ $log->inventory->part->Part_name }}</td>
                                             <td class="text-center">{{ $log->inventory->part->Part_number }}</td>
                                             <td class="text-center">{{ $log->Total_qty }}</td>
-                                            <td class="text-center">{{ $log->inventory->part->customer->name }}</td>
-                                            <td class="text-center">{{ $log->user->name }}</td>
+                                            <td class="text-center">{{ $log->inventory->part->customer->username }}</td>
+                                            <td class="text-center">{{ $log->status }}</td>
+                                            <td class="text-center">{{ $log->user->username }}</td>
                                             <td class="text-center">
-                                                <a href="#" class="btn btn-warning btn-sm">Edit</a>
-                                                <a href="#" class="btn btn-danger btn-sm">Delete</a>
+                                                <a href="{{ route('reports.edit', $log->id) }}"
+                                                    class="btn btn-warning btn-sm mb-1"
+                                                    style="font-size: 0.875rem; padding: 4px 8px;">Edit</a>
+                                                <form action="{{ route('reports.destroy', $log->id) }}" method="POST"
+                                                    onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        style="font-size: 0.875rem; padding: 4px 8px;">
+                                                        <i class="bi bi-trash"></i> Hapus
+                                                    </button>
+                                                </form>
+
                                             </td>
                                         </tr>
                                     @endforeach

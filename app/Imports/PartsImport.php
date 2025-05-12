@@ -43,9 +43,9 @@ class PartsImport implements ToCollection, WithHeadingRow
 
             // Proses bagian lainnya
             // Cek apakah data sudah ada
-            $existingPart = Part::where('inv_id', $row['inv_id'])
-                ->where('part_name', $row['part_name'])
-                ->where('part_number', $row['part_number'])
+            $existingPart = Part::where('Inv_id', $row['inv_id'])
+                ->where('Part_name', $row['part_name'])
+                ->where('Part_number', $row['part_number'])
                 ->first();
 
             if ($existingPart) {
@@ -66,9 +66,9 @@ class PartsImport implements ToCollection, WithHeadingRow
 
             // Jika semua ditemukan, simpan ke database
             $part = Part::create([
-                'inv_id' => $row['inv_id'],
-                'part_name' => $row['part_name'],
-                'part_number' => $row['part_number'],
+                'Inv_id' => $row['inv_id'],
+                'Part_name' => $row['part_name'],
+                'Part_number' => $row['part_number'],
                 'id_customer' => $customer->id,
                 'id_plan' => $plant->id,
                 'id_area' => $area->id,

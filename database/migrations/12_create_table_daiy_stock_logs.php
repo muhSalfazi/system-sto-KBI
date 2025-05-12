@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id_inventory');
             $table->unsignedBigInteger('prepared_by');
             $table->integer('Total_qty')->default(0);
-
+            $table->enum('status', ['OK', 'NG','VIRGIN','FUNSAI']);
             // index
             $table->index('id_inventory');
             $table->index('prepared_by');

@@ -42,12 +42,15 @@ Route::put('/parts/{part}', [PartController::class, 'update'])->name('parts.upda
 Route::delete('/parts/{part}', [PartController::class, 'destroy'])->name('parts.destroy');
 Route::post('/parts/import', [PartController::class, 'import'])->name('parts.import');
 
+// areal lokasi
 Route::get('/detail-lokasi', [DetailLokasiController::class, 'index'])->name('detail-lokasi.index');
 Route::get('/create', [DetailLokasiController::class, 'create'])->name('create.detail-lokasi');
 Route::post('/detail-lokasi-post', [DetailLokasiController::class, 'store'])->name('detail-lokasi.store');
 Route::get('/{rak}/edit', [DetailLokasiController::class, 'edit'])->name('edit.detail-lokasi');
 Route::put('/{rak}', [DetailLokasiController::class, 'update'])->name('update.detail-lokasi');
 Route::delete('/{rak}', [DetailLokasiController::class, 'destroy'])->name('destroy.detail-lokasi');
+Route::post('/detail-lokasi/import', [DetailLokasiController::class, 'import'])->name('detail-lokasi.import');
+
 
 // sto
 Route::get('/sto', [StoController::class, 'index'])->name('sto.index');
@@ -61,8 +64,13 @@ Route::get('/sto/export', [StoController::class, 'export'])->name('sto.export');
 
 // daily stock log
 Route::get('/daily-stock', [DailyStockLogController::class, 'index'])->name('daily-stock.index');
-// Route to handle the CSV import
 Route::post('/daily-stock/import', [DailyStockLogController::class, 'import'])->name('daily-stock.import.process');
+Route::get('daily-stock/{id}/edit', [DailyStockLogController::class, 'edit'])->name('reports.edit');
+Route::put('daily-stock/{id}', [DailyStockLogController::class, 'update'])->name('reports.update');
+Route::delete('daily-stock/{id}', [DailyStockLogController::class, 'destroy'])->name('reports.destroy');
+Route::get('/daily-stock/export', [DailyStockLogController::class, 'export'])->name('daily-stock.export');
+
+
 
 // select part area
 Route::get('/get-areas/{plantId}', [PartController::class, 'getAreas']);

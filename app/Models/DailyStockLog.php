@@ -14,6 +14,7 @@ class DailyStockLog extends Model
         'id_inventory',
         'prepared_by',
         'Total_qty',
+        'status',
         'created_at',
         'updated_at',
     ];

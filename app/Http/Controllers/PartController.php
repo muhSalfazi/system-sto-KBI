@@ -116,10 +116,11 @@ class PartController extends Controller
         $raks = Rak::where('id_area', $areaId)->get();
         return response()->json($raks);
     }
+    
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:csv,txt,text/plain,text/csv'
+             'file' => 'required|file|mimes:csv,txt'
         ]);
 
         try {

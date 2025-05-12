@@ -6,6 +6,9 @@ use App\Models\Rak;
 use App\Models\Area;
 use App\Models\Plant;
 use Illuminate\Http\Request;
+use App\Imports\DetailLokasiImport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class DetailLokasiController extends Controller
 {
@@ -82,4 +85,25 @@ class DetailLokasiController extends Controller
         $rak->delete();
         return redirect()->route('detail-lokasi.index')->with('success', 'Rak berhasil dihapus.');
     }
+
+    // Import
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt'
+        ]);
+
+        try {
+            $importer = new DetailLokasiImport();
+            Excel::import($importer, $request->file('file'));
+
+            session()->flash('import_logs', $importer->getLogs());
+
+            return back()->with('success', 'Import detail lokasi berhasil.');
+        } catch (\Exception $e) {
+            \Log::error('Gagal import detail lokasi: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat import.');
+        }
+    }
+
 }

@@ -12,12 +12,13 @@ use Carbon\Carbon;
 
 class StoImport implements ToCollection, WithHeadingRow
 {
-    protected $logs = [];
+    protected array $logs = [];
 
-    public function getLogs()
+    public function getLogs(): array
     {
         return $this->logs;
     }
+
 
     public function collection(Collection $rows)
     {
@@ -74,7 +75,7 @@ class StoImport implements ToCollection, WithHeadingRow
             ]);
 
             // Log keberhasilan
-            $this->logs[] = "Baris $rowNumber: Data berhasil diimpor (INV ID: {$row['inv_id']})";
+            // $this->logs[] = "Baris $rowNumber: Data berhasil diimpor (INV ID: {$row['inv_id']})";
         }
     }
 }
