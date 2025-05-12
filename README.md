@@ -15,7 +15,7 @@ STO Management System adalah aplikasi web yang digunakan untuk mengelola invento
 1. Clone repositori ini:
 
    ```sh
-   git clone (https://github.com/hfazli/update_sto.git)
+   git clone (https://github.com/muhSalfazi/system-sto-KBI.git)
    cd update_sto
    ```
 
@@ -87,6 +87,4 @@ STO Management System adalah aplikasi web yang digunakan untuk mengelola invento
 2. Arahkan kamera perangkat ke barcode yang ingin dipindai.
 3. Hasil pemindaian akan menampilkan informasi inventory yang sesuai.
 
-## 📄 Lisensi
 
-Proyek ini dilisensikan di bawah lisensi MIT. Lihat file [LICENSE](LICENSE) untuk informasi lebih lanjut.
