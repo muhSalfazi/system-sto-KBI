@@ -53,18 +53,36 @@ class StoImport implements ToCollection, WithHeadingRow
                 ->where('id_category', $category->id)
                 ->first();
 
+            // if ($existingSto) {
+            //     // Periksa apakah data sudah ada dalam periode bulan ini
+            //     $createdAt = Carbon::parse($existingSto->created_at);
+            //     $now = Carbon::now();
+            //     $diffInMonths = $createdAt->diffInMonths($now);
+
+            //     if ($diffInMonths < 1) {
+            //         // Jika sudah ada dan masih dalam periode bulan ini, maka lewati
+            //         $this->logs[] = "Baris $rowNumber: Sudah ada di database untuk bulan ini (INV ID: {$row['inv_id']}, Part Name: {$row['part_name']}).";
+            //         continue;  // Data duplikat dalam bulan yang sama
+            //     }
+            // }
+
             if ($existingSto) {
-                // Periksa apakah data sudah ada dalam periode bulan ini
                 $createdAt = Carbon::parse($existingSto->created_at);
                 $now = Carbon::now();
                 $diffInMonths = $createdAt->diffInMonths($now);
 
                 if ($diffInMonths < 1) {
-                    // Jika sudah ada dan masih dalam periode bulan ini, maka lewati
-                    $this->logs[] = "Baris $rowNumber: Sudah ada di database untuk bulan ini (INV ID: {$row['inv_id']}, Part Name: {$row['part_name']}).";
-                    continue;  // Data duplikat dalam bulan yang sama
+                    // Sudah ada dan masih bulan ini → update saja plan_stock-nya
+                    $existingSto->update([
+                        'plan_stock' => $row['plan_stock'],
+                        'status' => strtoupper($row['status']) === 'OK' ? 'OK' : 'NG',
+                    ]);
+
+                    $this->logs[] = "Baris $rowNumber: Plan stock di-*update* untuk bulan ini (INV ID: {$row['inv_id']}, Part Name: {$row['part_name']}).";
+                    continue;
                 }
             }
+
 
             // Jika data belum ada atau lebih dari satu bulan, simpan ke database
             Inventory::create([

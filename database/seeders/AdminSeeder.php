@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Role;
 
-class SuperAdminSeeder extends Seeder
+class AdminSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -18,15 +18,16 @@ class SuperAdminSeeder extends Seeder
     {
         // Buat user SuperAdmin
         $superAdmin = User::create([
-            'username' => 'superAdmin',
-            'first_name' => 'Super',
-            'last_name' => 'Admin',
-            'password' => Hash::make('superadminKbi'),
+            'username' => 'adminSTO',
+            'first_name' => 'salman',
+            'last_name' => 'fauzi',
+            'nik' => 'K02025',
+            'password' => Hash::make('adminKbi'),
         ]);
 
 
       // Ambil role_id untuk role 'superAdmin'
-      $superAdminRole = Role::where('name', 'superAdmin')->first();
+      $superAdminRole = Role::where('name', 'admin')->first();
 
       // Menetapkan role_id ke user
       $superAdmin->role()->associate($superAdminRole);

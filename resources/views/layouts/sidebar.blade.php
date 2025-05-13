@@ -8,8 +8,8 @@
                 </a>
         </li>
          <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : 'collapsed' }}"
-                    href="{{ route('dashboard') }}">
+                <a class="nav-link {{ request()->routeIs('forecast.index','forecast.create') ? 'active' : 'collapsed' }}"
+                    href="{{ route('forecast.index') }}">
                  <i class="bi bi-graph-up"></i>
                     <span>Forecast</span>
                 </a>
@@ -24,7 +24,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('daily-stock.index') ? 'active' : 'collapsed' }}"
+                <a class="nav-link {{ request()->routeIs('daily-stock.index','reports.edit') ? 'active' : 'collapsed' }}"
                     href="{{ route('daily-stock.index') }}">
                    <i class="bi bi-clipboard-fill"></i>
                     <span>Daily Stok</span>

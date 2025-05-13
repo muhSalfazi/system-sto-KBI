@@ -11,6 +11,7 @@
             </ol>
         </nav>
     </div><!-- End Page Title -->
+    {{-- =============== alert ========================== --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -28,6 +29,7 @@
             </ul>
         </div>
     @endif
+    {{-- ================================== --}}
 
     <section class="section">
         <div class="row">
@@ -36,7 +38,8 @@
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Data Users</h5>
                         <div class="mb-3">
-                            <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus-square"></i> Create New User</a>
+                            <a href="{{ route('users.create') }}" class="btn btn-primary btn-sm"><i
+                                    class="bi bi-plus-square"></i> Create New User</a>
                         </div>
 
                         <div class="table-responsive animate__animated animate__fadeInUp">
@@ -60,20 +63,22 @@
                                             <td class="text-center">{{ $user->role ? $user->role->name : '-' }}</td>
                                             <td class="text-center">{{ $user->nik ? $user->nik : '-' }}</td>
                                             <td class="text-center">
-                                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-success btn-sm">
-                                                    <i class="bi bi-pencil-square"></i> Edit User
+                                                <a href="{{ route('users.edit', $user->id) }}"
+                                                    class="btn btn-success btn-sm">
+                                                    <i class="bi bi-pencil-square"></i>
                                                 </a>
-                                                <form action="{{ route('users.destroy', $user) }}" method="POST" id="delete-form-{{ $user->id }}" style="display:inline;">
+                                                <form action="{{ route('users.destroy', $user) }}" method="POST"
+                                                    id="delete-form-{{ $user->id }}" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="button" onclick="confirmDelete({{ $user->id }})" class="btn btn-danger btn-sm">
-                                                        <i class="bi bi-trash3"></i> Delete
+                                                    <button type="button" onclick="confirmDelete({{ $user->id }})"
+                                                        class="btn btn-danger btn-sm">
+                                                        <i class="bi bi-trash3"></i>
                                                     </button>
                                                 </form>
                                             </td>
                                         </tr>
-
-                                        @endforeach
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -83,4 +88,3 @@
         </div>
     </section>
 @endsection
-

@@ -11,7 +11,7 @@
             </ol>
         </nav>
     </div>
-
+{{-- =========================  alert =======================--}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -43,7 +43,7 @@
             </ul>
         </div>
     @endif
-
+{{-- ==================================== --}}
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
@@ -123,7 +123,7 @@
                                             <td class="text-center">
                                                 <a href="{{ route('sto.edit', $part->id) }}" class="btn btn-success btn-sm"
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
-                                                    <i class="bi bi-pencil-square"></i> Update
+                                                    <i class="bi bi-pencil-square"></i>
                                                 </a>
                                                 <form action="{{ route('sto.destroy', $part->id) }}" method="POST"
                                                     style="font-size: 0.875rem; padding: 4px 8px;"
@@ -131,7 +131,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
-                                                        <i class="bi bi-trash3"></i> Delete
+                                                        <i class="bi bi-trash3"></i>
                                                     </button>
                                                 </form>
                                             </td>
@@ -145,6 +145,8 @@
             </div>
         </div>
     </section>
+
+
     {{-- modal import excel --}}
     <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog">

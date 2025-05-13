@@ -26,7 +26,8 @@
                                     @php
                                         $monthValue = now()->addMonths($i)->format('Y-m');
                                     @endphp
-                                    <option value="{{ $monthValue }}" {{ request('month') === $monthValue ? 'selected' : '' }}>
+                                    <option value="{{ $monthValue }}"
+                                        {{ request('month') === $monthValue ? 'selected' : '' }}>
                                         {{ now()->addMonths($i)->format('F Y') }}
                                     </option>
                                 @endfor
@@ -37,7 +38,8 @@
                             <select name="customer" id="custForecast" class="form-control">
                                 <option value="">All Customers</option>
                                 @foreach ($customers as $customer)
-                                    <option value="{{ $customer->username }}" {{ request('customer') === $customer->username ? 'selected' : '' }}>
+                                    <option value="{{ $customer->username }}"
+                                        {{ request('customer') === $customer->username ? 'selected' : '' }}>
                                         {{ $customer->username }}
                                     </option>
                                 @endforeach
@@ -47,7 +49,7 @@
                 </div>
             </form>
             <script>
-                document.addEventListener('DOMContentLoaded', function () {
+                document.addEventListener('DOMContentLoaded', function() {
                     const form = document.getElementById('filterForm');
                     document.getElementById('monthSelect').addEventListener('change', () => form.submit());
                     document.getElementById('custForecast').addEventListener('change', () => form.submit());
@@ -63,50 +65,50 @@
                         <!-- Bar Chart -->
                         <div id="dailychart"></div>
 
-                     <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        function loadStoChart() {
-            const month = document.getElementById('monthSelect').value;
-            const customer = document.getElementById('custForecast').value;
+                        <script>
+                            document.addEventListener("DOMContentLoaded", () => {
+                                function loadStoChart() {
+                                    const month = document.getElementById('monthSelect').value;
+                                    const customer = document.getElementById('custForecast').value;
 
-            fetch(`/dashboard/sto-chart-data?month=${month}&customer=${customer}`)
-                .then(response => response.json())
-                .then(result => {
-                    const chartContainer = document.querySelector("#dailychart");
-                    chartContainer.innerHTML = ""; // Clear chart first
+                                    fetch(`/dashboard/sto-chart-data?month=${month}&customer=${customer}`)
+                                        .then(response => response.json())
+                                        .then(result => {
+                                            const chartContainer = document.querySelector("#dailychart");
+                                            chartContainer.innerHTML = ""; // Clear chart first
 
-                    new ApexCharts(chartContainer, {
-                        series: [{
-                            name: "Plan Stock",
-                            data: result.data
-                        }],
-                        chart: {
-                            type: 'bar',
-                            height: 450
-                        },
-                        plotOptions: {
-                            bar: {
-                                borderRadius: 4,
-                                horizontal: false
-                            }
-                        },
-                        dataLabels: {
-                            enabled: false
-                        },
-                        xaxis: {
-                            categories: result.categories
-                        }
-                    }).render();
-                });
-        }
+                                            new ApexCharts(chartContainer, {
+                                                series: [{
+                                                    name: "Plan Stock",
+                                                    data: result.data
+                                                }],
+                                                chart: {
+                                                    type: 'bar',
+                                                    height: 450
+                                                },
+                                                plotOptions: {
+                                                    bar: {
+                                                        borderRadius: 4,
+                                                        horizontal: false
+                                                    }
+                                                },
+                                                dataLabels: {
+                                                    enabled: false
+                                                },
+                                                xaxis: {
+                                                    categories: result.categories
+                                                }
+                                            }).render();
+                                        });
+                                }
 
-        // Load awal
-        loadStoChart();
+                                // Load awal
+                                loadStoChart();
 
-        // Auto-refresh tiap 10 detik
-        setInterval(loadStoChart, 10000);
-    });
-</script>
+                                // Auto-refresh tiap 10 detik
+                                setInterval(loadStoChart, 10000);
+                            });
+                        </script>
 
                         <!-- End Bar Chart -->
                     </div>
@@ -135,7 +137,8 @@
                                             chartContainer.innerHTML = ""; // clear previous chart
 
                                             if (!result.series || result.series.length === 0) {
-                                                chartContainer.innerHTML = "<p class='text-center'>No data available for the selected filters.</p>";
+                                                chartContainer.innerHTML =
+                                                    "<p class='text-center'>No data available for the selected filters.</p>";
                                                 return;
                                             }
 
@@ -172,7 +175,12 @@
                                                     }
                                                 },
                                                 tooltip: {
-                                                    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+                                                    custom: function({
+                                                        series,
+                                                        seriesIndex,
+                                                        dataPointIndex,
+                                                        w
+                                                    }) {
                                                         const data = w.config.series[seriesIndex].data[dataPointIndex];
                                                         return `<div style="padding:10px">
                                         <strong>Part: ${data?.x ?? '-'}</strong><br>

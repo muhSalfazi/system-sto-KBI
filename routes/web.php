@@ -9,12 +9,15 @@ use App\Http\Controllers\StoController;
 use App\Http\Controllers\convertExcelToCsv;
 use App\Http\Controllers\DailyStockLogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ForecastController;
 
 /*
 |--------------------------------------------------------------------------
 | Routes
 |--------------------------------------------------------------------------
 */
+
+
 
 Route::get('/', [AuthController::class, 'showAdmin'])->name('admin.login');
 Route::post('admin/login', [AuthController::class, 'login'])->name('admin.login.post');
@@ -27,6 +30,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/fetch-daily-stock', [DashboardController::class, 'dailyStockSummary']);
     Route::get('/dashboard/daily-chart-data', [DashboardController::class, 'getDailyChartData'])->name('dashboard.dailyChartData');
     Route::get('/dashboard/sto-chart-data', [DashboardController::class, 'getStoChartData']);
+
+    // forecast
+    Route::get('/forecast', [ForecastController::class, 'index'])->name('forecast.index');
+    Route::post('/forecast/generate', [ForecastController::class, 'generate'])->name('forecast.generate');
+    Route::get('/forecast/create', [ForecastController::class, 'create'])->name('forecast.create');
+    Route::post('/forecast/store', [ForecastController::class, 'store'])->name('forecast.store');
+    Route::get('/forecast/{id}/edit', [ForecastController::class, 'edit'])->name('forecast.edit');
+    Route::put('/forecast/{id}', [ForecastController::class, 'update'])->name('forecast.update');
+    Route::delete('/forecast/{id}', [ForecastController::class, 'destroy'])->name('forecast.destroy');
+    Route::post('/forecast/import', [ForecastController::class, 'import'])->name('forecast.import');
+
 
     // user management
     Route::get('admin/user', [UserController::class, 'index'])->name('users.index');

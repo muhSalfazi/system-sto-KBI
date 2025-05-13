@@ -11,7 +11,7 @@
             </ol>
         </nav>
     </div>
-
+{{-- =====================alert ========================--}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -41,29 +41,28 @@
             </ul>
         </div>
     @endif
-
-
+{{-- ============================= --}}
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daftar Part</h5>
-                        <div class="mb-2">
-                            <a href="{{ route('parts.create') }}" class="btn btn-primary btn-sm  mb-1">
-                                <i class="bi bi-plus-square"></i> Create Part
-                            </a>
-                            <button type="button" class="btn btn-success btn-sm  mb-1"
-                                data-bs-toggle="modal"data-bs-target="#importModal">
-                                <i class="bi bi-filetype-csv"></i> Import Csv
-                            </button>
-                            <button type="button" class="btn btn-info btn-sm"
-                                data-bs-toggle="modal"data-bs-target="#exceltocsv">
-                                <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
-                            </button>
-
-                        </div>
-
+                        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
+                            <div class="mb-2">
+                                <a href="{{ route('parts.create') }}" class="btn btn-primary btn-sm  mb-1">
+                                    <i class="bi bi-plus-square"></i> Create Part
+                                </a>
+                                <button type="button" class="btn btn-success btn-sm  mb-1"
+                                    data-bs-toggle="modal"data-bs-target="#importModal">
+                                    <i class="bi bi-filetype-csv"></i> Import Csv
+                                </button>
+                                <button type="button" class="btn btn-info btn-sm"
+                                    data-bs-toggle="modal"data-bs-target="#exceltocsv">
+                                    <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
+                                </button>
+                            </div>
+                        @endif
                         <div class="table-responsive animate__animated animate__fadeInUp">
                             <table class="table table-striped table-bordered datatable">
                                 <thead class="thead-light">
@@ -98,7 +97,7 @@
                                                 <a href="{{ route('parts.edit', $part->id) }}"
                                                     class="btn btn-success btn-sm"
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
-                                                    <i class="bi bi-pencil-square"></i> Update
+                                                    <i class="bi bi-pencil-square"></i>
                                                 </a>
                                                 <form action="{{ route('parts.destroy', $part->id) }}" method="POST"
                                                     style="font-size: 0.875rem; padding: 4px 8px;"
@@ -106,7 +105,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
-                                                        <i class="bi bi-trash3"></i> Delete
+                                                        <i class="bi bi-trash3"></i>
                                                     </button>
                                                 </form>
                                             </td>
