@@ -20,6 +20,7 @@ use App\Http\Controllers\ForecastController;
 
 
 Route::get('/', [AuthController::class, 'showAdmin'])->name('admin.login');
+Route::get('user/login', [AuthController::class, 'showUser'])->name('user.login');
 Route::post('admin/login', [AuthController::class, 'login'])->name('admin.login.post');
 Route::post('admin/logout', [AuthController::class, 'logout'])->name('logout');
 
