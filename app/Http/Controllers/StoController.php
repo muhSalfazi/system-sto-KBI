@@ -53,6 +53,7 @@ class StoController extends Controller
             'id_part' => $request->id_part,
             'id_category' => $request->id_category,
             'plan_stock' => $request->plan_stock,
+            // 'act_stock' => $request->plan_stock,
             'status' => $request->status,
         ]);
 

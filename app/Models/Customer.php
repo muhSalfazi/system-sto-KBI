@@ -17,4 +17,9 @@ class Customer extends Model
     public function part(){
         return $this->hasMany(Part::class, 'id_customer', 'id');
     }
+
+    public function parts()
+    {
+        return $this->hasMany(Part::class, 'id_customer');
+    }
 }

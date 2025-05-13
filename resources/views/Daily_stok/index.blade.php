@@ -96,7 +96,7 @@
                                         <th class="text-center">Customer</th>
                                         <th class="text-center">Status</th>
                                         <th class="text-center">Prepared By</th>
-                                        <th class="text-center">Aksi</th>
+                                        <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -113,14 +113,14 @@
                                             <td class="text-center">
                                                 <a href="{{ route('reports.edit', $log->id) }}"
                                                     class="btn btn-warning btn-sm mb-1"
-                                                    style="font-size: 0.875rem; padding: 4px 8px;">Edit</a>
+                                                    style="font-size: 0.875rem; padding: 4px 8px;">Update</a>
                                                 <form action="{{ route('reports.destroy', $log->id) }}" method="POST"
-                                                    onsubmit="return confirm('Yakin ingin menghapus laporan ini?')">
+                                                    onsubmit="return confirm('Are you sure you want to delete this report?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm"
                                                         style="font-size: 0.875rem; padding: 4px 8px;">
-                                                        <i class="bi bi-trash"></i> Hapus
+                                                        <i class="bi bi-trash"></i> Delete
                                                     </button>
                                                 </form>
 

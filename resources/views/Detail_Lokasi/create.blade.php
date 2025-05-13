@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Create Detail Lokasi')
+@section('title', 'Create Location Details Data')
 
 @section('content')
     <div class="pagetitle">
-        <h1>Create Detail Lokasi</h1>
+        <h1>Create Location Details</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('detail-lokasi.index') }}">Detail Lokasi</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('detail-lokasi.index') }}">Location Details Data</a></li>
                 <li class="breadcrumb-item active">Create</li>
             </ol>
         </nav>
@@ -16,7 +16,7 @@
     <section class="section">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Form Detail Lokasi</h5>
+                <h5 class="card-title">Form Location Details </h5>
                 <form method="POST" action="{{ route('detail-lokasi.store') }}">
                     @csrf
                     <div class="row g-3">

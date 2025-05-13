@@ -71,6 +71,7 @@ class StoImport implements ToCollection, WithHeadingRow
                 'id_part' => $part->id,
                 'id_category' => $category->id,
                 'plan_stock' => $row['plan_stock'],
+                // 'act_stock' => $row['plan_stock'],
                 'status' => strtoupper($row['status']) === 'OK' ? 'OK' : 'NG',
             ]);
 

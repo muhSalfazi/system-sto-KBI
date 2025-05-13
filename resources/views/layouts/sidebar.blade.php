@@ -1,5 +1,19 @@
 <aside id="sidebar" class="sidebar hiden">
     <ul class="sidebar-nav" id="sidebar-nav">
+         <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : 'collapsed' }}"
+                    href="{{ route('dashboard') }}">
+                 <i class="bi bi-grid-1x2-fill"></i>
+                    <span>Dashboard</span>
+                </a>
+        </li>
+         <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : 'collapsed' }}"
+                    href="{{ route('dashboard') }}">
+                 <i class="bi bi-graph-up"></i>
+                    <span>Forecast</span>
+                </a>
+        </li>
         @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin', 'view']))
             <li class="nav-heading">Inventory List</li>
             <li class="nav-item">
@@ -12,7 +26,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('daily-stock.index') ? 'active' : 'collapsed' }}"
                     href="{{ route('daily-stock.index') }}">
-                    <i class="bi bi-clipboard"></i>
+                   <i class="bi bi-clipboard-fill"></i>
                     <span>Daily Stok</span>
                 </a>
             </li>
@@ -30,7 +44,7 @@
                 <a class="nav-link {{ request()->routeIs('detail-lokasi.index', 'create.detail-lokasi', 'edit.detail-lokasi') ? 'active' : 'collapsed' }}"
                     href="{{ route('detail-lokasi.index') }}">
                     <i class="bi bi-pin-map"></i>
-                    <span>Detail Lokasi</span>
+                    <span>Location Details</span>
                 </a>
             </li>
         @endif

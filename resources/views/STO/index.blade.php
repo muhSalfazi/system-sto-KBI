@@ -52,7 +52,7 @@
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daftar STO</h5>
                         <div class="mb-3">
                             <a href="{{ route('sto.create.get') }}" class="btn btn-primary btn-sm mb-1">
-                                <i class="bi bi-plus-square"></i> Tambah STO
+                                <i class="bi bi-plus-square"></i> Create STO
                             </a>
                             <button type="button" class="btn btn-success btn-sm mb-1"
                                 data-bs-toggle="modal"data-bs-target="#importModal">
@@ -64,7 +64,8 @@
                                 <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
                             </button>
                             {{-- export excel --}}
-                            <button type="button" class="btn btn-warning btn-sm" onclick="window.location='{{ route('sto.export', ['category_id' => request('category_id')]) }}'">
+                            <button type="button" class="btn btn-warning btn-sm"
+                                onclick="window.location='{{ route('sto.export', ['category_id' => request('category_id')]) }}'">
                                 <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
                             </button>
 
@@ -73,7 +74,8 @@
                         <div class="mb-3">
                             <!-- Filter Kategori -->
                             <form action="{{ route('sto.index') }}" method="GET" class="d-flex">
-                                <select name="category_id" id="category_id" class="form-select form-select-sm" style="width: 200px;">
+                                <select name="category_id" id="category_id" class="form-select form-select-sm"
+                                    style="width: 200px;">
                                     <option value="">-- Pilih Kategori --</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}"
@@ -97,9 +99,9 @@
                                         <th class="text-center">Part No</th>
                                         <th class="text-center">Plan Stok</th>
                                         <th class="text-center">Act Stok</th>
-                                        <th class="text-center">Kategori</th>
-                                        <th class="text-center">STO Priode</th>
-                                        <th class="text-center">Aksi</th>
+                                        <th class="text-center">Category</th>
+                                        <th class="text-center">STO Period</th>
+                                        <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -121,15 +123,15 @@
                                             <td class="text-center">
                                                 <a href="{{ route('sto.edit', $part->id) }}" class="btn btn-success btn-sm"
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
-                                                    <i class="bi bi-pencil-square"></i> Edit
+                                                    <i class="bi bi-pencil-square"></i> Update
                                                 </a>
                                                 <form action="{{ route('sto.destroy', $part->id) }}" method="POST"
                                                     style="font-size: 0.875rem; padding: 4px 8px;"
-                                                    onsubmit="return confirm('Yakin ingin menghapus STO ini?')">
+                                                    onsubmit="return confirm('Are you sure you want to delete this STO?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
-                                                        <i class="bi bi-trash3"></i> Hapus
+                                                        <i class="bi bi-trash3"></i> Delete
                                                     </button>
                                                 </form>
                                             </td>
@@ -157,7 +159,7 @@
                         <div class="mb-3">
                             <label for="file" class="form-label">Upload Csv File</label>
                             <input type="file" name="file" class="form-control" id="file" required
-                            accept=".csv">
+                                accept=".csv">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

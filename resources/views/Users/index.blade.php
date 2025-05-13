@@ -44,11 +44,11 @@
                                 <thead class="thead-light">
                                     <tr>
                                         <th scope="col" class="text-center">NO</th>
-                                        <th scope="col" class="text-center">Nama</th>
+                                        <th scope="col" class="text-center">Name</th>
                                         <th scope="col" class="text-center">Username</th>
                                         <th scope="col" class="text-center">Role</th>
                                         <th scope="col" class="text-center">Nik</th>
-                                        <th scope="col" class="text-center">Aksi</th>
+                                        <th scope="col" class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>

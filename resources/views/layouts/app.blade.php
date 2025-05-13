@@ -144,6 +144,13 @@
             });
         @endif
     </script>
+     <!-- Vendor JS Files -->
+   <script src="{{ asset('assets/vendor/apexcharts/apexcharts.min.js') }}"></script>
+
+    <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('assets/vendor/chart.js/chart.umd.js') }}"></script>
+<script src="{{ asset('assets/vendor/echarts/echarts.min.js') }}"></script>
+<script src="{{ asset('assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
 
 </body>
 

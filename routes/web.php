@@ -8,6 +8,7 @@ use App\Http\Controllers\DetailLokasiController;
 use App\Http\Controllers\StoController;
 use App\Http\Controllers\convertExcelToCsv;
 use App\Http\Controllers\DailyStockLogController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +21,12 @@ Route::post('admin/login', [AuthController::class, 'login'])->name('admin.login.
 Route::post('admin/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
+
+    // dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/fetch-daily-stock', [DashboardController::class, 'dailyStockSummary']);
+    Route::get('/dashboard/daily-chart-data', [DashboardController::class, 'getDailyChartData'])->name('dashboard.dailyChartData');
+    Route::get('/dashboard/sto-chart-data', [DashboardController::class, 'getStoChartData']);
 
     // user management
     Route::get('admin/user', [UserController::class, 'index'])->name('users.index');

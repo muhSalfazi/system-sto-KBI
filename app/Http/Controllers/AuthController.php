@@ -35,7 +35,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             // Otentikasi berhasil, arahkan ke halaman dashboard
-            return redirect()->route('users.index')->with('success', 'Login successful');
+            return redirect()->route('dashboard')->with('login-sukses', 'Login successful');
         }
 
 

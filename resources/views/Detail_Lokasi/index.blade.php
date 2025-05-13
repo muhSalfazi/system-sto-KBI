@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Data Detail Lokasi')
+@section('title', 'Location Details')
 
 @section('content')
     <div class="pagetitle animate__animated animate__fadeInLeft">
-        <h1>Data Detail Lokasi</h1>
+        <h1>Location Details</h1>
         <nav>
             <ol class="breadcrumb">
-                <li class="breadcrumb-item active">Detail Lokasi</li>
+                <li class="breadcrumb-item active">Location Details Data</li>
             </ol>
         </nav>
     </div><!-- End Page Title -->
@@ -46,10 +46,10 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title animate__animated animate__fadeInLeft">Detail Lokasi</h5>
+                        <h5 class="card-title animate__animated animate__fadeInLeft">Location Details Data</h5>
                         <div class="mb-2">
                             <a href="{{ route('create.detail-lokasi') }}" class="btn btn-primary btn-sm mb-1"><i
-                                    class="bi bi-plus-square"></i> Create Detail Lokasi</a>
+                                    class="bi bi-plus-square"></i> Create Location Details</a>
                             <button type="button" class="btn btn-success btn-sm  mb-1 "
                                 data-bs-toggle="modal"data-bs-target="#importModal">
                                 <i class="bi bi-filetype-csv"></i> Import Csv
@@ -65,10 +65,10 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center">No</th>
-                                        <th class="text-center">Nama Rak</th>
-                                        <th class="text-center">Nama Area</th>
-                                        <th class="text-center">Nama Plan</th>
-                                        <th class="text-center">Aksi</th>
+                                        <th class="text-center">Name Rack</th>
+                                        <th class="text-center">Name Area</th>
+                                        <th class="text-center">Name Plant</th>
+                                        <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -82,15 +82,15 @@
                                                 <a href="{{ route('edit.detail-lokasi', $rak->id) }}"
                                                     class="btn btn-success btn-sm"
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
-                                                    <i class="bi bi-pencil-square"></i> Edit
+                                                    <i class="bi bi-pencil-square"></i> Update
                                                 </a>
                                                 <form action="{{ route('destroy.detail-lokasi', $rak->id) }}" method="POST"
                                                     style="font-size: 0.875rem; padding: 4px 8px;"
-                                                    onsubmit="return confirm('Yakin ingin menghapus part ini?')">
+                                                    onsubmit="return confirm('Are you sure you want to delete this Location?')">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm">
-                                                        <i class="bi bi-trash3"></i> Hapus
+                                                        <i class="bi bi-trash3"></i> Delete
                                                     </button>
                                                 </form>
                                             </td>
