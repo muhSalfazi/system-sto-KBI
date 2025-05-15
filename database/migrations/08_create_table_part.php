@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('Inv_id');
             $table->string('Part_name')->nullable();
             $table->string('Part_number')->nullable();
+            $table->unsignedBigInteger('id_category');
             $table->unsignedBigInteger('id_customer')->nullable();
             $table->unsignedBigInteger('id_plan')->nullable();
             $table->unsignedBigInteger('id_area')->nullable();
@@ -27,7 +28,10 @@ return new class extends Migration
             $table->index('id_plan');
             $table->index('id_area');
             $table->index('id_rak');
+            $table->index('id_category');
             // Foreign key constraints
+            $table->foreign('id_category')->references('id')->on('tbl_category')->onDelete('cascade');
+
             $table->foreign('id_customer')->references('id')->on('tbl_customer')->onDelete('cascade');
             $table->foreign('id_plan')->references('id')->on('tbl_plan')->onDelete('cascade');
             $table->foreign('id_area')->references('id')->on('tbl_area')->onDelete('cascade');

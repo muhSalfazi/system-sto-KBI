@@ -12,6 +12,8 @@ class DailyStockLog extends Model
     protected $table = 'tbl_daily_stock_logs';
     protected $fillable = [
         'id_inventory',
+        'id_box_complete',
+        'id_box_uncomplete',
         'prepared_by',
         'Total_qty',
         'status',
@@ -25,6 +27,14 @@ class DailyStockLog extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'prepared_by');
+    }
+    public function boxComplete()
+    {
+        return $this->belongsTo(BoxComplete::class, 'id_box_complete');
+    }
+    public function boxUncomplete()
+    {
+        return $this->belongsTo(BoxUncomplete::class, 'id_box_uncomplete');
     }
 
 }

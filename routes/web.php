@@ -10,6 +10,7 @@ use App\Http\Controllers\convertExcelToCsv;
 use App\Http\Controllers\DailyStockLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForecastController;
+use App\Http\Controllers\DailyReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ use App\Http\Controllers\ForecastController;
 Route::get('/', [AuthController::class, 'showAdmin'])->name('admin.login');
 Route::get('user/login', [AuthController::class, 'showUser'])->name('user.login');
 Route::post('admin/login', [AuthController::class, 'login'])->name('admin.login.post');
+Route::post('user/login', [AuthController::class, 'userLogin'])->name('user.login.post');
 Route::post('admin/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
@@ -93,5 +95,20 @@ Route::middleware(['auth'])->group(function () {
 
     // excel convert
     Route::post('/convert', [convertExcelToCsv::class, 'convert'])->name('convert.excel');
+
+    // dailyreport
+    Route::get('/daily-report', [DailyReportController::class, 'index'])->name('dailyreport.index');
+    Route::post('/daily-report/scan', [DailyReportController::class, 'scan'])->name('sto.scan');
+    Route::get('/daily-report/search', [DailyReportController::class, 'search'])->name('sto.search');
+    Route::get('/daily-report/edit', [DailyReportController::class, 'edit'])->name('sto.edit');
+    Route::get('/daily-report/create', [DailyReportController::class, 'create'])->name('sto.create');
+    Route::get('/report/print/{id}', [DailyReportController::class, 'printReport'])->name('reports.print');
+    Route::post('/daily-report/newdaily', [DailyReportController::class, 'storeNew'])->name('sto.storeNew');
+    Route::post('/daily-report/{inventory_id}', [DailyReportController::class, 'storecreate'])->name('sto.store');
+    Route::get('/sto/form/{inventory_id}', [DailyReportController::class, 'form'])->name('sto.edit');
+
+
+
+
 });
 

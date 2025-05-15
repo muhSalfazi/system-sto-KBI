@@ -62,6 +62,22 @@
                                     <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
                                 </button>
                             </div>
+                            <div class="mb-3">
+                            <!-- Filter Kategori -->
+                            <form action="{{ route('parts.index') }}" method="GET" class="d-flex">
+                                <select name="category_id" id="category_id" class="form-select form-select-sm"
+                                    style="width: 200px;">
+                                    <option value="">-- Pilih Kategori --</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}"
+                                            {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-sm ms-2">Filter</button>
+                            </form>
+                        </div>
                         @endif
                         <div class="table-responsive animate__animated animate__fadeInUp">
                             <table class="table table-striped table-bordered datatable">
@@ -71,6 +87,7 @@
                                         <th class="text-center">Inv ID</th>
                                         <th class="text-center">Part Name</th>
                                         <th class="text-center">Part Number</th>
+                                        <th class="text-center">Category</th>
                                         <th class="text-center">Customer</th>
                                         <th class="text-center">Type Package</th>
                                         <th class="text-center">Qty/Box</th>
@@ -87,6 +104,7 @@
                                             <td class="text-center">{{ $part->Inv_id }}</td>
                                             <td class="text-center">{{ $part->Part_name }}</td>
                                             <td class="text-center">{{ $part->Part_number }}</td>
+                                            <td class="text-center">{{ $part->category->name ?? '-' }}</td>
                                             <td class="text-center">{{ $part->customer->username ?? '-' }}</td>
                                             <td class="text-center">{{ $part->package->type_pkg ?? '-' }}</td>
                                             <td class="text-center">{{ $part->package->qty ?? '-' }}</td>

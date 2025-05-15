@@ -28,14 +28,14 @@ class DailyStockImport implements ToCollection, WithHeadingRow, WithBatchInserts
         foreach ($rows as $row) {
             $invId = $row['inv_id'];
             $totalQty = (int) $row['total_qty'];
-            $status = strtoupper(trim($row['status'] ?? 'OK'));
+            // $status = strtoupper(trim($row['status'] ?? 'OK'));
 
-            $validStatus = ['OK', 'NG', 'VIRGIN', 'FUNSAI'];
-            if (!in_array($status, $validStatus)) {
-                $this->logs[] = "Baris {$rowNum}: Status tidak valid `{$status}`.";
-                $rowNum++;
-                continue;
-            }
+            // $validStatus = ['OK', 'NG', 'VIRGIN', 'FUNSAI'];
+            // if (!in_array($status, $validStatus)) {
+            //     $this->logs[] = "Baris {$rowNum}: Status tidak valid `{$status}`.";
+            //     $rowNum++;
+            //     continue;
+            // }
 
             $part = Part::where('Inv_id', $invId)->first();
             if (!$part) {
@@ -52,8 +52,8 @@ class DailyStockImport implements ToCollection, WithHeadingRow, WithBatchInserts
             }
 
             // Update inventory
-            $inventory->act_stock += $totalQty;
-            $inventory->status = $status;
+            $inventory->plan_stock += $totalQty;
+            // $inventory->status = $status;
             $inventory->updated_at = now();
             $inventory->save();
 
@@ -65,7 +65,7 @@ class DailyStockImport implements ToCollection, WithHeadingRow, WithBatchInserts
                 'id_inventory' => $inventory->id,
                 'prepared_by' => auth()->id(),
                 'Total_qty' => $totalQty,
-                'status' => $status,
+                // 'status' => $status,
             ]);
 
             $rowNum++;

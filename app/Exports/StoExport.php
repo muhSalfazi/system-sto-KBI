@@ -24,7 +24,7 @@ class StoExport implements FromCollection, WithHeadings, WithStyles, WithTitle, 
     // Mengambil data sesuai dengan kategori
     public function collection()
     {
-        $query = Inventory::with('part', 'Category');
+        $query = Inventory::with('part', 'part.category');
 
         if ($this->categoryId) {
             $query->where('id_category', $this->categoryId);
@@ -39,8 +39,7 @@ class StoExport implements FromCollection, WithHeadings, WithStyles, WithTitle, 
                 'part_name' => $sto->part->Part_name ?? '-',
                 'part_number' => $sto->part->Part_number ?? '-',
                 'plan_stock' => $sto->plan_stock ?? '-',
-                'category_name' => $sto->Category->name ?? '-',
-                'status' => $sto->status ? strtoupper($sto->status) : '-',
+                'category_name' => $sto->part->category->name ?? '-',
                 'sto_priode' => $sto->created_at ? $sto->created_at->format('M Y') : '-',
             ];
         });
@@ -57,7 +56,6 @@ class StoExport implements FromCollection, WithHeadings, WithStyles, WithTitle, 
             'Part No',
             'Plan Stok',
             'Kategori',
-            'Status',
             'STO Priode'
         ];
     }
@@ -78,8 +76,7 @@ class StoExport implements FromCollection, WithHeadings, WithStyles, WithTitle, 
         $sheet->getColumnDimension('E')->setWidth(15); // Part No
         $sheet->getColumnDimension('F')->setWidth(15); // Plan Stock
         $sheet->getColumnDimension('G')->setWidth(20); // Kategori
-        $sheet->getColumnDimension('H')->setWidth(10); // Status
-        $sheet->getColumnDimension('I')->setWidth(15); // STO Priode
+        $sheet->getColumnDimension('I')->setWidth(10); // STO Priode
     }
 
     // Memberikan judul untuk sheet

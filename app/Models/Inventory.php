@@ -14,8 +14,8 @@ class Inventory extends Model
         'id_part',
         'id_category',
         'plan_stock',
-        'status',
-        'act_stock'
+        'remark',
+        'note_remark'
     ];
 
 

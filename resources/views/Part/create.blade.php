@@ -59,11 +59,23 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
-                    <div class="col-md-6">
+                    <div class="col-md-3">
+                        <label for="id_category" class="form-label">Category</label>
+                        <select name="id_category" id="id_category"
+                            class="form-select @error('id_category') is-invalid @enderror" required>
+                            <option value="" disabled selected>Pilih Category</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('id_category')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-3">
                         <label for="id_customer" class="form-label">Customer</label>
                         <select name="id_customer" id="id_customer"
-                            class="form-select @error('id_customer') is-invalid @enderror" required>
+                            class="form-select select2 @error('id_customer') is-invalid @enderror" required>
                             <option value="" disabled selected>Pilih Customer</option>
                             @foreach ($customers as $customer)
                                 <option value="{{ $customer->id }}">{{ $customer->username }}</option>
@@ -163,6 +175,15 @@
                             $('#id_rak').html(options);
                         });
                 }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "-- Pilih --",
+                width: '100%'
             });
         });
     </script>

@@ -44,11 +44,10 @@
 
                     <div class="mb-3">
                         <label for="id_category" class="form-label">Kategori</label>
-                        <select name="id_category" id="id_category" class="form-select select2">
-                            <option value="">-- Pilih Kategori --</option>
+                        <select name="id_category" id="id_category" class="form-select select2" disabled>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}"
-                                    {{ $sto->id_category == $category->id ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}" selected>
+                                    {{ $sto->id_category == $category->id ? 'selected' : '' }}
                                     {{ $category->name }}
                                 </option>
                             @endforeach

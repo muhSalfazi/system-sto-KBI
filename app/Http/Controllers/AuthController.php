@@ -16,7 +16,7 @@ class AuthController extends Controller
     }
     public function showUser()
     {
-        return view('auth.user');  // Tampilan login
+        return view('auth.user-login');  // Tampilan user login
     }
 
     public function login(Request $request)
@@ -43,7 +43,29 @@ class AuthController extends Controller
         return redirect()->back()->with('error', 'Invalid Username or Password');
     }
 
+
+    public function userLogin(Request $request)
+    {
+        $request->validate([
+            'nik' => 'required|string|min:2',
+        ]);
+
+        $user = User::where('nik', $request->nik)->first();
+
+        if ($user) {
+            Auth::login($user); // login manual tanpa password
+            return redirect()->route('dailyreport.index')->with('success', 'Login berhasil');
+        }
+
+        return redirect()->back()->with('error', 'ID Card tidak ditemukan');
+    }
+
     public function logout()
+    {
+        Auth::logout();  // Keluar dari akun
+        return redirect()->route('admin.login');
+    }
+    public function logoutUser()
     {
         Auth::logout();  // Keluar dari akun
         return redirect()->route('admin.login');

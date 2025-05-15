@@ -56,14 +56,14 @@
 
                                     <div class="pt-4 pb-2">
                                         <h5 class="card-title text-center pb-0 fs-4">Login To User</h5>
-                                        <p class="text-center small">Enter your Nik/Id Card to login</p>
+                                        <p class="text-center small">Enter your Id Card Number to login</p>
                                     </div>
 
                                     <form class="row g-3 needs-validation" novalidate
-                                        action="{{ route('admin.login.post') }}" method="POST">
+                                        action="{{ route('user.login.post') }}" method="POST">
                                         @csrf
                                         <div class="col-12">
-                                            <label for="yournik" class="form-label">Nik/Id card</label>
+                                            <label for="yournik" class="form-label">Id Card Number</label>
                                             <div class="input-group has-validation">
                                                 <span class="input-group-text" id="inputGroupPrepend">
                                                     <i class="bi bi-person"></i>
@@ -80,7 +80,8 @@
                                                 style="font-size: 0.875rem; padding: 4px 8px;">Login</button>
                                         </div>
                                         <div class="col-12">
-                                            <a href="{{ route("admin.login") }}" class="btn btn-outline-secondary w-100"
+                                            <a href="{{ route('admin.login') }}"
+                                                class="btn btn-outline-secondary w-100"
                                                 style="font-size: 0.875rem; padding: 4px 8px;">
                                                 <i class="bi bi-box-arrow-in-right"></i> Login Admin
                                             </a>

@@ -41,31 +41,11 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="id_category" class="form-label">Kategori</label>
-                        <select name="id_category" id="id_category" class="form-select select2" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
 
                     <div class="mb-3">
                         <label for="plan_stock" class="form-label">Plan Stok</label>
                         <input type="text" name="plan_stock" id="plan_stock" class="form-control" required>
                     </div>
-
-                    <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select name="status" id="status" class="form-select" required>
-                            <option value="OK">OK</option>
-                            <option value="NG">NG</option>
-                            <option value="VIRGIN">VIRGIN</option>
-                            <option value="FUNSAI">FUNSAI</option>
-                        </select>
-                    </div>
-
                     <button type="submit" class="btn btn-primary">Simpan</button>
                     <a href="{{ route('sto.index') }}" class="btn btn-secondary">Kembali</a>
                 </form>

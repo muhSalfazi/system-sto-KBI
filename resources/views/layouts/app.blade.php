@@ -46,6 +46,9 @@
 <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
     rel="stylesheet">
 
+<!-- Tambahkan di <head> -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 <body>
     @include('layouts.header')
 
@@ -85,14 +88,14 @@
         </div>
     </div>
     {{-- end --}}
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- Template Main JS File -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     {{-- datatable --}}
     <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" defer></script>
-    <script src="{{ asset('assets/js/sweetalert2.min.js') }}"></script>
     <script>
         function confirmDelete(userId) {
             Swal.fire({

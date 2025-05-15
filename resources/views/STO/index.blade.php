@@ -11,7 +11,7 @@
             </ol>
         </nav>
     </div>
-{{-- =========================  alert =======================--}}
+    {{-- =========================  alert ======================= --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -43,7 +43,7 @@
             </ul>
         </div>
     @endif
-{{-- ==================================== --}}
+    {{-- ==================================== --}}
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
@@ -56,7 +56,7 @@
                             </a>
                             <button type="button" class="btn btn-success btn-sm mb-1"
                                 data-bs-toggle="modal"data-bs-target="#importModal">
-                                <i class="bi bi-filetype-csv"></i></i> Import Csv
+                                <i class="bi bi-filetype-csv"></i></i> Import Csv By Ledger
                             </button>
                             {{-- convert STO --}}
                             <button type="button" class="btn btn-info btn-sm "
@@ -73,19 +73,38 @@
 
                         <div class="mb-3">
                             <!-- Filter Kategori -->
-                            <form action="{{ route('sto.index') }}" method="GET" class="d-flex">
-                                <select name="category_id" id="category_id" class="form-select form-select-sm"
-                                    style="width: 200px;">
-                                    <option value="">-- Pilih Kategori --</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}"
-                                            {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                            {{ $category->name }}
+                            <form action="{{ route('sto.index') }}" method="GET" class="d-flex gap-2 align-items-end">
+                                <!-- Filter Kategori -->
+                                <div>
+                                    <label for="category_id" class="form-label mb-0">Kategori</label>
+                                    <select name="category_id" id="category_id" class="form-select form-select-sm"
+                                        style="width: 200px;">
+                                        <option value="">-- Pilih Kategori --</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}"
+                                                {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Filter Remark -->
+                                <div>
+                                    <label for="remark" class="form-label mb-0">Remark</label>
+                                    <select name="remark" id="remark" class="form-select form-select-sm"
+                                        style="width: 200px;">
+                                        <option value="">-- Pilih Remark --</option>
+                                        <option value="normal" {{ request('remark') == 'normal' ? 'selected' : '' }}>Normal
                                         </option>
-                                    @endforeach
-                                </select>
-                                <button type="submit" class="btn btn-primary btn-sm ms-2">Filter</button>
+                                        <option value="abnormal" {{ request('remark') == 'abnormal' ? 'selected' : '' }}>
+                                            Abnormal</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
                             </form>
+
                         </div>
 
                         <div class="table-responsive animate__animated animate__fadeInUp">
@@ -101,6 +120,7 @@
                                         <th class="text-center">Act Stok</th>
                                         <th class="text-center">Category</th>
                                         <th class="text-center">STO Period</th>
+                                        <th class="text-center">Remark</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -116,10 +136,11 @@
                                             <td class="text-center">{{ $part->part->Part_number ?? '-' }}</td>
                                             <td class="text-center">{{ $part->plan_stock ?? '-' }}</td>
                                             <td class="text-center">{{ $part->act_stock ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->Category->name ?? '-' }}</td>
+                                            <td class="text-center">{{ $part->part->category->name ?? '-' }}</td>
                                             <td class="text-center">
                                                 {{ $part->updated_at ? $part->updated_at->format('M Y') : '-' }}
                                             </td>
+                                            <td class="text-center">{{ $part->remark ?? '-' }}</td>
                                             <td class="text-center">
                                                 <a href="{{ route('sto.edit', $part->id) }}" class="btn btn-success btn-sm"
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
@@ -173,5 +194,4 @@
         </div>
     </div>
     {{-- end --}}
-
 @endsection

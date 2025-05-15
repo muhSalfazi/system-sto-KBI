@@ -9,7 +9,17 @@ class Part extends Model
     use HasFactory;
 
     protected $table = 'tbl_part';
-    protected $fillable = ['Inv_id', 'Part_name', 'Part_number', 'id_customer', 'id_pkg', 'id_plan', 'id_area', 'id_rak'];
+    protected $fillable = [
+        'Inv_id',
+        'Part_name',
+        'Part_number',
+        'id_category',
+        'id_customer',
+        'id_pkg',
+        'id_plan',
+        'id_area',
+        'id_rak'
+    ];
 
     public function customer()
     {
@@ -37,8 +47,12 @@ class Part extends Model
     }
 
     public function inventories()
-{
-    return $this->hasMany(Inventory::class, 'id_part');
-}
+    {
+        return $this->hasMany(Inventory::class, 'id_part');
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'id_category');
+    }
 
 }

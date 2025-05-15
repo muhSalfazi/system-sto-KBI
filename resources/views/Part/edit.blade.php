@@ -50,8 +50,13 @@
                         <input type="text" name="Part_number" id="part_number" class="form-control"
                             value="{{ old('Part_number', $part->Part_number) }}" disabled>
                     </div>
+                    <div class="col-md-3">
+                        <label for="id_category" class="form-label">Category</label>
+                        <input type="text" name="id_category" id="id_category" class="form-control"
+                            value="{{ old('id_category', $part->category->name) }}" disabled>
+                    </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <label for="id_customer" class="form-label">Customer</label>
                         <select name="id_customer" id="id_customer" class="form-select" required>
                             @foreach ($customers as $customer)

@@ -19,11 +19,18 @@ class StoController extends Controller
         $categories = Category::all();
 
         // Query untuk mengambil data STO, dengan filter kategori jika ada
-        $query = Inventory::with('part.plant', 'part.area', 'part.rak');
+        $query = Inventory::with('part.plant', 'part.area', 'part.rak', 'part.category');
 
-        // Jika ada kategori yang dipilih, filter berdasarkan kategori
+
+        // Jika ada kategori yang dipilih, filter berdasarkan kategori dari relasi part
         if ($request->has('category_id') && $request->category_id != '') {
-            $query->where('id_category', $request->category_id);
+            $query->whereHas('part', function ($q) use ($request) {
+                $q->where('id_category', $request->category_id);
+            });
+        }
+        // Filter berdasarkan remark langsung dari tabel inventory
+        if ($request->filled('remark')) {
+            $query->where('remark', $request->remark);
         }
 
         // Ambil data berdasarkan query
@@ -44,17 +51,12 @@ class StoController extends Controller
     {
         $request->validate([
             'id_part' => 'required|exists:tbl_part,id',
-            'id_category' => 'required|exists:tbl_category,id',
             'plan_stock' => 'required|string',
-            'status' => 'required|in:OK,NG,FUNSAI,VIRGIN',
         ]);
 
         Inventory::create([
             'id_part' => $request->id_part,
-            'id_category' => $request->id_category,
             'plan_stock' => $request->plan_stock,
-            // 'act_stock' => $request->plan_stock,
-            'status' => $request->status,
         ]);
 
         return redirect()->route('sto.index')->with('success', 'Data STO berhasil ditambahkan.');
@@ -72,16 +74,10 @@ class StoController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'id_category' => 'sometimes|exists:tbl_category,id',
             'status' => 'sometimes|in:OK,NG',
         ]);
 
         $sto = Inventory::findOrFail($id);
-
-        $sto->update([
-            'id_category' => $request->id_category,
-            'status' => $request->status,
-        ]);
 
         return redirect()->route('sto.index')->with('success', 'Data STO berhasil diperbarui.');
     }

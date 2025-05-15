@@ -15,8 +15,8 @@ class Category extends Model
         'name',
     ];
 
-    public function Inventorys()
+    public function parts()
     {
-        return $this->hasMany(Inventory::class, 'id_category');
+        return $this->hasMany(Part::class, 'id_category');
     }
 }

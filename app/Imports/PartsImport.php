@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Plant;
 use App\Models\Area;
 use App\Models\Rak;
+use App\Models\Category;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -34,6 +35,9 @@ class PartsImport implements ToCollection, WithHeadingRow
             if (isset($row['customer']) && !isset($row['rak'])) {
                 $logMsg = "Kolom Rak tidak ditemukan pada baris: " . json_encode($row);
             }
+            if (isset($row['customer']) && !isset($row['kategori'])) {
+                $logMsg = "Kolom Rak tidak ditemukan pada baris: " . json_encode($row);
+            }
 
             // Simpan log ke array logs
             if ($logMsg) {
@@ -58,8 +62,9 @@ class PartsImport implements ToCollection, WithHeadingRow
             $plant = Plant::where('name', $row['plan'])->first();
             $area = Area::where('nama_area', $row['area'])->first();
             $rak = Rak::where('nama_rak', $row['rak'])->first();
+            $category = Category::where('name', $row['kategori'])->first();
 
-            if (!$customer || !$plant || !$area || !$rak) {
+            if (!$customer || !$plant || !$area || !$rak || !$category) {
                 $this->logs[] = "Relasi tidak ditemukan pada baris: " . json_encode($row);
                 continue;
             }
@@ -73,6 +78,7 @@ class PartsImport implements ToCollection, WithHeadingRow
                 'id_plan' => $plant->id,
                 'id_area' => $area->id,
                 'id_rak' => $rak->id,
+                'id_category' => $category->id,
             ]);
 
             Package::create([

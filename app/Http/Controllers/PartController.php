@@ -7,6 +7,7 @@ use App\Models\Package;
 use App\Models\Plant;
 use App\Models\Area;
 use App\Models\Rak;
+use App\Models\Category;
 use App\Imports\PartsImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
@@ -15,12 +16,22 @@ use Illuminate\Support\Facades\Log;
 class PartController extends Controller
 {public function index(Request $request)
     {
-        // Gunakan pagination untuk mengurangi beban memori
-        $parts = Part::with(['customer', 'package', 'plant', 'area', 'rak'])
-                    ->paginate(5);  // Atur jumlah data per halaman sesuai kebutuhan
+        // Ambil semua kategori untuk filter
+        $categories = Category::all();
+
+        // Query untuk mengambil data Part, dengan filter kategori jika ada
+        $query = Part::with(['customer', 'package', 'plant', 'area', 'rak', 'category']);
+
+        // Jika ada kategori yang dipilih, filter berdasarkan kategori
+        if ($request->has('category_id') && $request->category_id != '') {
+            $query->where('id_category', $request->category_id);
+        }
+
+        // Ambil data berdasarkan query
+        $parts = $query->get();
 
         // Kembalikan view dengan data yang sudah dipaginasi
-        return view('Part.index', compact('parts'));
+        return view('Part.index', compact('parts','categories'));
     }
 
 
@@ -31,6 +42,7 @@ class PartController extends Controller
             'plants' => Plant::all(),
             'areas' => Area::all(),
             'raks' => Rak::all(),
+            'categories' => Category::all(),
         ]);
     }
 
@@ -42,6 +54,7 @@ class PartController extends Controller
             'Part_name' => 'required',
             'Part_number' => 'required',
             'id_customer' => 'required|exists:tbl_customer,id',
+            'id_category' => 'required|exists:tbl_category,id',
             'id_plan' => 'required|exists:tbl_plan,id',
             'id_area' => 'required|exists:tbl_area,id',
             'id_rak' => 'required|exists:tbl_rak,id',
@@ -116,7 +129,7 @@ class PartController extends Controller
         $raks = Rak::where('id_area', $areaId)->get();
         return response()->json($raks);
     }
-    
+
     public function import(Request $request)
     {
         $request->validate([

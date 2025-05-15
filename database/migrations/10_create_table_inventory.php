@@ -14,16 +14,17 @@ return new class extends Migration
         Schema::create('tbl_inventory', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_part');
-            $table->unsignedBigInteger('id_category');
             $table->integer('plan_stock')->default(0);
             $table->integer('act_stock')->default(0);
-            $table->enum('status', ['OK', 'NG','VIRGIN','FUNSAI']);
+            // $table->string('remark')->nullable();
+            $table->enum('remark',['normal','abnormal'])->default('normal');
+             $table->string('note_remark')->nullable();
+
 
             // index
             $table->index('id_part');
 
             // fk
-            $table->foreign('id_category')->references('id')->on('tbl_category')->onDelete('cascade');
             $table->foreign('id_part')->references('id')->on('tbl_part')->onDelete('cascade');
 
             $table->timestamps();
