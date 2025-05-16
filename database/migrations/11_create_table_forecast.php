@@ -13,15 +13,17 @@ return new class extends Migration
     {
         Schema::create('tbl_forecast', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_inventory');
+            $table->unsignedBigInteger('id_part');
             $table->integer('hari_kerja');
+            $table->integer('Qty_Box');
+            $table->date('date' )->default(0);
             $table->integer('min')->default(0);
             $table->integer('max')->default(0);
 
             // index
-            $table->index('id_inventory');
+            $table->index('id_part');
             // fk
-            $table->foreign('id_inventory')->references('id')->on('tbl_inventory')->onDelete('cascade');
+            $table->foreign('id_part')->references('id')->on('tbl_part')->onDelete('cascade');
             $table->timestamps();
         });
     }

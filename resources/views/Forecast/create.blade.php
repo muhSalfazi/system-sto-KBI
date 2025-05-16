@@ -33,14 +33,18 @@
                     @csrf
                     <div class="mb-3">
                         <label for="id_part" class="form-label">Inv id</label>
-                        <select name="id_part" id="id_part" class="form-select select2" required>
+                        <select name="id_part" id="id_part" class="form-select mb-2 select2" required>
                             <option value="">-- Pilih Part --</option>
                             @foreach ($parts as $part)
-                                <option value="{{ $part->id }}">{{ $part->Inv_id }} - {{ $part->Part_name }}</option>
+                                <option value="{{ $part->Inv_id }}">{{ $part->Inv_id }} - {{ $part->Part_name }}</option>
                             @endforeach
                         </select>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="jumlah_po" class="form-label">Qty/Box</label>
+                        <input type="text" name="jumlah_po" id="jumlah_po" class="form-control" required>
+                    </div>
                     <div class="mb-3">
                         <label for="plan_stock" class="form-label">Hari Kerja</label>
                         <input type="text" name="plan_stock" id="plan_stock" class="form-control" required>
@@ -56,7 +60,9 @@
     <script>
         $(document).ready(function() {
             $('.select2').select2({
+                theme: 'bootstrap-5',
                 placeholder: "-- Pilih --",
+                  allowClear: true,
                 width: '100%'
             });
         });

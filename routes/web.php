@@ -66,7 +66,7 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     // sto
     Route::get('/sto', [StoController::class, 'index'])->name('sto.index');
     Route::get('/sto/create', [StoController::class, 'create'])->name('sto.create.get');
-    Route::post('/sto/store', [StoController::class, 'store'])->name('sto.store');
+    Route::post('/sto/store', [StoController::class, 'store'])->name('sto.store.admin');
     Route::get('/sto/edit/{id}', [StoController::class, 'edit'])->name('sto.edit');
     Route::put('/sto/update/{id}', [StoController::class, 'update'])->name('sto.update');
     Route::delete('/sto/destroy/{id}', [StoController::class, 'destroy'])->name('sto.destroy');

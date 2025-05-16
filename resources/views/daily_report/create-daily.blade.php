@@ -138,8 +138,8 @@
         $(document).ready(function() {
             $('.select2').select2({
                 theme: 'bootstrap-5', // pakai tema Bootstrap 5
+                xallowClear: true,
                 placeholder: "-- Pilih Inv_id --",
-                allowClear: true,
                 width: '100%'
             });
 

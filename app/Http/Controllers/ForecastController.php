@@ -15,7 +15,7 @@ class ForecastController extends Controller
 {
     public function index()
     {
-        $forecasts = Forecast::with('inventory.part.customer')->get();
+        $forecasts = Forecast::with('part.customer')->get();
 
         return view('Forecast.index', compact('forecasts'));
     }
@@ -61,31 +61,33 @@ class ForecastController extends Controller
         return redirect()->route('forecast.index')->with('success', 'Forecast berhasil dihapus.');
     }
 
-    // Menyimpan data forecast
+
     public function store(Request $request)
     {
         $request->validate([
-            'id_part' => 'required|exists:tbl_part,id',
-            'plan_stock' => 'required|integer|min:1|max:31', // Hari kerja
+            'id_part' => 'required|exists:tbl_part,Inv_id',
+            'jumlah_po' => 'required|numeric|min:1',
+            'plan_stock' => 'required|integer|min:1',
         ]);
 
         // Cari inventory berdasarkan id_part
-        $inventory = Inventory::where('id_part', $request->id_part)->latest()->first();
+        $part = Part::where('Inv_id', $request->id_part)->latest()->first();
 
-        if (!$inventory) {
+        if (!$part) {
             return redirect()->back()->withErrors(['id_part' => 'Inventory tidak ditemukan untuk Part ini.']);
         }
 
-        $totalOrder = $inventory->plan_stock;
+        $jumlahPO = (int) $request->jumlah_po;
         $hariKerja = (int) $request->plan_stock;
 
-        $min = (int) ceil($totalOrder / $hariKerja);
+        $min = (int) ceil($jumlahPO / $hariKerja);
         $max = $min * 3;
 
         Forecast::updateOrCreate(
-            ['id_inventory' => $inventory->id],
+            ['id_part' => $part->id],
             [
                 'hari_kerja' => $hariKerja,
+                'Qty_Box' => $jumlahPO,
                 'min' => $min,
                 'max' => $max,
             ]
@@ -93,6 +95,7 @@ class ForecastController extends Controller
 
         return redirect()->route('forecast.index')->with('success', 'Data forecast berhasil disimpan.');
     }
+
     // Mengimpor data forecast dari file Excel
 
     public function import(Request $request)

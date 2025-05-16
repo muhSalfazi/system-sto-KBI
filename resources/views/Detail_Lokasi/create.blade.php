@@ -52,7 +52,7 @@
                         <!-- Area: Pilih atau Tambah -->
                         <div class="col-md-6">
                             <label for="id_area" class="form-label">Pilih Area (opsional)</label>
-                            <select name="id_area" id="id_area" class="form-select" disabled>
+                            <select name="id_area" id="id_area" class="form-select select2" disabled>
                                 <option value="">-- Pilih Plan terlebih dahulu --</option>
                             </select>
                         </div>
@@ -60,8 +60,9 @@
                         <div class="col-md-6">
                             <label for="nama_area_baru" class="form-label">Atau Tambah Area Baru</label>
                             <input type="text" class="form-control" name="nama_area_baru" id="nama_area_baru"
-                                placeholder="Nama Area Baru (opsional)">
+                                placeholder="Nama Area Baru (opsional)" disabled>
                         </div>
+
 
                         <!-- Submit -->
                         <div class="col-12">
@@ -73,12 +74,25 @@
             </div>
         </div>
     </section>
+    {{-- select 2 --}}
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                theme: 'bootstrap-5', // pakai tema Bootstrap 5
+                xallowClear: true,
+                placeholder: "-- Pilih --",
+                width: '100%'
+            });
+        });
+    </script>
+    {{-- ===== --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const selectPlan = document.getElementById('id_plan');
             const selectArea = document.getElementById('id_area');
             const inputAreaBaru = document.getElementById('nama_area_baru');
 
+            // Load area saat plan dipilih
             selectPlan.addEventListener('change', function() {
                 const planId = this.value;
                 if (planId) {
@@ -93,33 +107,40 @@
                                 selectArea.appendChild(option);
                             });
                             selectArea.disabled = false;
+                            validateAreaInputs();
                         });
                 } else {
                     selectArea.innerHTML = `<option value="">-- Pilih Plan terlebih dahulu --</option>`;
                     selectArea.disabled = true;
+                    inputAreaBaru.disabled = true;
                 }
             });
 
-            // Disable Area baru jika pilih area
-            selectArea.addEventListener('change', function() {
-                if (this.value) {
+            // Fungsi validasi input area vs area baru
+            function validateAreaInputs() {
+                const areaSelected = selectArea.value !== '';
+                const areaBaruFilled = inputAreaBaru.value.trim() !== '';
+
+                // Jika pilih area → area baru disable
+                if (areaSelected) {
                     inputAreaBaru.disabled = true;
-                    inputAreaBaru.value = '';
                 } else {
                     inputAreaBaru.disabled = false;
                 }
-            });
 
-            // Disable select area jika input area baru
-            inputAreaBaru.addEventListener('input', function() {
-                if (this.value.trim() !== '') {
+                // Jika isi area baru → select area disable
+                if (areaBaruFilled) {
                     selectArea.disabled = true;
-                    selectArea.value = '';
-                } else {
+                } else if (selectPlan.value) {
                     selectArea.disabled = false;
                 }
-            });
+            }
+
+            // Listener perubahan input
+            selectArea.addEventListener('change', validateAreaInputs);
+            inputAreaBaru.addEventListener('input', validateAreaInputs);
         });
     </script>
+
 
 @endsection

@@ -8,7 +8,7 @@ use App\Models\Plant;
 use Illuminate\Http\Request;
 use App\Imports\DetailLokasiImport;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Illuminate\Support\Facades\Validator;
 
 class DetailLokasiController extends Controller
 {
@@ -30,28 +30,41 @@ class DetailLokasiController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'nama_rak' => 'required',
             'id_plan' => 'required|exists:tbl_plan,id',
             'id_area' => 'nullable|exists:tbl_area,id',
             'nama_area_baru' => 'nullable|string'
         ]);
 
-        // Gunakan area lama jika dipilih, atau buat baru jika diisi
-        if ($validated['id_area']) {
-            $areaId = $validated['id_area'];
-        } elseif (!empty($validated['nama_area_baru'])) {
+        // Validasi khusus: tidak boleh isi dua-duanya
+        $validator->after(function ($validator) use ($request) {
+            if ($request->filled('id_area') && $request->filled('nama_area_baru')) {
+                $validator->errors()->add('id_area', 'Tidak boleh mengisi area lama dan area baru secara bersamaan.');
+            }
+
+            if (!$request->filled('id_area') && !$request->filled('nama_area_baru')) {
+                $validator->errors()->add('id_area', 'Wajib pilih salah satu: area lama atau input area baru.');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Logika area
+        if ($request->filled('id_area')) {
+            $areaId = $request->id_area;
+        } else {
             $newArea = Area::create([
-                'nama_area' => $validated['nama_area_baru'],
-                'id_plan' => $validated['id_plan'],
+                'nama_area' => $request->nama_area_baru,
+                'id_plan' => $request->id_plan,
             ]);
             $areaId = $newArea->id;
-        } else {
-            return back()->withErrors(['id_area' => 'Pilih area atau masukkan area baru']);
         }
 
         Rak::create([
-            'nama_rak' => $validated['nama_rak'],
+            'nama_rak' => $request->nama_rak,
             'id_area' => $areaId
         ]);
 

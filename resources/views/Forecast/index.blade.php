@@ -62,7 +62,9 @@
                                         <th class="text-center">Inv ID</th>
                                         <th class="text-center">Part Name</th>
                                         <th class="text-center">Part Number</th>
+                                        <th class="text-center">Location</th>
                                         <th class="text-center">Customer</th>
+                                        <th class="text-center">Qty/Box</th>
                                         <th class="text-center">Working Days</th>
                                         <th class="text-center">Min</th>
                                         <th class="text-center">Max</th>
@@ -73,12 +75,13 @@
                                     @foreach ($forecasts as $index => $forecast)
                                         <tr>
                                             <td class="text-center">{{ $index + 1 }}</td>
-                                            <td class="text-center">{{ $forecast->inventory->part->Inv_id ?? '-' }}</td>
-                                            <td class="text-center">{{ $forecast->inventory->part->Part_name ?? '-' }}</td>
-                                            <td class="text-center">{{ $forecast->inventory->part->Part_number ?? '-' }}
-                                            </td>
+                                            <td class="text-center">{{ $forecast->part->Inv_id ?? '-' }}</td>
+                                            <td class="text-center">{{ $forecast->part->Part_name ?? '-' }}</td>
+                                            <td class="text-center">{{ $forecast->part->Part_number ?? '-' }}</td>
+                                            <td class="text-center">{{ $forecast->part->plant->name ?? '-' }}</td>
                                             <td class="text-center">
-                                                {{ $forecast->inventory->part->customer->username ?? '-' }}</td>
+                                                {{ $forecast->part->customer->username ?? '-' }}</td>
+                                            <td class="text-center">{{ $forecast->Qty_Box }}</td>
                                             <td class="text-center">{{ $forecast->hari_kerja }}</td>
                                             <td class="text-center">{{ $forecast->min }}</td>
                                             <td class="text-center">{{ $forecast->max }}</td>

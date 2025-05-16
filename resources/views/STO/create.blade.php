@@ -29,14 +29,14 @@
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Form Input STO</h5>
-                <form action="{{ route('sto.store') }}" method="POST">
+                <form action="{{ route('sto.store.admin') }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <label for="id_part" class="form-label">Part</label>
                         <select name="id_part" id="id_part" class="form-select select2" required>
                             <option value="">-- Pilih Part --</option>
                             @foreach ($parts as $part)
-                                <option value="{{ $part->id }}">{{ $part->Part_name }} - {{ $part->Part_number }}
+                                <option value="{{ $part->id }}">{{ $part->Inv_id }} - {{ $part->Part_name }} - {{ $part->Part_number }}
                                 </option>
                             @endforeach
                         </select>
@@ -53,10 +53,11 @@
         </div>
     </section>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-
-    <script>
+ <script>
         $(document).ready(function() {
             $('.select2').select2({
+                 theme: 'bootstrap-5', // pakai tema Bootstrap 5
+                xallowClear: true,
                 placeholder: "-- Pilih --",
                 width: '100%'
             });

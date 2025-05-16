@@ -11,14 +11,16 @@ class Forecast extends Model
     protected $table = 'tbl_forecast';
 
     protected $fillable = [
-        'id_inventory',
+        'id_part',
         'hari_kerja',
+        'Qty_Box',
         'min',
         'max',
     ];
 
-    public function inventory()
+    public function part()
     {
-        return $this->belongsTo(Inventory::class, 'id_inventory');
+        return $this->belongsTo(Part::class, 'id_part');
     }
+
 }
