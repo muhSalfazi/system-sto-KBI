@@ -12,10 +12,10 @@ class Inventory extends Model
 
     protected $fillable = [
         'id_part',
-        'id_category',
+        'act_stock',
         'plan_stock',
         'remark',
-        'note_remark'
+        'note_remark',
     ];
 
 

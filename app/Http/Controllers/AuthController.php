@@ -27,19 +27,26 @@ class AuthController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-        // Cek kredensial login
         $credentials = [
             'username' => $request->username,
             'password' => $request->password
         ];
 
         if (Auth::attempt($credentials)) {
-            // Otentikasi berhasil, arahkan ke halaman dashboard
+            // Ambil user yang sedang login
+            $user = Auth::user();
+
+            // Cek apakah role-nya adalah 'user'
+            if ($user->role === 'user') {
+                Auth::logout(); // logout langsung
+                return redirect()->back()->with('error', 'Akses tidak diperbolehkan untuk user biasa.');
+            }
+
+            // Jika bukan user biasa, lanjut ke dashboard
             return redirect()->route('dashboard')->with('login-sukses', 'Login successful');
         }
 
-
-        // Jika gagal login, kirim error dan kembali ke halaman login
+        // Jika gagal login
         return redirect()->back()->with('error', 'Invalid Username or Password');
     }
 
@@ -53,12 +60,18 @@ class AuthController extends Controller
         $user = User::where('nik', $request->nik)->first();
 
         if ($user) {
+            // Cek role
+            if ($user->role !== 'user') {
+                return redirect()->back()->with('error', 'Akses hanya diperbolehkan untuk user role.');
+            }
+
             Auth::login($user); // login manual tanpa password
             return redirect()->route('dailyreport.index')->with('success', 'Login berhasil');
         }
 
         return redirect()->back()->with('error', 'ID Card tidak ditemukan');
     }
+
 
     public function logout()
     {

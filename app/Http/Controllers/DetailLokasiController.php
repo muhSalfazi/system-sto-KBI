@@ -106,4 +106,12 @@ class DetailLokasiController extends Controller
         }
     }
 
+    // get area by plan
+    public function getByPlan($id)
+    {
+        $areas = Area::where('id_plan', $id)->get();
+        return response()->json($areas);
+    }
+
+
 }

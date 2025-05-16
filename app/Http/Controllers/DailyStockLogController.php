@@ -6,8 +6,6 @@ use App\Models\Inventory;
 use App\Models\Part;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\DailyStockImport;
-use Illuminate\Support\Facades\DB;
 use App\Exports\DailyStockExport;
 class DailyStockLogController extends Controller
 {
@@ -27,30 +25,6 @@ class DailyStockLogController extends Controller
         $statuses = ['OK', 'NG', 'VIRGIN', 'FUNSAI']; // untuk dropdown filter
 
         return view('Daily_stok.index', compact('dailyStockLogs', 'statuses'));
-    }
-
-
-    /**
-     * Mengimpor file CSV atau Excel dan memproses data.
-     */
-    public function import(Request $request)
-    {
-        // Validasi file CSV atau Excel
-        $request->validate([
-            'file' => 'required|file|mimes:csv,txt'
-        ]);
-
-        try {
-            $importer = new DailyStockImport();
-            Excel::import($importer, $request->file('file'));
-
-            session()->flash('import_logs', $importer->getLogs());
-
-            return redirect()->route('daily-stock.index')->with('success', 'Import stok harian berhasil.');
-        } catch (\Exception $e) {
-            \Log::error('Import stok gagal', ['error' => $e->getMessage()]);
-            return redirect()->route('reports.edit')->with('error', 'Terjadi kesalahan saat mengimpor file.');
-        }
     }
 
     public function edit($id)

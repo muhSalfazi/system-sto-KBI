@@ -4,7 +4,7 @@
   <div class="container">
     <div class="card p-2 p-md-4 mt-4 shadow-lg">
       <h5 class="card-title text-white">Search Results</h5>
-      
+
       <!-- Search Form -->
       <form action="{{ route('sto.search') }}" method="GET" class="mb-4">
         <div class="input-group">
@@ -14,7 +14,7 @@
           </div>
         </div>
       </form>
-      
+
       @if ($results->isEmpty())
         <p class="text-white">No results found.</p>
       @else
@@ -37,7 +37,7 @@
           </tbody>
         </table>
       @endif
-      <a href="{{ route('sto.index') }}" class="btn btn-success mt-3">Back</a>
+      <a href="{{ route('dailyreport.index') }}" class="btn btn-success mt-3">Back</a>
     </div>
   </div>
 @endsection

@@ -96,11 +96,13 @@
                                     <tr>
                                         <td class="text-center">{{ $key + 1 }}</td>
                                         <td class="text-center">{{ $log->created_at }}</td>
-                                        <td class="text-center">{{ $log->inventory->part->Inv_id }}</td>
-                                        <td class="text-center">{{ $log->inventory->part->Part_name }}</td>
-                                        <td class="text-center">{{ $log->inventory->part->Part_number }}</td>
+                                        <td>{{ optional(optional($log->inventory)->part)->Inv_id ?? '-' }}</td>
+                                        <td>{{ optional(optional($log->inventory)->part)->Part_name ?? '-' }}</td>
+                                        <td>{{ optional(optional($log->inventory)->part)->Part_number ?? '-' }}</td>
+
                                         <td class="text-center">{{ $log->Total_qty }}</td>
-                                        <td class="text-center">{{ $log->inventory->part->customer->username }}</td>
+                                         <td>{{ optional(optional(optional($log->inventory)->part)->customer)->username ?? '-' }}</td>
+
                                         <td class="text-center">{{ $log->status }}</td>
                                         <td class="text-center">{{ $log->user->username }}</td>
                                         <td class="text-center">

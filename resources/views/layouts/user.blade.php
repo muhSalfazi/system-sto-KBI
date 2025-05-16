@@ -19,8 +19,10 @@
     <link href="{{ asset('assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
+
     <!-- Template Main CSS File -->
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/css/qr.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/form.css') }}" rel="stylesheet">
     <!-- CSS Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
@@ -30,9 +32,17 @@
     <!-- Select2 Bootstrap 5 Theme -->
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
         rel="stylesheet">
-
-    <!-- Tambahkan di <head> -->
+    <!-- JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- CSS Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- Select2 Bootstrap 5 Theme -->
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+        rel="stylesheet">
+
 </head>
 
 <body>
@@ -41,22 +51,22 @@
             <div class="container container-fluid">
                 <div class="d-flex flex-column align-items-start">
                     <div class="d-flex align-items-center">
-                        <a href="{{ route('sto.index') }}" class="text-white">
-                            <i class="fas fa-warehouse me-2"></i> Scan STO
+                        <a href="{{ route('dailyreport.index') }}" class="text-white">
+                            <h4> <i class="fas fa-clipboard-check me-2"></i><strong>Scan Qrcode STO </strong></h4>
                         </a>
                     </div>
                     @if (isset($inventory))
-                        <p class="colom mt-1" style="font-size: 17px; margin-bottom: -1px; color:rgb(255, 255, 255);">
+                        <p class="colom mt-1" style="font-size: 15px; margin-bottom: -1px; color:rgb(255, 255, 255);">
                             <i class="fas fa-file-invoice"></i>&nbsp;&nbsp;Inventory ID&nbsp;:&nbsp;
                             <strong
-                                style="width: 5px; font-size: 20px; color:rgb(255, 225, 0); padding: 1px; text-transform: uppercase;">
+                                style="width: 5px; font-size: 15px; color:rgb(255, 225, 0); padding: 1px; text-transform: uppercase;">
                                 {{ $inventory->part->Inv_id ?? 'Not Available' }}
                             </strong>
                         </p>
-                        <p class="colom mt-1" style="font-size: 17px; margin-bottom: -1px; color:rgb(255, 255, 255);">
+                        <p class="colom mt-1" style="font-size: 15px; margin-bottom: -1px; color:rgb(255, 255, 255);">
                             <i class="fas  fa-user-tie"></i>&nbsp;&nbsp;Customer&nbsp;:&nbsp;
                             <strong
-                                style="width: 5px; font-size: 20px; color:rgb(255, 213, 0); padding: 1px; text-transform: uppercase;">
+                                style="width: 5px; font-size: 15px; color:rgb(255, 213, 0); padding: 1px; text-transform: uppercase;">
                                 {{ $inventory->part->customer->username ?? 'Not Available' }}
                             </strong>
                         </p>
@@ -110,12 +120,14 @@
         @endif
         @if ($errors->any())
             <div class="container mt-3">
-                <div class="alert alert-danger">
-                    <ul>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Terjadi kesalahan:</strong>
+                    <ul class="mb-0 mt-2">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </div>
         @endif
@@ -124,18 +136,13 @@
         @yield('contents')
 
     </section>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- Template Main JS File -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
-    {{-- jsload --}}
+    {{-- js html5-qrcode --}}
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
     <script>
-        window.addEventListener('load', function() {
-            // Sembunyikan loader setelah halaman selesai dimuat
-            document.getElementById('loader').style.display = 'none';
-        });
-
         function confirmLogout() {
             Swal.fire({
                 title: 'Apakah Anda yakin ingin keluar?',
@@ -152,8 +159,10 @@
             });
         }
     </script>
+
+    {{-- js select2 dan sweetalert2 --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </body>
 
 </html>

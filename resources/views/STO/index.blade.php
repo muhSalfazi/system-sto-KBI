@@ -11,7 +11,7 @@
             </ol>
         </nav>
     </div>
-    {{-- =========================  alert ======================= --}}
+    {{-- ========================= alert ======================= --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -54,13 +54,13 @@
                             <a href="{{ route('sto.create.get') }}" class="btn btn-primary btn-sm mb-1">
                                 <i class="bi bi-plus-square"></i> Create STO
                             </a>
-                            <button type="button" class="btn btn-success btn-sm mb-1"
-                                data-bs-toggle="modal"data-bs-target="#importModal">
+                            <button type="button" class="btn btn-success btn-sm mb-1" data-bs-toggle="modal"
+                                data-bs-target="#importModal">
                                 <i class="bi bi-filetype-csv"></i></i> Import Csv By Ledger
                             </button>
                             {{-- convert STO --}}
-                            <button type="button" class="btn btn-info btn-sm "
-                                data-bs-toggle="modal"data-bs-target="#exceltocsv">
+                            <button type="button" class="btn btn-info btn-sm " data-bs-toggle="modal"
+                                data-bs-target="#exceltocsv">
                                 <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
                             </button>
                             {{-- export excel --}}
@@ -81,8 +81,7 @@
                                         style="width: 200px;">
                                         <option value="">-- Pilih Kategori --</option>
                                         @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}"
-                                                {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
                                                 {{ $category->name }}
                                             </option>
                                         @endforeach
@@ -121,6 +120,7 @@
                                         <th class="text-center">Category</th>
                                         <th class="text-center">STO Period</th>
                                         <th class="text-center">Remark</th>
+                                        <th class="text-center">Note-Remark</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -140,7 +140,17 @@
                                             <td class="text-center">
                                                 {{ $part->updated_at ? $part->updated_at->format('M Y') : '-' }}
                                             </td>
-                                            <td class="text-center">{{ $part->remark ?? '-' }}</td>
+                                            <td class="text-center">
+                                                @if ($part->remark === 'normal')
+                                                    <span class="badge bg-success text-white px-2 py-1">Normal</span>
+                                                @elseif ($part->remark === 'abnormal')
+                                                    <span class="badge bg-danger text-white px-2 py-1">Abnormal</span>
+                                                @else
+                                                    <span class="badge bg-secondary text-white px-2 py-1">-</span>
+                                                @endif
+                                            </td>
+
+                                            <td class="text-center">{{ $part->note_remark ?? '-' }}</td>
                                             <td class="text-center">
                                                 <a href="{{ route('sto.edit', $part->id) }}" class="btn btn-success btn-sm"
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
@@ -181,8 +191,7 @@
                         @csrf
                         <div class="mb-3">
                             <label for="file" class="form-label">Upload Csv File</label>
-                            <input type="file" name="file" class="form-control" id="file" required
-                                accept=".csv">
+                            <input type="file" name="file" class="form-control" id="file" required accept=".csv">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

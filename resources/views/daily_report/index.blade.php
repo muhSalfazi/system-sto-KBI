@@ -1,24 +1,24 @@
 @extends('layouts.user')
 
 @section('contents')
- @if (session('report'))
-    <div class="alert alert-info alert-dismissible fade show" role="alert">
-        <a href="{{ route('reports.print', session('report')) }}" class="text-black text-decoration-underline">
-            Print PDF
-        </a>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-
+    @if (session('report'))
+        <div class="container mt-3">
+            <div id="downloadContainer" class="alert alert-info alert-dismissible fade show" role="alert">
+                <a href="{{ route('reports.print', session('report')) }}" class="text-black text-decoration-underline">
+                    Print PDF
+                </a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    @endif
 
     {{-- Main Content --}}
-
     <div class="container">
         <div class="card p-2 p-md-4 mt-4 shadow-lg">
             <!-- Form Packing -->
             <form action="{{ route('sto.scan') }}" method="POST" id="stoForm">
                 @csrf
+
                 <div class="mb-2">
                     <label for="inventory_id" class="form-label" style="font-size: 1.1rem;">Inventory ID (Scan QR)</label>
                     <div class="input-group my-2 my-md-3">
@@ -36,7 +36,7 @@
                 </div>
             </form>
             <div class="text-center">
-                <a href="{{ route('sto.create') }}" class="btn btn-link mt-2 text-white" type="button" id="showFormBtn">
+                <a href="{{ route('sto.create.report') }}" class="btn btn-link mt-2 text-white" type="button" id="showFormBtn">
                     ID Inventory Kosong? Klik disini
                 </a>
             </div>
@@ -69,11 +69,25 @@
             </div>
         </div>
 
+        {{-- edit get daily --}}
+        <script>
+            function redirectToEdit() {
+                const id = document.getElementById('id_report').value.trim();
+
+                if (!id) {
+                    alert('Masukkan nomor report terlebih dahulu.');
+                    return;
+                }
+
+                window.location.href = '/sto/edit-log/' + id;
+            }
+        </script>
+        {{-- ===== --}}
         <script>
             function redirectToEdit() {
                 const id = document.getElementById('id_report').value;
                 if (id) {
-                    const url = `{{ url('/sto/form') }}/${id}`;
+                    const url = `{{ url('/sto/edit-log/') }}/${id}`;
                     window.location.href = url;
                 } else {
                     alert('Silakan masukkan ID terlebih dahulu.');
@@ -99,7 +113,6 @@
 
     <!-- Tambahkan ini -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-
     <script>
         let html5QrcodeScanner = new Html5QrcodeScanner(
             "reader", {
@@ -118,14 +131,18 @@
                 reader.style.display = 'block';
                 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
             } else {
-                reader.style.display = 'none';
-                html5QrcodeScanner.clear();
+                html5QrcodeScanner.clear().then(() => {
+                    reader.style.display = 'none';
+                }).catch(err => {
+                    console.error("Clear scanner error:", err);
+                });
             }
         }
 
         function showLoading() {
             let submitButton = document.querySelector('#btnSubmit');
-            submitButton.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Checking Inventory...`;
+            submitButton.innerHTML =
+                `<span class="spinner-border spinner-border-sm me-1 btn-info"></span> Checking Inventory...`;
             submitButton.disabled = true;
         }
 
@@ -138,5 +155,31 @@
         function onScanFailure(error) {
             console.warn(`Scan error: ${error}`);
         }
+    </script>
+
+    <script>
+        //Trigger Auto Download
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadContainer = document.getElementById('downloadContainer');
+
+            if (downloadContainer) {
+                const downloadLink = downloadContainer.querySelector('a');
+
+                if (downloadLink) {
+                    // Simulasikan klik untuk download
+                    const url = downloadLink.href;
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.src = url;
+
+                    // Setelah iframe dimuat, sembunyikan alert
+                    iframe.onload = function() {
+                        downloadContainer.style.display = 'none';
+                    };
+
+                    document.body.appendChild(iframe);
+                }
+            }
+        });
     </script>
 @endsection

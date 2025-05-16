@@ -10,7 +10,7 @@ use App\Models\BoxUncomplete;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-use Dompdf\Dompdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
@@ -25,7 +25,7 @@ class DailyReportController extends Controller
     // jika tidak ada inventory id
     public function create()
     {
-        $parts = Part::with(['category', 'plant', 'area'])->get();
+        $parts = Part::with(['category', 'plant', 'area', 'rak'])->get();
         return view('daily_report.create-daily', compact('parts'));
     }
 
@@ -66,6 +66,7 @@ class DailyReportController extends Controller
             'plan_stock' => $data['plan_stock'],
             'remark' => $remark,
             'note_remark' => $note_remark,
+            'act_stock' => $data['grand_total'],
         ]);
 
         // Simpan Box Complete
@@ -85,15 +86,6 @@ class DailyReportController extends Controller
             ]);
         }
 
-        // Simpan ke DailyStockLog
-        DailyStockLog::create([
-            'id_inventory' => $inventory->id,
-            'id_box_complete' => $boxComplete->id,
-            'id_box_uncomplete' => $boxUncomplete?->id,
-            'Total_qty' => $data['grand_total'],
-            'prepared_by' => $data['prepared_by'],
-            'status' => $data['status'],
-        ]);
 
         $dailyLog = DailyStockLog::create([
             'id_inventory' => $inventory->id,
@@ -151,14 +143,13 @@ class DailyReportController extends Controller
 
     public function storecreate(Request $request, $inventory_id)
     {
-        // Pastikan inventory_id memang valid ID dari Inventory
         $inventory = Inventory::findOrFail($inventory_id);
 
         $data = $request->validate([
             'status' => 'required|string',
-            'qty_per_box' => 'required|integer',
-            'qty_box' => 'required|integer',
-            'total' => 'required|integer',
+            'qty_per_box' => 'nullable|integer',
+            'qty_box' => 'nullable|integer',
+            'total' => 'nullable|integer',
             'qty_per_box_2' => 'nullable|integer',
             'qty_box_2' => 'nullable|integer',
             'total_2' => 'nullable|integer',
@@ -167,14 +158,14 @@ class DailyReportController extends Controller
             'prepared_by' => 'required|integer',
         ]);
 
-        // Simpan ke BoxComplete
+        // Simpan BoxComplete
         $boxComplete = BoxComplete::create([
             'qty_per_box' => $data['qty_per_box'],
             'qty_box' => $data['qty_box'],
             'total' => $data['total'],
         ]);
 
-        // Simpan ke BoxUncomplete jika ada input
+        // Simpan BoxUncomplete jika ada
         $boxUncomplete = null;
         if (!empty($data['qty_per_box_2']) && !empty($data['qty_box_2'])) {
             $boxUncomplete = BoxUncomplete::create([
@@ -184,8 +175,8 @@ class DailyReportController extends Controller
             ]);
         }
 
-        // Simpan ke DailyStockLog
-        DailyStockLog::create([
+        // Simpan DailyStockLog
+        $dailyLog = DailyStockLog::create([
             'id_inventory' => $inventory->id,
             'id_box_complete' => $boxComplete->id,
             'id_box_uncomplete' => $boxUncomplete?->id,
@@ -194,13 +185,31 @@ class DailyReportController extends Controller
             'status' => $data['status'],
         ]);
 
-        return redirect()->route('dailyreport.index')->with('success', 'Data berhasil disimpan.');
+        // Re-calculate grand total dari semua STO untuk inventory ini
+        $totalActual = DailyStockLog::where('id_inventory', $inventory->id)->sum('Total_qty');
+
+        // Hitung gap dan remark
+        $gap = $totalActual - $inventory->plan_stock;
+        $remark = ($gap === 0) ? 'normal' : 'abnormal';
+        $note_remark = ($gap === 0) ? null : 'gap: ' . $gap;
+
+        // Update inventory
+        $inventory->update([
+            'act_stock' => $totalActual,
+            'remark' => $remark,
+            'note_remark' => $note_remark,
+        ]);
+
+        return redirect()->route('dailyreport.index')
+            ->with('success', 'Data berhasil disimpan.')
+            ->with('report', $dailyLog->id);
     }
 
-    // print pdf
 
+    // print pdf
     public function printReport($id)
     {
+        // Ambil data laporan lengkap beserta relasinya
         $report = DailyStockLog::with([
             'inventory.part.category',
             'inventory.part.plant',
@@ -208,28 +217,69 @@ class DailyReportController extends Controller
             'user'
         ])->findOrFail($id);
 
-        $report = DailyStockLog::with(['inventory.part.category', 'inventory.plant', 'user'])->findOrFail($id);
-
-        // QR Code
+        // Buat QR Code SVG
         $renderer = new ImageRenderer(
             new RendererStyle(300),
             new SvgImageBackEnd()
         );
         $writer = new Writer($renderer);
-        $qrSvg = $writer->writeString($report->inventory->id ?? '-');
+        $qrSvg = $writer->writeString($report->inventory->part->Inv_id ?? '-');
         $qrBase64 = 'data:image/svg+xml;base64,' . base64_encode($qrSvg);
 
-        $html = view('pdf.daily_report', [
+        // Generate PDF
+        return Pdf::loadView('pdf.daily_report', [
             'report' => $report,
             'qrCodeBase64' => $qrBase64,
-        ])->render();
+        ])
+            ->setPaper([0, 0, 226.77, 600], 'portrait') // 80mm x 21cm
+            ->download('report_' . $report->id . '.pdf');
+    }
 
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
 
-        return $dompdf->stream('report_' . $report->id . '.pdf');
+        $results = Part::where('Part_name', 'like', '%' . $query . '%')
+            ->orWhere('Part_number', 'like', '%' . $query . '%')
+            ->get(['Inv_id as inventory_id', 'Part_name as part_name', 'Part_number as part_number']);
+
+        return view('daily_report.search', compact('results'));
+    }
+
+    // edit daily report
+    public function editLog($id)
+    {
+        $log = DailyStockLog::with('inventory.part.category', 'inventory.part.plant', 'inventory.part.area', 'inventory.part.rak')->findOrFail($id);
+        $statuses = ['OK', 'NG', 'Virgin', 'Funsai'];
+
+        return view('daily_report.edit', compact('log', 'statuses'));
+    }
+
+    public function updateLog(Request $request, $id)
+    {
+        $data = $request->validate([
+            'plan_stock' => 'required|integer',
+        ]);
+
+        $log = DailyStockLog::with('inventory')->findOrFail($id);
+        $inventory = $log->inventory;
+
+        if (!$inventory) {
+            return back()->with('error', 'Inventory tidak ditemukan.');
+        }
+
+        // Hitung ulang remark & gap
+        $gap = $inventory->act_stock - $data['plan_stock'];
+        $remark = ($gap === 0) ? 'normal' : 'abnormal';
+        $note_remark = ($gap === 0) ? null : 'gap: ' . $gap;
+
+        $inventory->update([
+            'plan_stock' => $data['plan_stock'],
+            'remark' => $remark,
+            'note_remark' => $note_remark,
+        ]);
+
+        return redirect()->route('dailyreport.index')->with('success', 'Plan stock berhasil diperbarui dari DailyStockLog.');
     }
 
 

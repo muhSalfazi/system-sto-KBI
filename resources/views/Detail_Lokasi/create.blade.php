@@ -52,11 +52,8 @@
                         <!-- Area: Pilih atau Tambah -->
                         <div class="col-md-6">
                             <label for="id_area" class="form-label">Pilih Area (opsional)</label>
-                            <select name="id_area" id="id_area" class="form-select">
-                                <option value="">-- Pilih Area --</option>
-                                @foreach ($areas as $area)
-                                    <option value="{{ $area->id }}">{{ $area->nama_area }}</option>
-                                @endforeach
+                            <select name="id_area" id="id_area" class="form-select" disabled>
+                                <option value="">-- Pilih Plan terlebih dahulu --</option>
                             </select>
                         </div>
 
@@ -78,10 +75,32 @@
     </section>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const selectPlan = document.getElementById('id_plan');
             const selectArea = document.getElementById('id_area');
             const inputAreaBaru = document.getElementById('nama_area_baru');
 
-            // Disable inputAreaBaru saat selectArea punya value
+            selectPlan.addEventListener('change', function() {
+                const planId = this.value;
+                if (planId) {
+                    fetch(`/get-area-by-plan/${planId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            selectArea.innerHTML = `<option value="">-- Pilih Area --</option>`;
+                            data.forEach(area => {
+                                const option = document.createElement('option');
+                                option.value = area.id;
+                                option.textContent = area.nama_area;
+                                selectArea.appendChild(option);
+                            });
+                            selectArea.disabled = false;
+                        });
+                } else {
+                    selectArea.innerHTML = `<option value="">-- Pilih Plan terlebih dahulu --</option>`;
+                    selectArea.disabled = true;
+                }
+            });
+
+            // Disable Area baru jika pilih area
             selectArea.addEventListener('change', function() {
                 if (this.value) {
                     inputAreaBaru.disabled = true;
@@ -91,7 +110,7 @@
                 }
             });
 
-            // Disable selectArea saat user isi inputAreaBaru
+            // Disable select area jika input area baru
             inputAreaBaru.addEventListener('input', function() {
                 if (this.value.trim() !== '') {
                     selectArea.disabled = true;
@@ -102,4 +121,5 @@
             });
         });
     </script>
+
 @endsection

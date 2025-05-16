@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             PlanSeeder::class,
             AreaSeeder::class,
             CategorySeeder::class,
-            RakSeeder::class,
+            // RakSeeder::class,
             AdminSeeder::class,
         ]);
     }
