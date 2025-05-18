@@ -76,7 +76,7 @@
                     <div class="dropdown">
                         <div class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown"
                             data-bs-toggle="dropdown" aria-expanded="false" role="button">
-                            <small class="d-block">
+                            <small class="d-block" style="font-size: 12px;">
                                 <i class="fas fa-user me-1" style="color:#1abc9c;"></i>
                                 {{ Auth::user()->username ?? 'Guest' }}
                             </small>

@@ -36,7 +36,7 @@ class UserController extends Controller
             'username' => 'required|string|max:255|unique:tbl_user',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'ID-card' => 'required|string|min:3',
+            'ID-card' => 'required|string|min:3|unique:tbl_user,nik',
             'role' => 'required|exists:tbl_role,name',
         ]);
 

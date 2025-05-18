@@ -142,8 +142,10 @@
                                 value="{{ $inventory->part->area->nama_area ?? '' }}">
                         </div>
                     </div>
-
-                    <button type="submit" class="btn btn-success w-100">Submit</button>
+                    <div class="row d-flex align-items-center">
+                        <button type="submit" class="btn btn-success mt-2 btn-sm col-6">Submit</button>
+                        <a href="{{ route('dailyreport.index') }}" class="btn btn-info btn-sm mt-2 col-6">Back</a>
+                    </div>
                 </form>
             </div>
         </div>
