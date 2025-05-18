@@ -137,7 +137,7 @@ class DailyReportController extends Controller
         }
 
         // 3. Redirect ke halaman edit atau sesuai kebutuhan
-        return redirect()->route('sto.edit', ['inventory_id' => $inventory->id]);
+        return redirect()->route('sto.edit.report', ['inventory_id' => $inventory->id]);
 
     }
 

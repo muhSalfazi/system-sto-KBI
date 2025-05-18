@@ -9,28 +9,26 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use Carbon\Carbon;
 
 class StoExport implements FromCollection, WithHeadings, WithStyles, WithTitle, WithColumnFormatting
 {
     protected $categoryId;
 
-    // Constructor untuk menerima category_id
     public function __construct($categoryId = null)
     {
         $this->categoryId = $categoryId;
     }
 
-    // Mengambil data sesuai dengan kategori
     public function collection()
     {
         $query = Inventory::with('part', 'part.category');
 
         if ($this->categoryId) {
-            $query->where('id_category', $this->categoryId);
+            $query->whereHas('part', function ($q) {
+                $q->where('id_category', $this->categoryId);
+            });
         }
 
-        // Mengambil data dengan format yang sudah ditentukan
         return $query->get()->map(function ($sto) {
             return [
                 'no' => $sto->id,
@@ -39,13 +37,15 @@ class StoExport implements FromCollection, WithHeadings, WithStyles, WithTitle, 
                 'part_name' => $sto->part->Part_name ?? '-',
                 'part_number' => $sto->part->Part_number ?? '-',
                 'plan_stock' => $sto->plan_stock ?? '-',
+                'act_stock' => $sto->act_stock ?? '-',
                 'category_name' => $sto->part->category->name ?? '-',
                 'sto_priode' => $sto->created_at ? $sto->created_at->format('M Y') : '-',
+                'remark' => $sto->remark ?? '-',
+                'note_remark' => $sto->note_remark ?? '-',
             ];
         });
     }
 
-    // Menambahkan Headings pada Excel
     public function headings(): array
     {
         return [
@@ -55,42 +55,48 @@ class StoExport implements FromCollection, WithHeadings, WithStyles, WithTitle, 
             'Part Name',
             'Part No',
             'Plan Stok',
+            'Act Stok',
             'Kategori',
-            'STO Priode'
+            'STO Priode',
+            'Remark',
+            'Note Remark'
         ];
     }
 
-    // Menambahkan Style pada Excel
     public function styles($sheet)
     {
-        // Mengatur style untuk seluruh tabel
-        $sheet->getStyle('A1:I1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:I1')->getAlignment()->setHorizontal('center');
-        $sheet->getStyle('A1:I1')->getFill()->setFillType('solid')->getStartColor()->setRGB('F4CCCC'); // Header warna latar belakang
+        // Header styling
+        $sheet->getStyle('A1:K1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:K1')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('A1:K1')->getFill()
+            ->setFillType('solid')
+            ->getStartColor()->setRGB('F4CCCC');
 
-        // Mengatur ukuran kolom
-        $sheet->getColumnDimension('A')->setWidth(5); // No
-        $sheet->getColumnDimension('B')->setWidth(20); // DateTime
-        $sheet->getColumnDimension('C')->setWidth(15); // Inv ID
-        $sheet->getColumnDimension('D')->setWidth(25); // Part Name
-        $sheet->getColumnDimension('E')->setWidth(15); // Part No
-        $sheet->getColumnDimension('F')->setWidth(15); // Plan Stock
-        $sheet->getColumnDimension('G')->setWidth(20); // Kategori
-        $sheet->getColumnDimension('I')->setWidth(10); // STO Priode
+        // Kolom width
+        $sheet->getColumnDimension('A')->setWidth(7);
+        $sheet->getColumnDimension('B')->setWidth(13);
+        $sheet->getColumnDimension('C')->setWidth(11);
+        $sheet->getColumnDimension('D')->setWidth(14);
+        $sheet->getColumnDimension('E')->setWidth(12);
+        $sheet->getColumnDimension('F')->setWidth(14);
+        $sheet->getColumnDimension('G')->setWidth(13);
+        $sheet->getColumnDimension('H')->setWidth(13);
+        $sheet->getColumnDimension('I')->setWidth(15);
+        $sheet->getColumnDimension('J')->setWidth(11);
+        $sheet->getColumnDimension('K')->setWidth(16);
     }
 
-    // Memberikan judul untuk sheet
     public function title(): string
     {
-        return 'List_STO_Data';  // Nama sheet
+        return 'List_STO_Data';
     }
 
-    // Menambahkan formatting untuk kolom tertentu
     public function columnFormats(): array
     {
         return [
-            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Format Plan Stok sebagai angka
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Format DateTime
+            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Plan Stock
+            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Act Stock
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY, // DateTime
         ];
     }
 }

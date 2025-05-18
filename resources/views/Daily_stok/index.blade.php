@@ -48,87 +48,90 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daily Stock By Barcode</h5>
-                        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
-                            <div class="mb-2">
+                        <div class="mb-2">
 
-                                {{-- export excel --}}
-                                <a href="{{ route('daily-stock.export', ['status' => request('status')]) }}"
-                                    class="btn btn-warning btn-sm">
-                                    <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
-                                </a>
-                                <div class="row mb-3">
-                                    <div class="col-md-3">
-                                        <form method="GET" action="{{ route('daily-stock.index') }}">
-                                            <label for="statusFilter" class="form-label">Filter Status:</label>
-                                            <select class="form-select" name="status" id="statusFilter"
-                                                onchange="this.form.submit()">
-                                                <option value="">-- Semua Status --</option>
-                                                @foreach ($statuses as $status)
-                                                    <option value="{{ $status }}"
-                                                        {{ request('status') == $status ? 'selected' : '' }}>
-                                                        {{ $status }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </form>
-                                    </div>
+                            {{-- export excel --}}
+                            <a href="{{ route('daily-stock.export', ['status' => request('status')]) }}"
+                                class="btn btn-warning btn-sm">
+                                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
+                            </a>
+                            <div class="row mb-3">
+                                <div class="col-md-3">
+                                    <form method="GET" action="{{ route('daily-stock.index') }}">
+                                        <label for="statusFilter" class="form-label">Filter Status:</label>
+                                        <select class="form-select" name="status" id="statusFilter"
+                                            onchange="this.form.submit()">
+                                            <option value="">-- Semua Status --</option>
+                                            @foreach ($statuses as $status)
+                                                <option value="{{ $status }}"
+                                                    {{ request('status') == $status ? 'selected' : '' }}>
+                                                    {{ $status }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </form>
                                 </div>
-                        @endif
-                    </div>
-                    <div class="table-responsive animate__animated animate__fadeInUp">
-                        <table class="table table-striped table-bordered datatable">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">No</th>
-                                    <th class="text-center">DateTime</th>
-                                    <th class="text-center">Inv Id</th>
-                                    <th class="text-center">Part Name</th>
-                                    <th class="text-center">Part No</th>
-                                    <th class="text-center">Total Qty</th>
-                                    <th class="text-center">Customer</th>
-                                    <th class="text-center">Status</th>
-                                    <th class="text-center">Prepared By</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($dailyStockLogs as $key => $log)
+                            </div>
+                        </div>
+                        <div class="table-responsive animate__animated animate__fadeInUp">
+                            <table class="table table-striped table-bordered datatable">
+                                <thead>
                                     <tr>
-                                        <td class="text-center">{{ $key + 1 }}</td>
-                                        <td class="text-center">{{ $log->created_at }}</td>
-                                        <td>{{ optional(optional($log->inventory)->part)->Inv_id ?? '-' }}</td>
-                                        <td>{{ optional(optional($log->inventory)->part)->Part_name ?? '-' }}</td>
-                                        <td>{{ optional(optional($log->inventory)->part)->Part_number ?? '-' }}</td>
-
-                                        <td class="text-center">{{ $log->Total_qty }}</td>
-                                         <td>{{ optional(optional(optional($log->inventory)->part)->customer)->username ?? '-' }}</td>
-
-                                        <td class="text-center">{{ $log->status }}</td>
-                                        <td class="text-center">{{ $log->user->username }}</td>
-                                        <td class="text-center">
-                                            <a href="{{ route('reports.edit', $log->id) }}"
-                                                class="btn btn-warning btn-sm mb-1"
-                                                style="font-size: 0.875rem; padding: 4px 8px;"><i
-                                                    class="bi bi-pencil-square"></i></a>
-                                            <form action="{{ route('reports.destroy', $log->id) }}" method="POST"
-                                                onsubmit="return confirm('Are you sure you want to delete this report?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"
-                                                    style="font-size: 0.875rem; padding: 4px 8px;">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </form>
-
-                                        </td>
+                                        <th class="text-center">No</th>
+                                        <th class="text-center">DateTime</th>
+                                        <th class="text-center">Inv Id</th>
+                                        <th class="text-center">Part Name</th>
+                                        <th class="text-center">Part No</th>
+                                        <th class="text-center">Total Qty</th>
+                                        <th class="text-center">Customer</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Prepared By</th>
+                                        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
+                                            <th class="text-center">Action</th>
+                                        @endif
                                     </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    @foreach ($dailyStockLogs as $key => $log)
+                                        <tr>
+                                            <td class="text-center">{{ $key + 1 }}</td>
+                                            <td class="text-center">{{ $log->created_at }}</td>
+                                            <td>{{ optional(optional($log->inventory)->part)->Inv_id ?? '-' }}</td>
+                                            <td>{{ optional(optional($log->inventory)->part)->Part_name ?? '-' }}</td>
+                                            <td>{{ optional(optional($log->inventory)->part)->Part_number ?? '-' }}</td>
+
+                                            <td class="text-center">{{ $log->Total_qty }}</td>
+                                            <td>{{ optional(optional(optional($log->inventory)->part)->customer)->username ?? '-' }}
+                                            </td>
+
+                                            <td class="text-center">{{ $log->status }}</td>
+                                            <td class="text-center">{{ $log->user->username }}</td>
+                                            @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
+                                                <td class="text-center">
+                                                    <a href="{{ route('reports.edit', $log->id) }}"
+                                                        class="btn btn-warning btn-sm mb-1"
+                                                        style="font-size: 0.875rem; padding: 4px 8px;"><i
+                                                            class="bi bi-pencil-square"></i></a>
+                                                    <form action="{{ route('reports.destroy', $log->id) }}" method="POST"
+                                                        onsubmit="return confirm('Are you sure you want to delete this report?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                            style="font-size: 0.875rem; padding: 4px 8px;">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+
+                                                </td>
+                                            @endif
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     </section>
 @endsection

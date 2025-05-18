@@ -23,6 +23,8 @@ return new class extends Migration
 
             // index
             $table->index('id_part');
+            $table->index('min');
+            $table->index('max');
             // fk
             $table->foreign('id_part')->references('id')->on('tbl_part')->onDelete('cascade');
             $table->timestamps();

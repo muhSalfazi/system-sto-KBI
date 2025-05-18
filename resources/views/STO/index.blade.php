@@ -51,116 +51,120 @@
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daftar STO</h5>
                         <div class="d-flex align-items-center mb-3">
-                            <a href="{{ route('sto.create.get') }}" class="btn btn-primary btn-sm me-2"
-                                style="font-size: 0.875rem; padding: 4px 8px;">
-                                <i class="bi bi-plus-square"></i> Create STO
-                            </a>
-                            <button type="button" class="btn btn-success btn-sm me-2"
-                                style="font-size: 0.875rem; padding: 4px 8px;" data-bs-toggle="modal"
-                                data-bs-target="#importModal">
-                                <i class="bi bi-filetype-csv"></i></i> Import Csv By Ledger
-                            </button>
-                            {{-- convert STO --}}
-                            <button type="button" class="btn btn-info btn-sm me-2"
-                                style="font-size: 0.875rem; padding: 4px 8px;" data-bs-toggle="modal"
-                                data-bs-target="#exceltocsv">
-                                <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
-                            </button>
-                            {{-- export excel --}}
-                            <button type="button" class="btn btn-warning btn-sm me-2"
-                                style="font-size: 0.875rem; padding: 4px 8px;"
-                                onclick="window.location='{{ route('sto.export', ['category_id' => request('category_id')]) }}'">
-                                <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
-                            </button>
+                                @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
+                                <a href="{{ route('sto.create.get') }}" class="btn btn-primary btn-sm me-2"
+                                    style="font-size: 0.875rem; padding: 4px 8px;">
+                                    <i class="bi bi-plus-square"></i> Create STO
+                                </a>
+                                <button type="button" class="btn btn-success btn-sm me-2"
+                                    style="font-size: 0.875rem; padding: 4px 8px;" data-bs-toggle="modal"
+                                    data-bs-target="#importModal">
+                                    <i class="bi bi-filetype-csv"></i></i> Import Csv By Ledger
+                                </button>
+                                {{-- convert STO --}}
+                                <button type="button" class="btn btn-info btn-sm me-2"
+                                    style="font-size: 0.875rem; padding: 4px 8px;" data-bs-toggle="modal"
+                                    data-bs-target="#exceltocsv">
+                                    <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
+                                </button>
+                                {{-- export excel --}}
+                        @endif
+                        <button type="button" class="btn btn-warning btn-sm me-2"
+                            style="font-size: 0.875rem; padding: 4px 8px;"
+                            onclick="window.location='{{ route('sto.export', ['category_id' => request('category_id')]) }}'">
+                            <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
+                        </button>
 
-                        </div>
-                        <div class="table-responsive animate__animated animate__fadeInUp">
-                            <div class="d-flex align-items-center mb-3">
+                    </div>
+                    <div class="table-responsive animate__animated animate__fadeInUp">
+                        <div class="d-flex align-items-center mb-3">
+                            <!-- Filter Kategori -->
+                            <form action="{{ route('sto.index') }}" method="GET" class="d-flex gap-2 align-items-end">
                                 <!-- Filter Kategori -->
-                                <form action="{{ route('sto.index') }}" method="GET" class="d-flex gap-2 align-items-end">
-                                    <!-- Filter Kategori -->
-                                    <div>
-                                        <label for="category_id" class="form-label mb-0">Kategori</label>
-                                        <select name="category_id" id="category_id" class="form-select form-select-sm "
-                                            style="width: 200px;">
-                                            <option value="">-- Pilih Kategori --</option>
-                                            @foreach ($categories as $category)
-                                                <option value="{{ $category->id }}"
-                                                    {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                                    {{ $category->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <!-- Filter Remark -->
-                                    <div>
-                                        <label for="remark" class="form-label mb-0">Remark</label>
-                                        <select name="remark" id="remark" class="form-select form-select-sm"
-                                            style="width: 200px;">
-                                            <option value="">-- Pilih Remark --</option>
-                                            <option value="normal" {{ request('remark') == 'normal' ? 'selected' : '' }}>
-                                                Normal
+                                <div>
+                                    <label for="category_id" class="form-label mb-0">Kategori</label>
+                                    <select name="category_id" id="category_id" class="form-select form-select-sm "
+                                        style="width: 200px;">
+                                        <option value="">-- Pilih Kategori --</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}"
+                                                {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
                                             </option>
-                                            <option value="abnormal"
-                                                {{ request('remark') == 'abnormal' ? 'selected' : '' }}>
-                                                Abnormal</option>
-                                        </select>
-                                    </div>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                                    <button type="submit" class="btn btn-primary btn-sm me-2"
-                                        style="font-size: 0.875rem; padding: 4px 8px;">Filter</button>
-                                    <a href="{{ route('sto.index') }}" class="btn btn-secondary btn-sm me-2"
-                                        style="font-size: 0.875rem; padding: 4px 8px;">Reset</a>
-                                </form>
+                                <!-- Filter Remark -->
+                                <div>
+                                    <label for="remark" class="form-label mb-0">Remark</label>
+                                    <select name="remark" id="remark" class="form-select form-select-sm"
+                                        style="width: 200px;">
+                                        <option value="">-- Pilih Remark --</option>
+                                        <option value="normal" {{ request('remark') == 'normal' ? 'selected' : '' }}>
+                                            Normal
+                                        </option>
+                                        <option value="abnormal" {{ request('remark') == 'abnormal' ? 'selected' : '' }}>
+                                            Abnormal</option>
+                                    </select>
+                                </div>
 
-                            </div>
+                                <button type="submit" class="btn btn-primary btn-sm me-2"
+                                    style="font-size: 0.875rem; padding: 4px 8px;">Filter</button>
+                                <a href="{{ route('sto.index') }}" class="btn btn-secondary btn-sm me-2"
+                                    style="font-size: 0.875rem; padding: 4px 8px;">Reset</a>
+                            </form>
+
                         </div>
-                        <div class="table-responsive animate__animated animate__fadeInUp">
-                            <table class="table table-striped table-bordered datatable">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th class="text-center">No</th>
-                                        <th class="text-center">DateTime</th>
-                                        <th class="text-center">Inv ID</th>
-                                        <th class="text-center">Part Name</th>
-                                        <th class="text-center">Part No</th>
-                                        <th class="text-center">Plan Stok</th>
-                                        <th class="text-center">Act Stok</th>
-                                        <th class="text-center">Category</th>
-                                        <th class="text-center">STO Period</th>
-                                        <th class="text-center">Remark</th>
-                                        <th class="text-center">Note-Remark</th>
+                    </div>
+                    <div class="table-responsive animate__animated animate__fadeInUp">
+                        <table class="table table-striped table-bordered datatable">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th class="text-center">No</th>
+                                    <th class="text-center">DateTime</th>
+                                    <th class="text-center">Inv ID</th>
+                                    <th class="text-center">Part Name</th>
+                                    <th class="text-center">Part No</th>
+                                    <th class="text-center">Plan Stok</th>
+                                    <th class="text-center">Act Stok</th>
+                                    <th class="text-center">Category</th>
+                                    <th class="text-center">STO Period</th>
+                                    <th class="text-center">Remark</th>
+                                    <th class="text-center">Note-Remark</th>
+                                    @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
                                         <th class="text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($parts as $part)
-                                        <tr>
-                                            <td class="text-center">{{ $loop->iteration }}</td>
-                                            <td class="text-center">
-                                                {{ $part->updated_at ? $part->updated_at->format('d-m-Y H:i:s') : '-' }}
-                                            </td>
-                                            <td class="text-center">{{ $part->part->Inv_id ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->part->Part_name ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->part->Part_number ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->plan_stock ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->act_stock ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->part->category->name ?? '-' }}</td>
-                                            <td class="text-center">
-                                                {{ $part->updated_at ? $part->updated_at->format('M Y') : '-' }}
-                                            </td>
-                                            <td class="text-center">
-                                                @if ($part->remark === 'normal')
-                                                    <span class="badge bg-success text-white px-2 py-1">Normal</span>
-                                                @elseif ($part->remark === 'abnormal')
-                                                    <span class="badge bg-danger text-white px-2 py-1">Abnormal</span>
-                                                @else
-                                                    <span class="badge bg-secondary text-white px-2 py-1">-</span>
-                                                @endif
-                                            </td>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($parts as $part)
+                                    <tr>
+                                        <td class="text-center">{{ $loop->iteration }}</td>
+                                        <td class="text-center">
+                                            {{ $part->updated_at ? $part->updated_at->format('d-m-Y H:i:s') : '-' }}
+                                        </td>
+                                        <td class="text-center">{{ $part->part->Inv_id ?? '-' }}</td>
+                                        <td class="text-center">{{ $part->part->Part_name ?? '-' }}</td>
+                                        <td class="text-center">{{ $part->part->Part_number ?? '-' }}</td>
+                                        <td class="text-center">{{ $part->plan_stock ?? '-' }}</td>
+                                        <td class="text-center">{{ $part->act_stock ?? '-' }}</td>
+                                        <td class="text-center">{{ $part->part->category->name ?? '-' }}</td>
+                                        <td class="text-center">
+                                            {{ $part->updated_at ? $part->updated_at->format('M Y') : '-' }}
+                                        </td>
+                                        <td class="text-center">
+                                            @if ($part->remark === 'normal')
+                                                <span class="badge bg-success text-white px-2 py-1">Normal</span>
+                                            @elseif ($part->remark === 'abnormal')
+                                                <span class="badge bg-danger text-white px-2 py-1">Abnormal</span>
+                                            @else
+                                                <span class="badge bg-secondary text-white px-2 py-1">-</span>
+                                            @endif
+                                        </td>
 
-                                            <td class="text-center">{{ $part->note_remark ?? '-' }}</td>
+                                        <td class="text-center">{{ $part->note_remark ?? '-' }}</td>
+                                        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
                                             <td class="text-center">
                                                 <a href="{{ route('sto.edit', $part->id) }}"
                                                     class="btn btn-success btn-sm"
@@ -177,14 +181,15 @@
                                                     </button>
                                                 </form>
                                             </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                        @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </section>
 

@@ -24,7 +24,7 @@ class AuthController extends Controller
         // Validasi input
         $request->validate([
             'username' => 'required|string|max:255',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:3',
         ]);
 
         $credentials = [
@@ -37,7 +37,7 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Cek apakah role-nya adalah 'user'
-            if ($user->role === 'user') {
+            if ($user->role?->name=== 'User') {
                 Auth::logout(); // logout langsung
                 return redirect()->back()->with('error', 'Akses tidak diperbolehkan untuk user biasa.');
             }
@@ -61,9 +61,10 @@ class AuthController extends Controller
 
         if ($user) {
             // Cek role
-            if ($user->role !== 'user') {
+            if ($user->role?->name !== 'User') {
                 return redirect()->back()->with('error', 'Akses hanya diperbolehkan untuk user role.');
             }
+
 
             Auth::login($user); // login manual tanpa password
             return redirect()->route('dailyreport.index')->with('success', 'Login berhasil');

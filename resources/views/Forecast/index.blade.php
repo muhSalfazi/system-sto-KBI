@@ -38,8 +38,8 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Forecast Data</h5>
-                        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
-                            <div class="mb-2">
+                        <div class="mb-2">
+                            @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
                                 <a href="{{ route('forecast.create') }}" class="btn btn-primary btn-sm  mb-1">
                                     <i class="bi bi-plus-square"></i> Create Forecast
                                 </a>
@@ -52,8 +52,8 @@
                                     data-bs-target="#exceltocsv">
                                     <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
                                 </button>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
                         {{-- filter --}}
                         <form method="GET" class="row g-3 align-items-end mb-3">
                             <div class="col-md-4">
@@ -61,7 +61,8 @@
                                 <select name="customer" id="customer" class="form-select select2">
                                     <option value="">-- Semua Customer --</option>
                                     @foreach ($customers as $cust)
-                                        <option value="{{ $cust->username }}" {{ request('customer') == $cust->username ? 'selected' : '' }}>
+                                        <option value="{{ $cust->username }}"
+                                            {{ request('customer') == $cust->username ? 'selected' : '' }}>
                                             {{ $cust->username }}
                                         </option>
                                     @endforeach
@@ -99,7 +100,9 @@
                                         <th class="text-center">Po/Pcs</th>
                                         <th class="text-center">Min</th>
                                         <th class="text-center">Max</th>
-                                        <th class="text-center">Action</th>
+                                        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
+                                            <th class="text-center">Action</th>
+                                        @endif
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -120,23 +123,26 @@
                                             <td class="text-center">{{ $forecast->PO_pcs }}</td>
                                             <td class="text-center">{{ $forecast->min }}</td>
                                             <td class="text-center">{{ $forecast->max }}</td>
-                                            <td class="text-center">
+                                            @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
+                                                <td class="text-center">
 
-                                                <a href="{{ route('forecast.edit', $forecast->id) }}"
-                                                    class="btn btn-success btn-sm"
-                                                    style="font-size: 0.875rem; padding: 4px 8px;">
-                                                    <i class="bi bi-pencil-square"></i>
-                                                </a>
-                                                <form action="{{ route('forecast.destroy', $forecast->id) }}" method="POST"
-                                                    onsubmit="return confirm('Are you sure you want to delete this forecast?')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                    <a href="{{ route('forecast.edit', $forecast->id) }}"
+                                                        class="btn btn-success btn-sm"
                                                         style="font-size: 0.875rem; padding: 4px 8px;">
-                                                        <i class="bi bi-trash3"></i>
-                                                    </button>
-                                                </form>
-                                            </td>
+                                                        <i class="bi bi-pencil-square"></i>
+                                                    </a>
+                                                    <form action="{{ route('forecast.destroy', $forecast->id) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('Are you sure you want to delete this forecast?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                            style="font-size: 0.875rem; padding: 4px 8px;">
+                                                            <i class="bi bi-trash3"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -162,7 +168,8 @@
                         @csrf
                         <div class="mb-3">
                             <label for="file" class="form-label">Upload Csv File</label>
-                            <input type="file" name="file" class="form-control" id="file" required accept=".csv">
+                            <input type="file" name="file" class="form-control" id="file" required
+                                accept=".csv">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

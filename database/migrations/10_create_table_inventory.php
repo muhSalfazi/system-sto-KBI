@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,12 +16,14 @@ return new class extends Migration
             $table->integer('plan_stock')->default(0);
             $table->integer('act_stock')->default(0);
             // $table->string('remark')->nullable();
-            $table->enum('remark',['normal','abnormal'])->default('normal');
-             $table->string('note_remark')->nullable();
+            $table->enum('remark', ['normal', 'abnormal'])->default('normal');
+            $table->string('note_remark')->nullable();
 
 
             // index
             $table->index('id_part');
+            $table->index('plan_stock');
+            $table->index('act_stock');
 
             // fk
             $table->foreign('id_part')->references('id')->on('tbl_part')->onDelete('cascade');

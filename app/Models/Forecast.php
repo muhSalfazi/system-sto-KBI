@@ -24,5 +24,10 @@ class Forecast extends Model
     {
         return $this->belongsTo(Part::class, 'id_part');
     }
+    public function forecast()
+{
+    return $this->hasMany(Forecast::class, 'id_part');
+}
+
 
 }

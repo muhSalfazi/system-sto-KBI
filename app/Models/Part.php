@@ -54,9 +54,13 @@ class Part extends Model
     {
         return $this->belongsTo(Category::class, 'id_category');
     }
-    public function forecast()
+    public function forecasts()
     {
         return $this->hasMany(Forecast::class, 'id_part');
     }
 
+    public function forecast()
+{
+    return $this->hasOne(Forecast::class, 'id_part')->latestOfMany(); // opsional
+}
 }

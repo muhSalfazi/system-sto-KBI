@@ -17,6 +17,10 @@ return new class extends Migration
             // Foreign key constraints
             $table->string('name');
             $table->string('username')->unique();
+
+            // index
+            $table->index('name');
+            $table->index('username');
             $table->timestamps();
         });
     }

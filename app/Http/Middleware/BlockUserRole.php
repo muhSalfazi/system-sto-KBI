@@ -9,7 +9,7 @@ class BlockUserRole
 {
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::check() && Auth::user()->role === 'user') {
+        if (Auth::check() && Auth::user()->role?->name === 'User') {
             Auth::logout(); // Logout user
             return redirect()->route('user.login')->with('error', 'Akses ditolak. Hanya untuk Admin.');
         }

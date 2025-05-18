@@ -75,7 +75,17 @@
                                         .then(response => response.json())
                                         .then(result => {
                                             const chartContainer = document.querySelector("#dailychart");
-                                            chartContainer.innerHTML = ""; // Clear chart first
+                                            chartContainer.innerHTML = ""; // Clear existing content
+
+                                            const hasData = result.data && result.data.length > 0;
+
+                                            if (!hasData) {
+                                                chartContainer.innerHTML = `
+              <div class="text-center text-muted mt-3">
+                <p><strong>Data tidak tersedia</strong> untuk bulan atau customer yang dipilih.</p>
+              </div>`;
+                                                return;
+                                            }
 
                                             new ApexCharts(chartContainer, {
                                                 series: [{
@@ -89,7 +99,8 @@
                                                 plotOptions: {
                                                     bar: {
                                                         borderRadius: 4,
-                                                        horizontal: false
+                                                        horizontal: false,
+                                                        distributed: true
                                                     }
                                                 },
                                                 dataLabels: {
@@ -99,6 +110,13 @@
                                                     categories: result.categories
                                                 }
                                             }).render();
+                                        })
+                                        .catch(error => {
+                                            console.error("Gagal memuat data chart:", error);
+                                            document.querySelector("#dailychart").innerHTML = `
+            <div class="text-center text-danger mt-3">
+              <p><strong>Terjadi kesalahan saat memuat data chart.</strong></p>
+            </div>`;
                                         });
                                 }
 
@@ -119,62 +137,173 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Daily Stok</h5>
-                        <!-- Bar Chart -->
-                        <div id="barChart"></div>
+                        <h5 class="card-title">Daily Stock (Per Item)</h5>
+                        <div id="stockComparisonChart"></div>
+
                         <script>
                             document.addEventListener("DOMContentLoaded", () => {
-                                function loadDailyChart() {
-                                    const monthInput = document.getElementById('monthSelect');
-                                    const customerInput = document.getElementById('custForecast');
-                                    const month = monthInput.value;
-                                    const customer = customerInput.value;
+                                const chartContainer = document.querySelector("#stockComparisonChart");
+
+                                function loadStoChart() {
+                                    const month = document.getElementById("monthSelect").value;
+                                    const customer = document.getElementById("custForecast").value;
 
                                     fetch(`/dashboard/daily-chart-data?month=${month}&customer=${customer}`)
-                                        .then(response => response.json())
+                                        .then(res => res.json())
                                         .then(result => {
-                                            const chartContainer = document.querySelector("#barChart");
-                                            chartContainer.innerHTML = ""; // clear previous chart
-
-                                            if (!result.series || result.series.length === 0) {
-                                                chartContainer.innerHTML =
-                                                    "<p class='text-center'>No data available for the selected filters.</p>";
+                                            if (!result.series || result.series[1].data.length === 0) {
+                                                chartContainer.innerHTML = "<p class='text-center'>Data tidak tersedia.</p>";
                                                 return;
                                             }
 
-                                            new ApexCharts(chartContainer, {
-                                                series: result.series,
+                                            const allActual = result.series[1].data.map(d => d.y);
+                                            const allMax = result.series[2].data.map(d => d.y);
+                                            const allMin = result.series[0].data.map(d => d.y);
+                                            const yMax = Math.max(...allActual, ...allMax) + 10;
+                                            const yMin = Math.min(...allMin, 0) - 5;
+
+                                            const minMap = new Map();
+                                            const maxMap = new Map();
+
+                                            result.series[0].data.forEach(d => {
+                                                const invId = d.x.split(" - ")[1];
+                                                minMap.set(`${d.x}`, d.y);
+                                            });
+
+                                            result.series[2].data.forEach(d => {
+                                                const invId = d.x.split(" - ")[1];
+                                                maxMap.set(`${d.x}`, d.y);
+                                            });
+
+                                            const annotations = [];
+
+                                            // Garis batas MIN & MAX
+                                            [...minMap.entries()].forEach(([label, val]) => {
+                                                const invId = label.split(" - ")[1];
+                                                annotations.push({
+                                                    y: val,
+                                                    borderColor: '#00BFFF',
+                                                    strokeDashArray: 6,
+                                                    label: {
+                                                        borderColor: '#00BFFF',
+                                                        style: {
+                                                            color: '#fff',
+                                                            background: '#00BFFF'
+                                                        },
+                                                        text: `Min (${invId})`
+                                                    }
+                                                });
+                                            });
+
+                                            [...maxMap.entries()].forEach(([label, val]) => {
+                                                const invId = label.split(" - ")[1];
+                                                annotations.push({
+                                                    y: val,
+                                                    borderColor: '#FF0000',
+                                                    strokeDashArray: 6,
+                                                    label: {
+                                                        borderColor: '#FF0000',
+                                                        style: {
+                                                            color: '#fff',
+                                                            background: '#FF0000'
+                                                        },
+                                                        text: `Max (${invId})`
+                                                    }
+                                                });
+                                            });
+
+                                            // Buat warna dinamis berdasarkan inv_id
+                                            const invColors = {};
+                                            const colorPalette = [
+                                                '#1f77b4', '#2ca02c', '#ff7f0e', '#d62728',
+                                                '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
+                                                '#bcbd22', '#17becf'
+                                            ];
+                                            let colorIndex = 0;
+
+                                            const actualData = result.series[1].data.map((d, i) => {
+                                                const tanggal = d.x.split(" - ")[0];
+                                                const inv = d.x.split(" - ")[1];
+                                                const fullKey = `${tanggal} - ${inv}`;
+
+                                                if (!invColors[inv]) {
+                                                    invColors[inv] = colorPalette[colorIndex % colorPalette.length];
+                                                    colorIndex++;
+                                                }
+
+                                                return {
+                                                    x: tanggal,
+                                                    y: d.y,
+                                                    fillColor: invColors[inv],
+                                                    inv: inv,
+                                                    label: fullKey,
+                                                    min: result.series[0].data[i]?.y || 0,
+                                                    max: result.series[2].data[i]?.y || 0
+                                                };
+                                            });
+
+                                            const chart = new ApexCharts(chartContainer, {
                                                 chart: {
                                                     type: 'bar',
-                                                    height: 450,
-                                                    stacked: true
+                                                    height: 500,
+                                                    toolbar: {
+                                                        show: true
+                                                    },
+                                                    zoom: {
+                                                        enabled: true
+                                                    }
+                                                },
+                                                series: [{
+                                                    name: 'Actual',
+                                                    data: actualData
+                                                }],
+                                                annotations: {
+                                                    yaxis: annotations
                                                 },
                                                 plotOptions: {
                                                     bar: {
-                                                        borderRadius: 4,
-                                                        horizontal: true
+                                                        columnWidth: '55%',
+                                                        distributed: true // penting agar warna per item aktif
                                                     }
                                                 },
                                                 dataLabels: {
-                                                    enabled: true
+                                                    enabled: false
                                                 },
                                                 xaxis: {
-                                                    title: {
-                                                        text: 'Total Qty'
-                                                    },
-                                                    categories: result.categories
-                                                },
-                                                yaxis: {
-                                                    title: {
-                                                        text: 'Inv id'
-                                                    },
+                                                    type: 'category',
                                                     labels: {
+                                                        rotate: 0,
                                                         style: {
-                                                            fontSize: '14px'
+                                                            fontSize: '10px'
+                                                        }
+                                                    },
+                                                    title: {
+                                                        text: 'Days',
+                                                        style: {
+                                                            fontWeight: 600
                                                         }
                                                     }
                                                 },
+                                                yaxis: {
+                                                    min: yMin < 0 ? 0 : yMin,
+                                                    max: yMax,
+                                                    title: {
+                                                        text: 'Total Qty',
+                                                        style: {
+                                                            fontWeight: 600
+                                                        }
+                                                    },
+                                                    labels: {
+                                                        formatter: val => `${val} pcs`
+                                                    }
+                                                },
+                                                fill: {
+                                                    type: 'solid'
+                                                },
+                                                colors: actualData.map(d => d.fillColor),
                                                 tooltip: {
+                                                    shared: false,
+                                                    intersect: true,
                                                     custom: function({
                                                         series,
                                                         seriesIndex,
@@ -182,26 +311,72 @@
                                                         w
                                                     }) {
                                                         const data = w.config.series[seriesIndex].data[dataPointIndex];
-                                                        return `<div style="padding:10px">
-                                        <strong>Part: ${data?.x ?? '-'}</strong><br>
-                                        Total Qty: ${data?.y ?? 0}<br>
-                                        Date: ${data?.tanggal ?? '-'}
-                                    </div>`;
+                                                        return `
+  <div style="
+      background: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      border-left: 4px solid #007bff;
+      min-width: 200px;
+  ">
+    <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 6px;">
+      ${data.label}
+    </div>
+    <div style="font-size: 13px; color: #555;">
+      <span style="display: inline-block; width: 70px;">Min:</span> <strong style="color: #00BFFF;">${data.min} pcs</strong><br/>
+      <span style="display: inline-block; width: 70px;">Actual:</span> <strong style="color: #FFA500;">${data.y} pcs</strong><br/>
+      <span style="display: inline-block; width: 70px;">Max:</span> <strong style="color: #FF0000;">${data.max} pcs</strong>
+    </div>
+  </div>
+`;
+
+                                                    }
+                                                },
+                                                legend: {
+                                                    show: false,
+                                                    position: 'top',
+                                                    horizontalAlign: 'center',
+                                                    formatter: function(seriesName, opts) {
+                                                        return opts.w.globals.initialSeries[0].data[opts.seriesIndex]
+                                                            ?.inv || seriesName;
+                                                    }
+                                                },
+                                                grid: {
+                                                    borderColor: '#e7e7e7',
+                                                    row: {
+                                                        colors: ['#f3f3f3', 'transparent'],
+                                                        opacity: 0.5
                                                     }
                                                 }
-                                            }).render();
+                                            });
+
+                                            chartContainer.innerHTML = ''; // reset container
+                                            chart.render();
                                         });
                                 }
 
-                                // First load
-                                loadDailyChart();
-                                // Refresh every 10 seconds
-                                setInterval(loadDailyChart, 10000);
+                                // 🔄 Load pertama kali
+                                loadStoChart();
+
+                                // 🔁 Auto-refresh setiap 10 detik
+                                setInterval(loadStoChart, 10000);
                             });
                         </script>
-                        <!-- End Bar Chart -->
+
+
+
+
+
+
+
+
                     </div>
+
+
                 </div>
+
             </div>
             <!-- Bar Chart -->
         </div>

@@ -74,7 +74,8 @@ class DashboardController extends Controller
             'stoChartData'
         ));
     }
-    public function getDailyChartData(Request $request)
+
+    public function getStoChartData(Request $request)
     {
         $month = $request->query('month', now()->format('Y-m'));
         $customer = $request->query('customer');
@@ -82,89 +83,86 @@ class DashboardController extends Controller
         $start = Carbon::parse($month)->startOfMonth();
         $end = Carbon::parse($month)->endOfMonth();
 
-        $query = DailyStockLog::with('inventory.part.customer')
+        $query = Inventory::with('part.customer')
             ->whereBetween('updated_at', [$start, $end]);
 
         if ($customer) {
-            $query->whereHas('inventory.part.customer', function ($q) use ($customer) {
+            $query->whereHas('part.customer', function ($q) use ($customer) {
                 $q->where('username', $customer);
             });
         }
 
-        $logs = $query->get();
+        $stoData = $query->get();
 
-        // Ambil semua part name unik
-        $partNames = $logs->pluck('inventory.part.Inv_id')->filter()->unique()->values();
-
-        // Ambil list tanggal dalam bulan
-        $days = collect();
-        for ($i = 0; $i <= $end->diffInDays($start); $i++) {
-            $days->push($start->copy()->addDays($i));
-        }
-
-        // Buat data series
-        $series = [];
-        foreach ($days as $day) {
-            $dataPerPart = [];
-
-            foreach ($partNames as $partName) {
-                $qty = $logs->filter(function ($item) use ($day, $partName) {
-                    return Carbon::parse($item->updated_at)->isSameDay($day)
-                        && ($item->inventory->part->Inv_id ?? 'Unknown') === $partName;
-                })->sum('Total_qty');
-
-                // Format sesuai kebutuhan tooltip custom
-                $dataPerPart[] = [
-                    'x' => $partName,
-                    'y' => $qty,
-                    'tanggal' => $day->format('d M')
-                ];
-            }
-
-            $series[] = [
-                'name' => $day->format('d M'),
-                'data' => $dataPerPart
-            ];
-        }
+        $stoChartData = $stoData->groupBy(function ($item) {
+            return $item->part->customer->username ?? 'Unknown';
+        })->map(function ($group) {
+            return $group->sum('plan_stock');
+        });
 
         return response()->json([
-            'categories' => $partNames,
-            'series' => $series
+            'categories' => $stoChartData->keys()->values(),
+            'data' => $stoChartData->values()
         ]);
     }
 
-    public function getStoChartData(Request $request)
-{
-    $month = $request->query('month', now()->format('Y-m'));
-    $customer = $request->query('customer');
 
-    $start = Carbon::parse($month)->startOfMonth();
-    $end = Carbon::parse($month)->endOfMonth();
+       public function getDailyChartData(Request $request)
+    {
+        $month = $request->query('month', now()->format('Y-m'));
+        $customer = $request->query('customer');
 
-    $query = Inventory::with('part.customer')
-        ->whereBetween('updated_at', [$start, $end]);
+        $start = Carbon::parse($month)->startOfMonth();
+        $end = Carbon::parse($month)->endOfMonth();
 
-    if ($customer) {
-        $query->whereHas('part.customer', function ($q) use ($customer) {
-            $q->where('username', $customer);
-        });
+        $partsQuery = Part::with(['forecast', 'inventories']);
+
+        if ($customer) {
+            $partsQuery->whereHas('customer', function ($q) use ($customer) {
+                $q->where('username', $customer);
+            });
+        }
+
+        $parts = $partsQuery->get();
+
+        $min = [];
+        $actual = [];
+        $max = [];
+
+        for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+            $dayLabel = $date->format('d M');
+
+            foreach ($parts as $part) {
+                $label = $dayLabel . ' - ' . $part->Inv_id;
+
+                $forecast = $part->forecast()
+                    ->whereMonth('forecast_month', $date->month)
+                    ->whereYear('forecast_month', $date->year)
+                    ->first();
+
+                $minVal = (int) ($forecast->min ?? 0);
+                $maxVal = (int) ($forecast->max ?? 0);
+
+                $inventoryIds = $part->inventories->pluck('id');
+
+                $actualVal = (int) DailyStockLog::whereIn('id_inventory', $inventoryIds)
+                    ->whereDate('created_at', $date)
+                    ->sum('Total_qty');
+
+                $min[] = ['x' => $label, 'y' => $minVal];
+                $actual[] = ['x' => $label, 'y' => $actualVal];
+                $max[] = ['x' => $label, 'y' => $maxVal];
+            }
+        }
+
+        return response()->json([
+            'series' => [
+                ['name' => 'Min', 'data' => $min],
+                ['name' => 'Actual', 'data' => $actual],
+                ['name' => 'Max', 'data' => $max],
+            ]
+        ]);
     }
-
-    $stoData = $query->get();
-
-    $stoChartData = $stoData->groupBy(function ($item) {
-        return $item->part->customer->username ?? 'Unknown';
-    })->map(function ($group) {
-        return $group->sum('plan_stock');
-    });
-
-    return response()->json([
-        'categories' => $stoChartData->keys()->values(),
-        'data' => $stoChartData->values()
-    ]);
-}
-
-
 
 
 }
