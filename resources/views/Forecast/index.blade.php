@@ -54,6 +54,35 @@
                                 </button>
                             </div>
                         @endif
+                        {{-- filter --}}
+                        <form method="GET" class="row g-3 align-items-end mb-3">
+                            <div class="col-md-4">
+                                <label for="customer" class="form-label">Filter Customer</label>
+                                <select name="customer" id="customer" class="form-select select2">
+                                    <option value="">-- Semua Customer --</option>
+                                    @foreach ($customers as $cust)
+                                        <option value="{{ $cust->username }}" {{ request('customer') == $cust->username ? 'selected' : '' }}>
+                                            {{ $cust->username }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="forecast_month" class="form-label">Filter Forecast Bulan</label>
+                                <input type="month" name="forecast_month" class="form-control" placeholder="mm-yyyy"
+                                    value="{{ request('forecast_month') }}">
+                            </div>
+
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary btn-sm"
+                                    style="font-size: 0.875rem; padding: 4px 8px;">Filter</button>
+                                <a href="{{ route('forecast.index') }}" class="btn btn-secondary btn-sm"
+                                    style="font-size: 0.875rem; padding: 4px 8px;">Reset</a>
+                            </div>
+                        </form>
+                        {{-- end filter --}}
+
                         <div class="table-responsive animate__animated animate__fadeInUp">
                             <table class="table table-striped table-bordered datatable">
                                 <thead>
@@ -64,8 +93,10 @@
                                         <th class="text-center">Part Number</th>
                                         <th class="text-center">Location</th>
                                         <th class="text-center">Customer</th>
-                                        <th class="text-center">Qty/Box</th>
+                                        <th class="text-center">forecast month</th>
                                         <th class="text-center">Working Days</th>
+                                        <th class="text-center">Qty/Box</th>
+                                        <th class="text-center">Po/Pcs</th>
                                         <th class="text-center">Min</th>
                                         <th class="text-center">Max</th>
                                         <th class="text-center">Action</th>
@@ -79,10 +110,14 @@
                                             <td class="text-center">{{ $forecast->part->Part_name ?? '-' }}</td>
                                             <td class="text-center">{{ $forecast->part->Part_number ?? '-' }}</td>
                                             <td class="text-center">{{ $forecast->part->plant->name ?? '-' }}</td>
+                                            <td class="text-center">{{ $forecast->part->customer->username ?? '-' }}</td>
                                             <td class="text-center">
-                                                {{ $forecast->part->customer->username ?? '-' }}</td>
-                                            <td class="text-center">{{ $forecast->Qty_Box }}</td>
+                                                {{ \Carbon\Carbon::parse($forecast->forecast_month)->format('M Y') }}
+                                            </td>
+
                                             <td class="text-center">{{ $forecast->hari_kerja }}</td>
+                                            <td class="text-center">{{ $forecast->qty_box }}</td>
+                                            <td class="text-center">{{ $forecast->PO_pcs }}</td>
                                             <td class="text-center">{{ $forecast->min }}</td>
                                             <td class="text-center">{{ $forecast->max }}</td>
                                             <td class="text-center">
@@ -92,12 +127,12 @@
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
-                                                <form action="{{ route('forecast.destroy', $forecast->id) }}"
-                                                    method="POST" style="font-size: 0.875rem; padding: 4px 8px;"
+                                                <form action="{{ route('forecast.destroy', $forecast->id) }}" method="POST"
                                                     onsubmit="return confirm('Are you sure you want to delete this forecast?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        style="font-size: 0.875rem; padding: 4px 8px;">
                                                         <i class="bi bi-trash3"></i>
                                                     </button>
                                                 </form>
@@ -127,8 +162,7 @@
                         @csrf
                         <div class="mb-3">
                             <label for="file" class="form-label">Upload Csv File</label>
-                            <input type="file" name="file" class="form-control" id="file" required
-                                accept=".csv">
+                            <input type="file" name="file" class="form-control" id="file" required accept=".csv">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

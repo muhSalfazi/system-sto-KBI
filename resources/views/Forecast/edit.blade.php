@@ -14,7 +14,6 @@
     </div>
 
     <section class="section">
-        {{-- ==========alert================== --}}
         @if ($errors->any())
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -25,15 +24,31 @@
                 </ul>
             </div>
         @endif
-        {{-- ================================== --}}
+
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Update Forecast untuk:
-                    {{ $forecast->inventory->part->Inv_id ?? '-' }}|{{ $forecast->inventory->part->Part_name ?? '-' }}</h5>
+                <h5 class="card-title">Update Forecast:
+                    {{ $forecast->part->Inv_id ?? '-' }} | {{ $forecast->part->Part_name ?? '-' }}</h5>
 
                 <form action="{{ route('forecast.update', $forecast->id) }}" method="POST">
                     @csrf
                     @method('PUT')
+
+                    <div class="mb-3">
+                        <label for="forecast_month" class="form-label">Forecast Bulan</label>
+                        <input type="month" name="forecast_month" class="form-control"
+                            value="{{ \Carbon\Carbon::parse($forecast->forecast_month)->format('m-Y') }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="qty_box" class="form-label">Qty/Box</label>
+                        <input type="number" name="qty_box" class="form-control" value="{{ $forecast->qty_box }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="po_pcs" class="form-label">Jumlah PO (pcs)</label>
+                        <input type="number" name="po_pcs" class="form-control" value="{{ $forecast->po_pcs }}" required>
+                    </div>
 
                     <div class="mb-3">
                         <label for="hari_kerja" class="form-label">Hari Kerja</label>

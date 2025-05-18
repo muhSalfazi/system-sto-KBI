@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_part');
             $table->integer('hari_kerja');
-            $table->integer('Qty_Box');
-            $table->date('date' )->default(0);
+            $table->integer('qty_box');
+            $table->date('forecast_month' );
+            $table->integer('PO_pcs' );
             $table->integer('min')->default(0);
             $table->integer('max')->default(0);
 

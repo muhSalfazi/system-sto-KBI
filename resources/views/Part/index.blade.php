@@ -11,7 +11,7 @@
             </ol>
         </nav>
     </div>
-{{-- =====================alert ========================--}}
+    {{-- =====================alert ======================== --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -41,7 +41,7 @@
             </ul>
         </div>
     @endif
-{{-- ============================= --}}
+    {{-- ============================= --}}
     <section class="section">
         <div class="row">
             <div class="col-lg-12">
@@ -49,35 +49,38 @@
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daftar Part</h5>
                         @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
-                            <div class="mb-2">
-                                <a href="{{ route('parts.create') }}" class="btn btn-primary btn-sm  mb-1">
+                            <div class="mb-2 d-flex align-items-center">
+                                <a href="{{ route('parts.create') }}" class="btn btn-primary btn-sm me-2">
                                     <i class="bi bi-plus-square"></i> Create Part
                                 </a>
-                                <button type="button" class="btn btn-success btn-sm  mb-1"
+                                <button type="button" class="btn btn-success btn-sm  me-2"
                                     data-bs-toggle="modal"data-bs-target="#importModal">
                                     <i class="bi bi-filetype-csv"></i> Import Csv
                                 </button>
-                                <button type="button" class="btn btn-info btn-sm"
+                                <button type="button" class="btn btn-info btn-sm me-2"
                                     data-bs-toggle="modal"data-bs-target="#exceltocsv">
                                     <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
                                 </button>
                             </div>
                             <div class="mb-3">
-                            <!-- Filter Kategori -->
-                            <form action="{{ route('parts.index') }}" method="GET" class="d-flex">
-                                <select name="category_id" id="category_id" class="form-select form-select-sm"
-                                    style="width: 200px;">
-                                    <option value="">-- Pilih Kategori --</option>
-                                    @foreach ($categories as $category)
-                                        <option value="{{ $category->id }}"
-                                            {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                            {{ $category->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <button type="submit" class="btn btn-primary btn-sm ms-2">Filter</button>
-                            </form>
-                        </div>
+                                <form action="{{ route('parts.index') }}" method="GET" class="d-flex align-items-center">
+                                    <select name="category_id" id="category_id" class="form-select form-select-sm me-2"
+                                        style="width: 300px;">
+                                        <option value="">-- Pilih Kategori --</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}"
+                                                {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <button type="submit" class="btn btn-primary btn-sm me-2"
+                                        style="font-size: 0.875rem; padding: 4px 8px;">Filter</button>
+                                    <a href="{{ route('parts.index') }}" class="btn btn-secondary btn-sm"
+                                        style="font-size: 0.875rem; padding: 4px 8px;">Reset</a>
+                                </form>
+                            </div>
+
                         @endif
                         <div class="table-responsive animate__animated animate__fadeInUp">
                             <table class="table table-striped table-bordered datatable">

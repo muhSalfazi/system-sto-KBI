@@ -13,7 +13,9 @@ class Forecast extends Model
     protected $fillable = [
         'id_part',
         'hari_kerja',
-        'Qty_Box',
+        'qty_box',
+        'forecast_month',
+        'PO_pcs',
         'min',
         'max',
     ];

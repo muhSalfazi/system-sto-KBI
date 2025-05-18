@@ -206,7 +206,7 @@ class DailyReportController extends Controller
     }
 
 
-    // print pdf
+    // buat print pdf
     public function printReport($id)
     {
         // Ambil data laporan lengkap beserta relasinya

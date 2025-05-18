@@ -54,6 +54,7 @@ class StoImport implements ToCollection, WithHeadingRow
             // Hitung selisih dan remark
             $gap = $planStock - $actStock;
             $remark = ($gap !== 0) ? 'abnormal' : 'normal';
+            $note_remark = ($gap === 0) ? null : 'gap: ' . $gap;
 
             // Tambahan remark dari kolom status
             $addRemark = trim($row['status']);
@@ -69,6 +70,7 @@ class StoImport implements ToCollection, WithHeadingRow
                         'plan_stock' => $planStock,
                         'act_stock' => $actStock,
                         'remark'     => $remark,
+                        'note_remark' => $note_remark,
                     ]);
 
                     $this->logs[] = "Baris $rowNumber: Plan stock di-*update* (INV ID: {$row['inv_id']}, Remark: $remark).";
@@ -82,9 +84,10 @@ class StoImport implements ToCollection, WithHeadingRow
                 'plan_stock'  => $planStock,
                 'act_stock'   => $actStock,
                 'remark'      => $remark,
+                'note_remark' => $note_remark,
             ]);
 
-            $this->logs[] = "Baris $rowNumber: Data baru disimpan (INV ID: {$row['inv_id']}, Remark: $remark).";
+            // $this->logs[] = "Baris $rowNumber: Data baru disimpan (INV ID: {$row['inv_id']}, Remark: $remark).";
         }
     }
 }

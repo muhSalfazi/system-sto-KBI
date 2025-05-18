@@ -50,62 +50,72 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title animate__animated animate__fadeInLeft">Daftar STO</h5>
-                        <div class="mb-3">
-                            <a href="{{ route('sto.create.get') }}" class="btn btn-primary btn-sm mb-1">
+                        <div class="d-flex align-items-center mb-3">
+                            <a href="{{ route('sto.create.get') }}" class="btn btn-primary btn-sm me-2"
+                                style="font-size: 0.875rem; padding: 4px 8px;">
                                 <i class="bi bi-plus-square"></i> Create STO
                             </a>
-                            <button type="button" class="btn btn-success btn-sm mb-1" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-success btn-sm me-2"
+                                style="font-size: 0.875rem; padding: 4px 8px;" data-bs-toggle="modal"
                                 data-bs-target="#importModal">
                                 <i class="bi bi-filetype-csv"></i></i> Import Csv By Ledger
                             </button>
                             {{-- convert STO --}}
-                            <button type="button" class="btn btn-info btn-sm " data-bs-toggle="modal"
+                            <button type="button" class="btn btn-info btn-sm me-2"
+                                style="font-size: 0.875rem; padding: 4px 8px;" data-bs-toggle="modal"
                                 data-bs-target="#exceltocsv">
                                 <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
                             </button>
                             {{-- export excel --}}
-                            <button type="button" class="btn btn-warning btn-sm"
+                            <button type="button" class="btn btn-warning btn-sm me-2"
+                                style="font-size: 0.875rem; padding: 4px 8px;"
                                 onclick="window.location='{{ route('sto.export', ['category_id' => request('category_id')]) }}'">
                                 <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
                             </button>
 
                         </div>
-
-                        <div class="mb-3">
-                            <!-- Filter Kategori -->
-                            <form action="{{ route('sto.index') }}" method="GET" class="d-flex gap-2 align-items-end">
+                        <div class="table-responsive animate__animated animate__fadeInUp">
+                            <div class="d-flex align-items-center mb-3">
                                 <!-- Filter Kategori -->
-                                <div>
-                                    <label for="category_id" class="form-label mb-0">Kategori</label>
-                                    <select name="category_id" id="category_id" class="form-select form-select-sm"
-                                        style="width: 200px;">
-                                        <option value="">-- Pilih Kategori --</option>
-                                        @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                                {{ $category->name }}
+                                <form action="{{ route('sto.index') }}" method="GET" class="d-flex gap-2 align-items-end">
+                                    <!-- Filter Kategori -->
+                                    <div>
+                                        <label for="category_id" class="form-label mb-0">Kategori</label>
+                                        <select name="category_id" id="category_id" class="form-select form-select-sm "
+                                            style="width: 200px;">
+                                            <option value="">-- Pilih Kategori --</option>
+                                            @foreach ($categories as $category)
+                                                <option value="{{ $category->id }}"
+                                                    {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                                    {{ $category->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <!-- Filter Remark -->
+                                    <div>
+                                        <label for="remark" class="form-label mb-0">Remark</label>
+                                        <select name="remark" id="remark" class="form-select form-select-sm"
+                                            style="width: 200px;">
+                                            <option value="">-- Pilih Remark --</option>
+                                            <option value="normal" {{ request('remark') == 'normal' ? 'selected' : '' }}>
+                                                Normal
                                             </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                            <option value="abnormal"
+                                                {{ request('remark') == 'abnormal' ? 'selected' : '' }}>
+                                                Abnormal</option>
+                                        </select>
+                                    </div>
 
-                                <!-- Filter Remark -->
-                                <div>
-                                    <label for="remark" class="form-label mb-0">Remark</label>
-                                    <select name="remark" id="remark" class="form-select form-select-sm"
-                                        style="width: 200px;">
-                                        <option value="">-- Pilih Remark --</option>
-                                        <option value="normal" {{ request('remark') == 'normal' ? 'selected' : '' }}>Normal
-                                        </option>
-                                        <option value="abnormal" {{ request('remark') == 'abnormal' ? 'selected' : '' }}>
-                                            Abnormal</option>
-                                    </select>
-                                </div>
+                                    <button type="submit" class="btn btn-primary btn-sm me-2"
+                                        style="font-size: 0.875rem; padding: 4px 8px;">Filter</button>
+                                    <a href="{{ route('sto.index') }}" class="btn btn-secondary btn-sm me-2"
+                                        style="font-size: 0.875rem; padding: 4px 8px;">Reset</a>
+                                </form>
 
-                                <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-                            </form>
-
+                            </div>
                         </div>
-
                         <div class="table-responsive animate__animated animate__fadeInUp">
                             <table class="table table-striped table-bordered datatable">
                                 <thead class="thead-light">
@@ -152,7 +162,8 @@
 
                                             <td class="text-center">{{ $part->note_remark ?? '-' }}</td>
                                             <td class="text-center">
-                                                <a href="{{ route('sto.edit', $part->id) }}" class="btn btn-success btn-sm"
+                                                <a href="{{ route('sto.edit', $part->id) }}"
+                                                    class="btn btn-success btn-sm"
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
@@ -191,7 +202,8 @@
                         @csrf
                         <div class="mb-3">
                             <label for="file" class="form-label">Upload Csv File</label>
-                            <input type="file" name="file" class="form-control" id="file" required accept=".csv">
+                            <input type="file" name="file" class="form-control" id="file" required
+                                accept=".csv">
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
