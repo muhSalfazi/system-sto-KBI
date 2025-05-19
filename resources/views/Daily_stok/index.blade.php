@@ -82,6 +82,8 @@
                                         <th class="text-center">Inv Id</th>
                                         <th class="text-center">Part Name</th>
                                         <th class="text-center">Part No</th>
+                                        <th class="text-center">Min</th>
+                                        <th class="text-center">Max</th>
                                         <th class="text-center">Total Qty</th>
                                         <th class="text-center">Customer</th>
                                         <th class="text-center">Status</th>
@@ -99,6 +101,13 @@
                                             <td>{{ optional(optional($log->inventory)->part)->Inv_id ?? '-' }}</td>
                                             <td>{{ optional(optional($log->inventory)->part)->Part_name ?? '-' }}</td>
                                             <td>{{ optional(optional($log->inventory)->part)->Part_number ?? '-' }}</td>
+                                            <td class="text-center">
+                                                {{ optional(optional(optional($log->inventory)->part)->forecast)->min ?? '-' }}
+                                            </td>
+                                            <td class="text-center">
+                                                {{ optional(optional(optional($log->inventory)->part)->forecast)->max ?? '-' }}
+                                            </td>
+
 
                                             <td class="text-center">{{ $log->Total_qty }}</td>
                                             <td>{{ optional(optional(optional($log->inventory)->part)->customer)->username ?? '-' }}

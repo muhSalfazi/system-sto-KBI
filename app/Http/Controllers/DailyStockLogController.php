@@ -14,7 +14,11 @@ class DailyStockLogController extends Controller
      */
     public function index(Request $request)
     {
-        $query = DailyStockLog::with(['inventory.part.customer', 'user']);
+        $query = DailyStockLog::with([
+            'inventory.part.customer',
+            'inventory.part.forecast',
+            'user'
+        ]);
 
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
