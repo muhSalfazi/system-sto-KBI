@@ -108,10 +108,6 @@
                                             <td class="text-center">{{ $log->user->username }}</td>
                                             @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
                                                 <td class="text-center">
-                                                    <a href="{{ route('reports.edit', $log->id) }}"
-                                                        class="btn btn-warning btn-sm mb-1"
-                                                        style="font-size: 0.875rem; padding: 4px 8px;"><i
-                                                            class="bi bi-pencil-square"></i></a>
                                                     <form action="{{ route('reports.destroy', $log->id) }}" method="POST"
                                                         onsubmit="return confirm('Are you sure you want to delete this report?')">
                                                         @csrf

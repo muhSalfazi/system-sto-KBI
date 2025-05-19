@@ -59,15 +59,8 @@
                                 <button type="button" class="btn btn-success btn-sm me-2"
                                     style="font-size: 0.875rem; padding: 4px 8px;" data-bs-toggle="modal"
                                     data-bs-target="#importModal">
-                                    <i class="bi bi-filetype-csv"></i></i> Import Csv By Ledger
+                                    <i class="bi bi-filetype-csv"></i></i> Import Excel By Ledger
                                 </button>
-                                {{-- convert STO --}}
-                                <button type="button" class="btn btn-info btn-sm me-2"
-                                    style="font-size: 0.875rem; padding: 4px 8px;" data-bs-toggle="modal"
-                                    data-bs-target="#exceltocsv">
-                                    <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
-                                </button>
-                                {{-- export excel --}}
                         @endif
                         <button type="button" class="btn btn-warning btn-sm me-2"
                             style="font-size: 0.875rem; padding: 4px 8px;"
@@ -199,16 +192,17 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="importModalLabel">Import List Sto from Csv</h5>
+                    <h5 class="modal-title" id="importModalLabel">Import List Sto from Excel</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form action="{{ route('sto.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
-                            <label for="file" class="form-label">Upload Csv File</label>
+                            <label for="file" class="form-label">Upload Excel File</label>
                             <input type="file" name="file" class="form-control" id="file" required
-                                accept=".csv">
+                                accept=".xls,.xlsx">
+                                  <small class="text-danger">*Download Template Excel Import: <a href="{{ asset('file/format-import-listSto(system-sto).xlsx') }}" download><i class="bi bi-download"></i> klik di sini</a></small>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

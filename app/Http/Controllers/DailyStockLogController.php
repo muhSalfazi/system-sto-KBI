@@ -27,45 +27,6 @@ class DailyStockLogController extends Controller
         return view('Daily_stok.index', compact('dailyStockLogs', 'statuses'));
     }
 
-    public function edit($id)
-    {
-        $report = DailyStockLog::with(['inventory.part', 'user'])->findOrFail($id);
-        $inventory = $report->inventory;
-
-        return view('Daily_stok.edit', compact('report', 'inventory'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:OK,NG,VIRGIN,FUNSAI',
-            'qty_per_box' => 'required|numeric',
-            'qty_box' => 'required|numeric',
-            'qty_per_box_2' => 'nullable|numeric',
-            'qty_box_2' => 'nullable|numeric',
-            'grand_total' => 'required|numeric',
-        ]);
-
-        try {
-            $report = DailyStockLog::findOrFail($id);
-            $inventory = $report->inventory;
-
-            // Update ke inventory (status dan lokasi)
-            $inventory->status = $request->status;
-            $inventory->save();
-
-            // Hanya update Total_qty (grand_total) di log
-            $report->update([
-                'Total_qty' => $request->grand_total,
-                'prepared_by' => auth()->id(),
-            ]);
-
-            return redirect()->route('daily-stock.index')->with('success', 'Laporan stok berhasil diperbarui.');
-        } catch (\Exception $e) {
-            \Log::error('Gagal update stok: ' . $e->getMessage());
-            return back()->with('error', 'Terjadi kesalahan saat update stok.');
-        }
-    }
     public function destroy($id)
     {
         try {

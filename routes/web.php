@@ -77,16 +77,12 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::get('/sto/export', [StoController::class, 'export'])->name('sto.export');
     // daily stock log
     Route::get('/daily-stock', [DailyStockLogController::class, 'index'])->name('daily-stock.index');
-    Route::post('/daily-stock/import', [DailyStockLogController::class, 'import'])->name('daily-stock.import.process');
-    Route::get('daily-stock/{id}/edit', [DailyStockLogController::class, 'edit'])->name('reports.edit');
-    Route::put('daily-stock/{id}', [DailyStockLogController::class, 'update'])->name('reports.update');
     Route::delete('daily-stock/{id}', [DailyStockLogController::class, 'destroy'])->name('reports.destroy');
     Route::get('/daily-stock/export', [DailyStockLogController::class, 'export'])->name('daily-stock.export');
     // dynamic select
     Route::get('/get-areas/{plantId}', [PartController::class, 'getAreas']);
     Route::get('/get-raks/{areaId}', [PartController::class, 'getRaks']);
     // excel convert
-    Route::post('/convert', [convertExcelToCsv::class, 'convert'])->name('convert.excel');
 
 });
 

@@ -45,12 +45,7 @@
                                 </a>
                                 <button type="button" class="btn btn-success btn-sm  mb-1 " data-bs-toggle="modal"
                                     data-bs-target="#importModal">
-                                    <i class="bi bi-filetype-csv"></i> Import Csv
-                                </button>
-                                {{-- convert --}}
-                                <button type="button" class="btn btn-info btn-sm " data-bs-toggle="modal"
-                                    data-bs-target="#exceltocsv">
-                                    <i class="bi bi-file-earmark-excel"></i>Convert Excel to Csv
+                                  <i class="bi bi-file-earmark-spreadsheet-fill"></i> Import Excel
                                 </button>
                             @endif
                         </div>
@@ -155,21 +150,22 @@
         </div>
     </section>
 
-    {{-- modal import Csv --}}
+    {{-- modal import Excel --}}
     <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="importModalLabel">Import Forecast from Csv</h5>
+                    <h5 class="modal-title" id="importModalLabel">Import Forecast from Excel</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form action="{{ route('forecast.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="mb-3">
-                            <label for="file" class="form-label">Upload Csv File</label>
+                            <label for="file" class="form-label">Upload Excel File</label>
                             <input type="file" name="file" class="form-control" id="file" required
-                                accept=".csv">
+                                accept=".xls,.xlsx">
+                                  <small class="text-danger">*Download Template Excel Import: <a href="{{ asset('file/format-import-Forecast(system-sto).xlsx') }}" download> <i class="bi bi-download"></i> klik di sini</a></small>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
