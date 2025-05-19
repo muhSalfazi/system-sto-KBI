@@ -91,7 +91,6 @@
                                         <th class="text-center">Customer</th>
                                         <th class="text-center">forecast month</th>
                                         <th class="text-center">Working Days</th>
-                                        <th class="text-center">Qty/Box</th>
                                         <th class="text-center">Po/Pcs</th>
                                         <th class="text-center">Min</th>
                                         <th class="text-center">Max</th>
@@ -114,7 +113,6 @@
                                             </td>
 
                                             <td class="text-center">{{ $forecast->hari_kerja }}</td>
-                                            <td class="text-center">{{ $forecast->qty_box }}</td>
                                             <td class="text-center">{{ $forecast->PO_pcs }}</td>
                                             <td class="text-center">{{ $forecast->min }}</td>
                                             <td class="text-center">{{ $forecast->max }}</td>

@@ -92,7 +92,6 @@ class ForecastController extends Controller
         $request->validate([
             'inv_id' => 'required|exists:tbl_part,Inv_id',
             'forecast_month' => 'required|date_format:Y-m',
-            'qty_box' => 'required|integer|min:1',
             'po_pcs' => 'required|integer|min:1',
             'hari_kerja' => 'required|integer|min:1',
         ]);
@@ -108,7 +107,6 @@ class ForecastController extends Controller
 
         $poPcs = (int) $request->po_pcs;
         $hariKerja = (int) $request->hari_kerja;
-        $qtyBox = (int) $request->qty_box;
 
         $min = (int) ceil($poPcs / max($hariKerja, 1));
         $max = $min * 3;
@@ -117,7 +115,6 @@ class ForecastController extends Controller
             ['id_part' => $part->id, 'forecast_month' => $forecastMonth],
             [
                 'hari_kerja' => $hariKerja,
-                'qty_box' => $qtyBox,
                 'PO_pcs' => $poPcs,
                 'min' => $min,
                 'max' => $max,

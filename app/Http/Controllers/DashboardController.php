@@ -106,8 +106,8 @@ class DashboardController extends Controller
         ]);
     }
 
-
-       public function getDailyChartData(Request $request)
+    // chart buat daily stock log
+      public function getDailyChartData(Request $request)
     {
         $month = $request->query('month', now()->format('Y-m'));
         $customer = $request->query('customer');
@@ -163,6 +163,60 @@ class DashboardController extends Controller
             ]
         ]);
     }
+
+
+    // chart buat stock daily
+    public function getDailyStockPerDayData(Request $request)
+    {
+        $month = $request->query('month', now()->format('Y-m'));
+        $customer = $request->query('customer');
+
+        $start = Carbon::parse($month)->startOfMonth();
+        $end = Carbon::parse($month)->endOfMonth();
+
+        $partsQuery = Part::with(['forecast', 'inventories']);
+
+        if ($customer) {
+            $partsQuery->whereHas('customer', function ($q) use ($customer) {
+                $q->where('username', $customer);
+            });
+        }
+
+        $parts = $partsQuery->get();
+
+        $series = [];
+
+        foreach ($parts as $part) {
+            $invId = $part->Inv_id;
+            $inventoryIds = $part->inventories->pluck('id');
+            $data = [];
+            $i = 1;
+
+            for ($date = $start->copy(); $date->lte($end); $date->addDay(), $i++) {
+                $tooltip = $date->format('d M') . ' - ' . $invId;
+
+                $sumStockPerDay = DailyStockLog::whereIn('id_inventory', $inventoryIds)
+                    ->whereDate('created_at', $date)
+                    ->sum('stock_per_day');
+
+                $data[] = [
+                    'x' => $i,
+                    'y' => round($sumStockPerDay ?? 0, 2),
+                    'label' => $tooltip
+                ];
+            }
+
+            $series[] = [
+                'name' => $invId,
+                'data' => $data
+            ];
+        }
+
+        return response()->json([
+            'series' => $series
+        ]);
+    }
+
 
 
 }

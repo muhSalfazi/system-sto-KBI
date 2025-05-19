@@ -15,7 +15,6 @@ return new class extends Migration {
             $table->unsignedBigInteger('id_part');
             $table->integer('plan_stock')->default(0);
             $table->integer('act_stock')->default(0);
-            // $table->string('remark')->nullable();
             $table->enum('remark', ['normal', 'abnormal'])->default('normal');
             $table->string('note_remark')->nullable();
 

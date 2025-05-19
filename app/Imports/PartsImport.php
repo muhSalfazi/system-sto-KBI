@@ -83,7 +83,7 @@ class PartsImport implements ToCollection, WithHeadingRow
 
             Package::create([
                 'type_pkg' => $row['type_pkg'],
-                'qty' => $row['qty_pkg'],
+                'qty' => $row['qty_kanban'],
                 'id_part' => $part->id,
             ]);
 

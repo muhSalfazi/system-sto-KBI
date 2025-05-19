@@ -8,6 +8,7 @@ use App\Models\Part;
 use App\Models\BoxComplete;
 use App\Models\BoxUncomplete;
 use Illuminate\Http\Request;
+use App\Models\Forecast;
 use Illuminate\Support\Facades\Auth;
 
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -55,6 +56,19 @@ class DailyReportController extends Controller
             return back()->with('error', 'Inventory untuk part ini sudah ada!');
         }
 
+        // Ambil forecast min untuk part ini
+        $forecast = Forecast::where('id_part', $part->id)->first();
+
+        if (!$forecast || $forecast->min == 0) {
+            return back()->with('error', 'Forecast untuk inventory ini belum diinputkan oleh admin.');
+        }
+
+        // Hitung stock harian
+        $stock_per_day = ($forecast->min > 0)
+            ? floor($data['grand_total'] / $forecast->min)
+            : 0;
+
+
         // Hitung remark & note_remark
         $gap = $data['grand_total'] - $data['plan_stock'];
         $remark = $gap === 0 ? 'normal' : 'abnormal';
@@ -67,6 +81,7 @@ class DailyReportController extends Controller
             'remark' => $remark,
             'note_remark' => $note_remark,
             'act_stock' => $data['grand_total'],
+
         ]);
 
         // Simpan Box Complete
@@ -86,21 +101,22 @@ class DailyReportController extends Controller
             ]);
         }
 
-
+        // Simpan Daily Log
         $dailyLog = DailyStockLog::create([
             'id_inventory' => $inventory->id,
             'id_box_complete' => $boxComplete->id,
             'id_box_uncomplete' => $boxUncomplete?->id,
             'Total_qty' => $data['grand_total'],
             'prepared_by' => $data['prepared_by'],
+            'stock_per_day' => $stock_per_day,
+
             'status' => $data['status'],
         ]);
 
-
         return redirect()->route('dailyreport.index')
-            ->with('success', 'Inventory & Daily Stock berhasil disimpan.')
+            // ->with('success', 'Inventory & Daily Stock berhasil disimpan. Stock harian: ' . $stock_per_day )
+            ->with('success', 'Inventory & Daily Stock berhasil disimpan')
             ->with('report', $dailyLog->id);
-
     }
 
     // halaman untuk buat isi qty sto
@@ -143,7 +159,7 @@ class DailyReportController extends Controller
 
     public function storecreate(Request $request, $inventory_id)
     {
-        $inventory = Inventory::findOrFail($inventory_id);
+        $inventory = Inventory::with('part')->findOrFail($inventory_id); // relasi part dimuat
 
         $data = $request->validate([
             'status' => 'required|string',
@@ -175,6 +191,22 @@ class DailyReportController extends Controller
             ]);
         }
 
+        // Ambil part dari inventory relasi
+        $part = $inventory->part;
+
+        // Ambil forecast
+        $forecast = Forecast::where('id_part', $part->id)->first();
+
+        if (!$forecast || $forecast->min == 0) {
+            return back()->with('error', 'Forecast untuk inventory ini belum diinputkan oleh admin.');
+        }
+
+        // Hitung stock harian
+        $stock_per_day = ($forecast->min > 0)
+            ? floor($data['grand_total'] / $forecast->min)
+            : 0;
+
+
         // Simpan DailyStockLog
         $dailyLog = DailyStockLog::create([
             'id_inventory' => $inventory->id,
@@ -183,12 +215,14 @@ class DailyReportController extends Controller
             'Total_qty' => $data['grand_total'],
             'prepared_by' => $data['prepared_by'],
             'status' => $data['status'],
+            'stock_per_day' => $stock_per_day,
+
         ]);
 
-        // Re-calculate grand total dari semua STO untuk inventory ini
+        // Total aktual semua stock log untuk inventory ini
         $totalActual = DailyStockLog::where('id_inventory', $inventory->id)->sum('Total_qty');
 
-        // Hitung gap dan remark
+        // Hitung remark
         $gap = $totalActual - $inventory->plan_stock;
         $remark = ($gap === 0) ? 'normal' : 'abnormal';
         $note_remark = ($gap === 0) ? null : 'gap: ' . $gap;
@@ -201,10 +235,10 @@ class DailyReportController extends Controller
         ]);
 
         return redirect()->route('dailyreport.index')
-            ->with('success', 'Data berhasil disimpan.')
+            // ->with('success', 'Data berhasil disimpan. Stock harian: ' . $stock_per_day )
+            ->with('success', 'Data berhasil disimpan')
             ->with('report', $dailyLog->id);
     }
-
 
     // buat print pdf
     public function printReport($id)

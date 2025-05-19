@@ -20,7 +20,7 @@ class ForecastImport implements ToCollection, WithHeadingRow
             $no = $index + 2;
 
             // Cek kelengkapan kolom
-            if (!isset($row['inv_id'], $row['hari_kerja'], $row['forecast_month'], $row['po_pcs'], $row['qty_box'])) {
+            if (!isset($row['inv_id'], $row['hari_kerja'], $row['forecast_month'], $row['po_pcs'])) {
                 $this->logs[] = "Baris $no: Kolom tidak lengkap.";
                 continue;
             }
@@ -35,7 +35,6 @@ class ForecastImport implements ToCollection, WithHeadingRow
             // Parsing nilai
             $hariKerja = (int) $row['hari_kerja'];
             $poPcs = (int) $row['po_pcs'];
-            $qtyBox = (int) $row['qty_box'];
 
             try {
                 $forecastMonth = Carbon::parse($row['forecast_month'])->startOfMonth();
@@ -51,7 +50,6 @@ class ForecastImport implements ToCollection, WithHeadingRow
                 ['id_part' => $part->id, 'forecast_month' => $forecastMonth],
                 [
                     'hari_kerja' => $hariKerja,
-                    'qty_box' => $qtyBox,
                     'po_pcs' => $poPcs,
                     'min' => $min,
                     'max' => $max,

@@ -85,6 +85,7 @@
                                         <th class="text-center">Min</th>
                                         <th class="text-center">Max</th>
                                         <th class="text-center">Total Qty</th>
+                                        <th class="text-center">daily stock</th>
                                         <th class="text-center">Customer</th>
                                         <th class="text-center">Status</th>
                                         <th class="text-center">Prepared By</th>
@@ -110,6 +111,7 @@
 
 
                                             <td class="text-center">{{ $log->Total_qty }}</td>
+                                            <td class="text-center">{{ $log->stock_per_day }}</td>
                                             <td>{{ optional(optional(optional($log->inventory)->part)->customer)->username ?? '-' }}
                                             </td>
 

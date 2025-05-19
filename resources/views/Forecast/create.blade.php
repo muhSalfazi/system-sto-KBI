@@ -48,11 +48,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="qty_box" class="form-label">Qty per Box</label>
-                        <input type="number" name="qty_box" id="qty_box" class="form-control" required>
-                    </div>
-
-                    <div class="mb-3">
                         <label for="po_pcs" class="form-label">Jumlah PO (pcs)</label>
                         <input type="number" name="po_pcs" id="po_pcs" class="form-control" required>
                     </div>

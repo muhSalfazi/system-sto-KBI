@@ -25,13 +25,13 @@ Route::post('user/login', [AuthController::class, 'userLogin'])->name('user.logi
 Route::post('admin/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'admin.only'])->group(function () {
+
     // dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/fetch-daily-stock', [DashboardController::class, 'dailyStockSummary']);
-    // Route::get('/dashboard/daily-chart-data', [DashboardController::class, 'getDailyChartData'])->name('dashboard.dailyChartData');
     Route::get('/dashboard/sto-chart-data', [DashboardController::class, 'getStoChartData']);
-   Route::get('/dashboard/daily-chart-data', [DashboardController::class, 'getDailyChartData'])->name('dashboard.dailyChartData');
-
+    Route::get('/dashboard/daily-chart-data', [DashboardController::class, 'getDailyChartData'])->name('dashboard.dailyChartData');
+    Route::get('/dashboard/daily-stock-perday-data', [DashboardController::class, 'getDailyStockPerDayData']);
 
     // forecast
     Route::get('/forecast', [ForecastController::class, 'index'])->name('forecast.index');
@@ -82,8 +82,6 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     // dynamic select
     Route::get('/get-areas/{plantId}', [PartController::class, 'getAreas']);
     Route::get('/get-raks/{areaId}', [PartController::class, 'getRaks']);
-    // excel convert
-
 });
 
 Route::middleware(['auth', 'user.only'])->group(function () {

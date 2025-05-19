@@ -17,6 +17,7 @@ class DailyStockLog extends Model
         'prepared_by',
         'Total_qty',
         'status',
+        'stock_per_day',
         'created_at',
         'updated_at',
     ];

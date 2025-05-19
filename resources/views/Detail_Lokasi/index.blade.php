@@ -117,9 +117,18 @@
                             <label for="file" class="form-label">Upload Excel File</label>
                             <input type="file" name="file" class="form-control" id="file" required
                                 accept=".xls,.xlsx">
-                                 <small class="text-danger">*Download Template Excel Import: <a href="{{ asset('file/format-import-lokasi.xlsx') }}" download><i class="bi bi-download"></i> klik di sini</a></small>
-
+                            <small class="text-danger mt-1">*Download Template Excel Import: <a
+                                    href="{{ asset('file/format-import-lokasi.xlsx') }}" download>
+                                    <i class="bi bi-download"></i> klik disini</a></small>
                         </div>
+                        <small class="text-primary">
+                            *Area dan plan sudah disiapkan otomatis:
+                            <a href="{{ asset('file/area_plan_list.xlsx') }}" download>
+                                <i class="bi bi-download"></i> Lihat referensi
+                            </a>
+                        </small>
+
+
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-success">Import</button>

@@ -18,12 +18,15 @@ return new class extends Migration
             $table->unsignedBigInteger('id_box_complete')->nullable();
             $table->unsignedBigInteger('id_box_uncomplete')->nullable();
             $table->integer('Total_qty')->default(0);
+            $table->integer('stock_per_day')->default(0);
             $table->enum('status', ['OK', 'NG','VIRGIN','FUNSAI']);
             // index
             $table->index('id_inventory');
             $table->index('prepared_by');
             $table->index('id_box_complete');
             $table->index('id_box_uncomplete');
+            $table->index('Total_qty');
+            $table->index('stock_per_day');
             // fk
             $table->foreign('id_box_complete')->references('id')->on('tbl_box_complete')->onDelete('cascade');
             $table->foreign('id_box_uncomplete')->references('id')->on('tbl_box_uncomplete')->onDelete('cascade');

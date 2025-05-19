@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Exports;
 
 use App\Models\DailyStockLog;
@@ -20,20 +21,27 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
 
     public function collection()
     {
-        $query = DailyStockLog::with(['inventory.part.customer', 'user']);
+        $query = DailyStockLog::with(['inventory.part.forecast', 'inventory.part.customer', 'user']);
 
         if ($this->status) {
             $query->where('status', $this->status);
         }
 
         return $query->get()->map(function ($log, $index) {
+            $part = optional($log->inventory)->part;
+            $forecast = optional($part)->forecast->first(); // ambil hanya 1 forecast
+
             return [
                 'no' => $index + 1,
                 'datetime' => optional($log->created_at)->format('d-m-Y H:i:s'),
-                'inv_id' => $log->inventory->part->Inv_id ?? '-',
-                'part_name' => $log->inventory->part->Part_name ?? '-',
-                'part_number' => $log->inventory->part->Part_number ?? '-',
+                'inv_id' => $part->Inv_id ?? '-',
+                'part_name' => $part->Part_name ?? '-',
+                'part_number' => $part->Part_number ?? '-',
+                'min' => $forecast->min ?? '-',
+                'max' => $forecast->max ?? '-',
                 'total_qty' => $log->Total_qty,
+                'daily_stock' => $log->stock_per_day ?? '-',
+                'customer' => optional($part->customer)->username ?? '-',
                 'status' => strtoupper($log->status ?? '-'),
                 'prepared_by' => $log->user->username ?? '-',
             ];
@@ -48,7 +56,11 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
             'Inv ID',
             'Part Name',
             'Part Number',
+            'Min',
+            'Max',
             'Total Qty',
+            'Daily Stock',
+            'Customer',
             'Status',
             'Prepared By',
         ];
@@ -56,18 +68,17 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
 
     public function styles($sheet)
     {
-        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:H1')->getAlignment()->setHorizontal('center');
-        $sheet->getStyle('A1:H1')->getFill()->setFillType('solid')->getStartColor()->setRGB('D9E1F2');
+        $sheet->getStyle('A1:L1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:L1')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('A1:L1')->getFill()->setFillType('solid')->getStartColor()->setRGB('D9E1F2');
 
-        $sheet->getColumnDimension('A')->setWidth(5);
-        $sheet->getColumnDimension('B')->setWidth(20);
-        $sheet->getColumnDimension('C')->setWidth(15);
-        $sheet->getColumnDimension('D')->setWidth(25);
-        $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->getColumnDimension('F')->setWidth(12);
-        $sheet->getColumnDimension('G')->setWidth(10);
-        $sheet->getColumnDimension('H')->setWidth(20);
+        // Atur lebar kolom
+        $columns = range('A', 'L');
+        $widths = [5, 20, 15, 25, 20, 8, 8, 12, 12, 15, 10, 20];
+
+        foreach ($columns as $i => $col) {
+            $sheet->getColumnDimension($col)->setWidth($widths[$i]);
+        }
     }
 
     public function title(): string
@@ -78,8 +89,8 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
     public function columnFormats(): array
     {
         return [
-            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Total Qty
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,           // DateTime
+            'H' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Total Qty
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,            // DateTime
         ];
     }
 }

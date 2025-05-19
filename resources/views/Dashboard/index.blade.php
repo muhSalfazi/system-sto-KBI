@@ -60,7 +60,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">STO</h5>
+                        <h5 class="card-title">STO Report</h5>
 
                         <!-- Bar Chart -->
                         <div id="dailychart"></div>
@@ -124,7 +124,7 @@
                                 loadStoChart();
 
                                 // Auto-refresh tiap 10 detik
-                                setInterval(loadStoChart, 10000);
+                                setInterval(loadStoChart, 20000);
                             });
                         </script>
 
@@ -133,11 +133,11 @@
                 </div>
             </div>
 
-            {{-- daily --}}
+            {{-- report daily --}}
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Daily Stock (Per Item)</h5>
+                        <h5 class="card-title">Daily (Per Item)</h5>
                         <div id="stockComparisonChart"></div>
 
                         <script>
@@ -294,7 +294,7 @@
                                                         }
                                                     },
                                                     labels: {
-                                                        formatter: val => `${val} pcs`
+                                                        formatter: val => `${Math.round(val)} pcs`
                                                     }
                                                 },
                                                 fill: {
@@ -357,20 +357,13 @@
                                         });
                                 }
 
-                                // 🔄 Load pertama kali
+                                // Load pertama kali
                                 loadStoChart();
 
-                                // 🔁 Auto-refresh setiap 10 detik
-                                setInterval(loadStoChart, 10000);
+                                // Auto-refresh setiap 10 detik
+                                setInterval(loadStoChart, 20000);
                             });
                         </script>
-
-
-
-
-
-
-
 
                     </div>
 
@@ -379,6 +372,117 @@
 
             </div>
             <!-- Bar Chart -->
+
+
+            {{-- daily stock --}}
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Daily Stock</h5>
+
+                        <!-- Bar Chart -->
+                          <div id="stockPerDayChart" style="height: 400px;"></div>
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                const chartContainer = document.querySelector("#stockPerDayChart");
+
+                                function loadStockPerDayChart() {
+                                    const month = document.getElementById("monthSelect")?.value;
+                                    const customer = document.getElementById("custForecast")?.value;
+
+                                    fetch(`/dashboard/daily-stock-perday-data?month=${month}&customer=${customer}`)
+                                        .then(res => res.json())
+                                        .then(result => {
+                                            if (!result.series || result.series.length === 0) {
+                                                chartContainer.innerHTML = "<p class='text-center'>Data tidak tersedia.</p>";
+                                                return;
+                                            }
+
+                                            const chart = new ApexCharts(chartContainer, {
+                                                chart: {
+                                                    type: 'line',
+                                                    height: 400,
+                                                    toolbar: {
+                                                        show: true
+                                                    }
+                                                },
+                                                series: result.series,
+                                                xaxis: {
+                                                    title: {
+                                                        text: 'Hari ke-',
+                                                        style: {
+                                                            fontWeight: 600
+                                                        }
+                                                    },
+                                                    labels: {
+                                                        style: {
+                                                            fontSize: '10px'
+                                                        }
+                                                    }
+                                                },
+                                                yaxis: {
+                                                    title: {
+                                                        text: 'Stock per Day',
+                                                        style: {
+                                                            fontWeight: 600
+                                                        }
+                                                    },
+                                                    labels: {
+                                                        formatter: val => `${val} `
+                                                    }
+                                                },
+                                                tooltip: {
+                                                    shared: false,
+                                                    custom: function({
+                                                        series,
+                                                        seriesIndex,
+                                                        dataPointIndex,
+                                                        w
+                                                    }) {
+                                                        const point = w.config.series[seriesIndex].data[dataPointIndex];
+                                                        return `
+                                <div style="
+      background: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      border-left: 4px solid #007bff;
+      min-width: 200px;">
+                                    <strong>${point.label}</strong><br/>
+                                    Qty Stock: ${point.y}
+                                </div>`;
+                                                    }
+                                                },
+                                                stroke: {
+                                                    curve: 'smooth'
+                                                },
+                                                dataLabels: {
+                                                    enabled: false
+                                                },
+                                                colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
+                                            });
+
+                                            chartContainer.innerHTML = '';
+                                            chart.render();
+                                        });
+                                }
+
+                                loadStockPerDayChart();
+                                setInterval(loadStockPerDayChart, 20000);
+                            });
+                        </script>
+
+
+                        <!-- End Bar Chart -->
+
+                    </div>
+                </div>
+            </div>
+
+
+
         </div>
 
     </section>
