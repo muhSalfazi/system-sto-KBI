@@ -19,8 +19,8 @@ class AdminSeeder extends Seeder
         // Buat user SuperAdmin
         $superAdmin = User::create([
             'username' => 'adminSTO',
-            'first_name' => 'salman',
-            'last_name' => 'fauzi',
+            'first_name' => 'admin',
+            'last_name' => 'KBISystem',
             'nik' => 'K02025',
             'password' => Hash::make('adminKbi'),
         ]);
