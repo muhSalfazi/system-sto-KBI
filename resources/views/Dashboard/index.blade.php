@@ -14,7 +14,8 @@
 
     <section class="section dashboard">
         <div class="row">
-            {{-- form STO --}}
+
+            {{-- form buat form filter bulan+customer --}}
             <form method="GET" action="{{ route('dashboard') }}" id="filterForm">
                 <div class="col-12">
                     <h5 class="card-title">Input Date & Customer</h5>
@@ -48,6 +49,7 @@
                     </div>
                 </div>
             </form>
+            {{-- endform  buat filter customer+bulan --}}
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const form = document.getElementById('filterForm');
@@ -56,6 +58,7 @@
                 });
             </script>
             {{-- end --}}
+
             {{-- STO --}}
             <div class="col-lg-12">
                 <div class="card">
@@ -64,7 +67,7 @@
 
                         <!-- Bar Chart -->
                         <div id="dailychart"></div>
-
+                        {{-- js STO --}}
                         <script>
                             document.addEventListener("DOMContentLoaded", () => {
                                 function loadStoChart() {
@@ -81,9 +84,9 @@
 
                                             if (!hasData) {
                                                 chartContainer.innerHTML = `
-              <div class="text-center text-muted mt-3">
-                <p><strong>Data tidak tersedia</strong> untuk bulan atau customer yang dipilih.</p>
-              </div>`;
+                                                <div class="text-center text-muted mt-3">
+                                                    <p><strong>Data tidak tersedia</strong> untuk bulan atau customer yang dipilih.</p>
+                                                </div>`;
                                                 return;
                                             }
 
@@ -114,12 +117,11 @@
                                         .catch(error => {
                                             console.error("Gagal memuat data chart:", error);
                                             document.querySelector("#dailychart").innerHTML = `
-            <div class="text-center text-danger mt-3">
-              <p><strong>Terjadi kesalahan saat memuat data chart.</strong></p>
-            </div>`;
+                                        <div class="text-center text-danger mt-3">
+                                        <p><strong>Terjadi kesalahan saat memuat data chart.</strong></p>
+                                        </div>`;
                                         });
                                 }
-
                                 // Load awal
                                 loadStoChart();
 
@@ -127,7 +129,6 @@
                                 setInterval(loadStoChart, 20000);
                             });
                         </script>
-
                         <!-- End Bar Chart -->
                     </div>
                 </div>
@@ -312,26 +313,25 @@
                                                     }) {
                                                         const data = w.config.series[seriesIndex].data[dataPointIndex];
                                                         return `
-  <div style="
-      background: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      border-left: 4px solid #007bff;
-      min-width: 200px;
-  ">
-    <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 6px;">
-      ${data.label}
-    </div>
-    <div style="font-size: 13px; color: #555;">
-      <span style="display: inline-block; width: 70px;">Min:</span> <strong style="color: #00BFFF;">${data.min} pcs</strong><br/>
-      <span style="display: inline-block; width: 70px;">Actual:</span> <strong style="color: #FFA500;">${data.y} pcs</strong><br/>
-      <span style="display: inline-block; width: 70px;">Max:</span> <strong style="color: #FF0000;">${data.max} pcs</strong>
-    </div>
-  </div>
-`;
-
+                                                    <div style="
+                                                        background: white;
+                                                        padding: 10px 15px;
+                                                        border-radius: 8px;
+                                                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                                        border-left: 4px solid #007bff;
+                                                        min-width: 200px;
+                                                    ">
+                                                        <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 6px;">
+                                                        ${data.label}
+                                                        </div>
+                                                        <div style="font-size: 13px; color: #555;">
+                                                        <span style="display: inline-block; width: 70px;">Min:</span> <strong style="color: #00BFFF;">${data.min} pcs</strong><br/>
+                                                        <span style="display: inline-block; width: 70px;">Actual:</span> <strong style="color: #FFA500;">${data.y} pcs</strong><br/>
+                                                        <span style="display: inline-block; width: 70px;">Max:</span> <strong style="color: #FF0000;">${data.max} pcs</strong>
+                                                        </div>
+                                                    </div>
+                                                    `;
                                                     }
                                                 },
                                                 legend: {
@@ -373,25 +373,43 @@
             </div>
             <!-- Bar Chart -->
 
-
             {{-- daily stock --}}
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Daily Stock</h5>
+                        <div class="row mb-3">
+                            {{-- filter buat Kategori --}}
+                            <div class="col-md-4">
+                                <label for="categorySelect" class="form-label">Filter by Category</label>
+                                <select id="categorySelect" name="category" class="form-select">
+                                    <option value="">-- Semua Kategori --</option>
+                                    @foreach ($categories as $category)
+                                        <option value="{{ $category->id }}"
+                                            {{ request('category') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            {{-- end filter buat kategori --}}
+                        </div>
 
                         <!-- Bar Chart -->
-                          <div id="stockPerDayChart" style="height: 400px;"></div>
-
+                        <div id="stockPerDayChart" style="height: 400px;"></div>
+                        {{-- js buat daily stock --}}
                         <script>
                             document.addEventListener("DOMContentLoaded", function() {
                                 const chartContainer = document.querySelector("#stockPerDayChart");
+                                document.getElementById('categorySelect')?.addEventListener('change', loadStockPerDayChart);
 
                                 function loadStockPerDayChart() {
                                     const month = document.getElementById("monthSelect")?.value;
                                     const customer = document.getElementById("custForecast")?.value;
+                                    const category = document.getElementById("categorySelect")?.value;
 
-                                    fetch(`/dashboard/daily-stock-perday-data?month=${month}&customer=${customer}`)
+
+                                    fetch(`/dashboard/daily-stock-perday-data?month=${month}&customer=${customer}&category=${category}`)
                                         .then(res => res.json())
                                         .then(result => {
                                             if (!result.series || result.series.length === 0) {
@@ -442,17 +460,17 @@
                                                     }) {
                                                         const point = w.config.series[seriesIndex].data[dataPointIndex];
                                                         return `
-                                <div style="
-      background: white;
-      padding: 10px 15px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      border-left: 4px solid #007bff;
-      min-width: 200px;">
-                                    <strong>${point.label}</strong><br/>
-                                    Qty Stock: ${point.y}
-                                </div>`;
+                                                        <div style="
+                                                                background: white;
+                                                                padding: 10px 15px;
+                                                                border-radius: 8px;
+                                                                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                                                border-left: 4px solid #007bff;
+                                                                min-width: 200px;">
+                                                            <strong>${point.label}</strong><br/>
+                                                            Qty Stock: ${point.y}
+                                                        </div>`;
                                                     }
                                                 },
                                                 stroke: {
@@ -473,16 +491,10 @@
                                 setInterval(loadStockPerDayChart, 20000);
                             });
                         </script>
-
-
                         <!-- End Bar Chart -->
-
                     </div>
                 </div>
             </div>
-
-
-
         </div>
 
     </section>

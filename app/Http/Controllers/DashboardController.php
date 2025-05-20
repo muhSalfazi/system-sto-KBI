@@ -8,6 +8,7 @@ use App\Models\Inventory;
 use App\Models\Part;
 use Carbon\Carbon;
 use App\Models\Customer;
+use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
@@ -15,11 +16,12 @@ class DashboardController extends Controller
     {
         $selectedMonth = $request->query('month');
         $selectedCustomer = $request->query('customer');
+        $selectedCategory = $request->query('category'); // Tambahan: ambil query filter kategori
 
-        // Semua customer
-        $customers = Customer::all();
+        $categories = Category::all(); // untuk dropdown
+        $customers = Customer::all();  // untuk dropdown
 
-        // List bulan dari inventory
+        // Ambil list bulan
         $months = Inventory::selectRaw("DATE_FORMAT(updated_at, '%Y-%m') as month")
             ->distinct()
             ->orderBy('month')
@@ -36,6 +38,12 @@ class DashboardController extends Controller
         if ($selectedCustomer) {
             $stoQuery->whereHas('part.customer', function ($query) use ($selectedCustomer) {
                 $query->where('username', $selectedCustomer);
+            });
+        }
+
+        if ($selectedCategory) {
+            $stoQuery->whereHas('part.category', function ($query) use ($selectedCategory) {
+                $query->where('id', $selectedCategory);
             });
         }
 
@@ -62,6 +70,12 @@ class DashboardController extends Controller
             });
         }
 
+        if ($selectedCategory) {
+            $dailyStockQuery->whereHas('inventory.part.category', function ($query) use ($selectedCategory) {
+                $query->where('id', $selectedCategory);
+            });
+        }
+
         $dailyStockData = $dailyStockQuery->get();
 
         return view('Dashboard.index', compact(
@@ -71,9 +85,12 @@ class DashboardController extends Controller
             'dailyStockData',
             'selectedMonth',
             'selectedCustomer',
-            'stoChartData'
+            'selectedCategory',
+            'stoChartData',
+            'categories'
         ));
     }
+
 
     public function getStoChartData(Request $request)
     {
@@ -107,7 +124,7 @@ class DashboardController extends Controller
     }
 
     // chart buat daily stock log
-      public function getDailyChartData(Request $request)
+    public function getDailyChartData(Request $request)
     {
         $month = $request->query('month', now()->format('Y-m'));
         $customer = $request->query('customer');
@@ -170,16 +187,23 @@ class DashboardController extends Controller
     {
         $month = $request->query('month', now()->format('Y-m'));
         $customer = $request->query('customer');
+        $category = $request->query('category'); // Tangkap query kategori
 
         $start = Carbon::parse($month)->startOfMonth();
         $end = Carbon::parse($month)->endOfMonth();
 
         $partsQuery = Part::with(['forecast', 'inventories']);
 
+        // Filter customer jika dipilih
         if ($customer) {
             $partsQuery->whereHas('customer', function ($q) use ($customer) {
                 $q->where('username', $customer);
             });
+        }
+
+        // ✅ Tambahkan filter kategori di sini
+        if ($category) {
+            $partsQuery->where('id_category', $category);
         }
 
         $parts = $partsQuery->get();
@@ -216,7 +240,6 @@ class DashboardController extends Controller
             'series' => $series
         ]);
     }
-
 
 
 }
