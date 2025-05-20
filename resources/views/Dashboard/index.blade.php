@@ -20,7 +20,7 @@
                 <div class="col-12">
                     <h5 class="card-title">Input Date & Customer</h5>
                     <div class="row mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label for="monthSelect">Select Month</label>
                             <select name="month" id="monthSelect" class="form-control">
                                 @for ($i = 0; $i < 12; $i++)
@@ -34,7 +34,7 @@
                                 @endfor
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label for="custForecast">Select Customer</label>
                             <select name="customer" id="custForecast" class="form-control">
                                 <option value="">All Customers</option>
@@ -138,9 +138,8 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Daily (Per Item)</h5>
+                        <h5 class="card-title">Daily</h5>
                         <div id="stockComparisonChart"></div>
-
                         <script>
                             document.addEventListener("DOMContentLoaded", () => {
                                 const chartContainer = document.querySelector("#stockComparisonChart");
