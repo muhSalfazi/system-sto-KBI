@@ -30,6 +30,13 @@
             </ul>
         </div>
     @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {{ session('error') }}
+        </div>
+    @endif
     @if (session('import_logs'))
         <div class="alert alert-info alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -82,8 +89,8 @@
                                                     style="font-size: 0.875rem; padding: 4px 8px;">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
-                                                <form action="{{ route('destroy.detail-lokasi', $rak->id) }}" method="POST"
-                                                    style="font-size: 0.875rem; padding: 4px 8px;"
+                                                <form action="{{ route('destroy.detail-lokasi', $rak->id) }}"
+                                                    method="POST" style="font-size: 0.875rem; padding: 4px 8px;"
                                                     onsubmit="return confirm('Are you sure you want to delete this Location?')">
                                                     @csrf
                                                     @method('DELETE')

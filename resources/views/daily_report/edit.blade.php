@@ -53,7 +53,7 @@
                     <div class="mb-3">
                         <label class="form-label">Plan Stock</label>
                         <input type="number" name="plan_stock" class="form-control"
-                            value="{{ $log->inventory->plan_stock }}">
+                            value="{{ $log->inventory->plan_stock }}" readonly>
                     </div>
 
                     <!-- Status -->
@@ -92,7 +92,7 @@
                                     value="{{ $log->Total_qty ?? 0 }}" readonly>
                             </div>
                         </div>
-                          <button type="button" class="btn btn-outline-primary mt-2 col-md-12"
+                        <button type="button" class="btn btn-outline-primary mt-2 col-md-12"
                             onclick="toggleOptionalQuantityInputs()">+ Item Uncomplete</button>
 
                         <div class="row mt-3" id="optionalQuantityInputs" style="display: none;">

@@ -14,13 +14,12 @@
 
     <section class="section dashboard">
         <div class="row">
-
             {{-- form buat form filter bulan+customer --}}
             <form method="GET" action="{{ route('dashboard') }}" id="filterForm">
                 <div class="col-12">
                     <h5 class="card-title">Input Date & Customer</h5>
-                    <div class="row mb-3">
-                        <div class="col-md-12">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
                             <label for="monthSelect">Select Month</label>
                             <select name="month" id="monthSelect" class="form-control">
                                 @for ($i = 0; $i < 12; $i++)
@@ -34,7 +33,7 @@
                                 @endfor
                             </select>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <label for="custForecast">Select Customer</label>
                             <select name="customer" id="custForecast" class="form-control">
                                 <option value="">All Customers</option>

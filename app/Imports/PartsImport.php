@@ -48,12 +48,10 @@ class PartsImport implements ToCollection, WithHeadingRow
             // Proses bagian lainnya
             // Cek apakah data sudah ada
             $existingPart = Part::where('Inv_id', $row['inv_id'])
-                ->where('Part_name', $row['part_name'])
-                ->where('Part_number', $row['part_number'])
                 ->first();
 
             if ($existingPart) {
-                $this->logs[] = "Data duplikat ditemukan: INV ID: {$row['inv_id']}, Part Name: {$row['part_name']}";
+                $this->logs[] = "Data duplikat ditemukan: INV ID: {$row['inv_id']}";
                 continue;
             }
 

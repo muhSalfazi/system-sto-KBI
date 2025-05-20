@@ -19,6 +19,13 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            {{ session('error') }}
+        </div>
+    @endif
+
     @if (session('import_logs'))
         <div class="alert alert-info alert-dismissible fade show" role="alert">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -45,7 +52,7 @@
                                 </a>
                                 <button type="button" class="btn btn-success btn-sm  mb-1 " data-bs-toggle="modal"
                                     data-bs-target="#importModal">
-                                  <i class="bi bi-file-earmark-spreadsheet-fill"></i> Import Excel
+                                    <i class="bi bi-file-earmark-spreadsheet-fill"></i> Import Excel
                                 </button>
                             @endif
                         </div>
@@ -163,7 +170,9 @@
                             <label for="file" class="form-label">Upload Excel File</label>
                             <input type="file" name="file" class="form-control" id="file" required
                                 accept=".xls,.xlsx">
-                                  <small class="text-danger">*Download Template Excel Import: <a href="{{ asset('file/format-import-Forecast(system-sto).xlsx') }}" download> <i class="bi bi-download"></i> klik di sini</a></small>
+                            <small class="text-danger">*Download Template Excel Import: <a
+                                    href="{{ asset('file/format-import-Forecast(system-sto).xlsx') }}" download> <i
+                                        class="bi bi-download"></i> klik di sini</a></small>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
