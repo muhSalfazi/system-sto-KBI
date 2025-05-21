@@ -92,7 +92,6 @@ class DashboardController extends Controller
         ));
     }
 
-
     public function getStoChartData(Request $request)
     {
         $month = $request->query('month', now()->format('Y-m'));

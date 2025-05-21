@@ -22,16 +22,18 @@
                         <div class="col-md-6">
                             <label for="monthSelect">Select Month</label>
                             <select name="month" id="monthSelect" class="form-control">
-                                @for ($i = 0; $i < 12; $i++)
+                                @for ($i = -5; $i <= 2; $i++)
+                                    {{-- dari 5 bulan lalu sampai 2 bulan ke depan --}}
                                     @php
                                         $monthValue = now()->addMonths($i)->format('Y-m');
                                     @endphp
                                     <option value="{{ $monthValue }}"
-                                        {{ request('month') === $monthValue ? 'selected' : '' }}>
+                                        {{ (request('month') ?? now()->format('Y-m')) === $monthValue ? 'selected' : '' }}>
                                         {{ now()->addMonths($i)->format('F Y') }}
                                     </option>
                                 @endfor
                             </select>
+
                         </div>
                         <div class="col-md-6">
                             <label for="custForecast">Select Customer</label>
@@ -160,6 +162,7 @@
                                 const chartContainer = document.querySelector("#stockComparisonChart");
                                 const weekSelect = document.getElementById("weekSelect");
                                 const monthSelect = document.getElementById("monthSelect");
+
 
                                 function updateWeekOptions() {
                                     const selectedMonth = monthSelect.value; // format: yyyy-mm
@@ -390,10 +393,6 @@
                             });
                         </script>
 
-
-
-                        </script>
-
                     </div>
 
                 </div>
@@ -405,7 +404,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Today’s Stock</h5>
+                        <h5 class="card-title">Today’s Stock - {{ now()->format('F Y') }}</h5>
                         <div class="row mb-3">
                             {{-- filter buat Kategori --}}
                             <div class="col-md-4">
@@ -548,9 +547,6 @@
                                 setInterval(loadStockPerDayChart, 20000);
                             });
                         </script>
-
-
-
 
                         <!-- End Bar Chart -->
                     </div>

@@ -136,7 +136,7 @@
                                                         onsubmit="return confirm('Are you sure you want to delete this forecast?')">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                        <button type="submit" class="btn btn-danger btn-sm mt-1"
                                                             style="font-size: 0.875rem; padding: 4px 8px;">
                                                             <i class="bi bi-trash3"></i>
                                                         </button>
