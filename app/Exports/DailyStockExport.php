@@ -8,15 +8,23 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Carbon\Carbon;
 
-class DailyStockExport implements FromCollection, WithHeadings, WithStyles, WithTitle, WithColumnFormatting
+class DailyStockExport implements FromCollection, WithHeadings, WithStyles, WithTitle, WithColumnFormatting, WithCustomStartCell
 {
     protected $status;
 
     public function __construct($status = null)
     {
         $this->status = $status;
+    }
+
+    public function startCell(): string
+    {
+        return 'A2';
     }
 
     public function collection()
@@ -29,21 +37,34 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
 
         return $query->get()->map(function ($log, $index) {
             $part = optional($log->inventory)->part;
-            $forecast = optional($part)->forecast->first(); // ambil hanya 1 forecast
+            $forecastMin = '-';
+            $forecastMax = '-';
+
+            if ($part && $log->created_at) {
+                $forecastMonth = Carbon::parse($log->created_at)->startOfMonth();
+                $forecast = $part->forecast()
+                    ->whereDate('forecast_month', $forecastMonth)
+                    ->first();
+
+                if ($forecast) {
+                    $forecastMin = $forecast->min ?? '-';
+                    $forecastMax = $forecast->max ?? '-';
+                }
+            }
 
             return [
-                'no' => $index + 1,
-                'datetime' => optional($log->created_at)->format('d-m-Y H:i:s'),
-                'inv_id' => $part->Inv_id ?? '-',
-                'part_name' => $part->Part_name ?? '-',
-                'part_number' => $part->Part_number ?? '-',
-                'min' => $forecast->min ?? '-',
-                'max' => $forecast->max ?? '-',
-                'total_qty' => $log->Total_qty,
-                'daily_stock' => $log->stock_per_day ?? '-',
-                'customer' => optional($part->customer)->username ?? '-',
-                'status' => strtoupper($log->status ?? '-'),
-                'prepared_by' => $log->user->username ?? '-',
+                $index + 1,
+                optional($log->created_at)->format('d-m-Y H:i:s'),
+                $part->Inv_id ?? '-',
+                $part->Part_name ?? '-',
+                $part->Part_number ?? '-',
+                $forecastMin,
+                $forecastMax,
+                $log->Total_qty,
+                $log->stock_per_day ?? '-',
+                optional($part->customer)->username ?? '-',
+                strtoupper($log->status ?? '-'),
+                $log->user->username ?? '-',
             ];
         });
     }
@@ -51,34 +72,53 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
     public function headings(): array
     {
         return [
-            'No',
-            'DateTime',
-            'Inv ID',
-            'Part Name',
-            'Part Number',
-            'Min',
-            'Max',
-            'Total Qty',
-            'Daily Stock',
-            'Customer',
-            'Status',
-            'Prepared By',
+            [
+                'No', 'DateTime', 'Inv ID', 'Part Name', 'Part No',
+                'STO STOCK PCS', '', 'ACT STOCK', '', 'Customer', 'Status', 'Prepared By'
+            ],
+            [
+                '', '', '', '', '',
+                'Min', 'Max', 'Qty', 'Day', '', '', ''
+            ]
         ];
     }
 
-    public function styles($sheet)
+    public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:L1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:L1')->getAlignment()->setHorizontal('center');
-        $sheet->getStyle('A1:L1')->getFill()->setFillType('solid')->getStartColor()->setRGB('D9E1F2');
+        // Merge header
+        $sheet->mergeCells('A2:A3');
+        $sheet->mergeCells('B2:B3');
+        $sheet->mergeCells('C2:C3');
+        $sheet->mergeCells('D2:D3');
+        $sheet->mergeCells('E2:E3');
+        $sheet->mergeCells('F2:G2');
+        $sheet->mergeCells('H2:I2');
+        $sheet->mergeCells('J2:J3');
+        $sheet->mergeCells('K2:K3');
+        $sheet->mergeCells('L2:L3');
 
-        // Atur lebar kolom
+        // Style header
+        $sheet->getStyle('A2:L3')->getFont()->setBold(true);
+        $sheet->getStyle('A2:L3')->getAlignment()->setHorizontal('center');
+        $sheet->getStyle('A2:L3')->getAlignment()->setVertical('center');
+        $sheet->getStyle('A2:L3')->getFill()->setFillType('solid')->getStartColor()->setRGB('D9E1F2');
+
+        // Set column width
         $columns = range('A', 'L');
-        $widths = [5, 20, 15, 25, 20, 8, 8, 12, 12, 15, 10, 20];
-
+        $widths = [5, 20, 15, 25, 20, 8, 8, 10, 8, 15, 10, 20];
         foreach ($columns as $i => $col) {
             $sheet->getColumnDimension($col)->setWidth($widths[$i]);
         }
+
+        // Tambahkan border ke seluruh tabel
+        $sheet->getStyle('A2:L' . $sheet->getHighestRow())->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ]);
     }
 
     public function title(): string
@@ -89,8 +129,9 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
     public function columnFormats(): array
     {
         return [
-            'H' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Total Qty
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,            // DateTime
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'H' => NumberFormat::FORMAT_NUMBER,
+            'I' => NumberFormat::FORMAT_NUMBER,
         ];
     }
 }

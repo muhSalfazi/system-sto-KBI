@@ -84,6 +84,15 @@ class StoExport implements FromCollection, WithHeadings, WithStyles, WithTitle, 
         $sheet->getColumnDimension('I')->setWidth(15);
         $sheet->getColumnDimension('J')->setWidth(11);
         $sheet->getColumnDimension('K')->setWidth(16);
+
+         $sheet->getStyle('A1:K' . $sheet->getHighestRow())->applyFromArray([
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => 'FF000000'],
+                ],
+            ],
+        ]);
     }
 
     public function title(): string

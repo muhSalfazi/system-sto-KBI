@@ -74,7 +74,7 @@
                             </div>
                         </div>
                         <div class="table-responsive animate__animated animate__fadeInUp">
-                            <table class="table table-striped table-bordered datatable">
+                            <table class="table table-striped table-bordered datatable mt-2">
                                 <thead>
                                     <tr>
                                         <th class="text-center align-middle" rowspan="2">No</th>
@@ -143,4 +143,9 @@
             </div>
         </div>
     </section>
+ <script>
+    $(document).ready(function() {
+        $('.datatable').DataTable();
+    });
+</script>
 @endsection
