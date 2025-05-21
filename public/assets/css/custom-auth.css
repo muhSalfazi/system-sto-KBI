@@ -74,3 +74,15 @@ body::before {
         max-width: 260px;
     }
 }
+
+
+.last-update-text {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 0.85rem;
+    color: #f0f0f0;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px 8px;
+    border-radius: 5px;
+}

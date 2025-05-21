@@ -16,6 +16,7 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use Carbon\Carbon;
 class DailyReportController extends Controller
 {
     //get halama utama
@@ -57,10 +58,16 @@ class DailyReportController extends Controller
         }
 
         // Ambil forecast min untuk part ini
-        $forecast = Forecast::where('id_part', $part->id)->first();
+        $issuedDate = Carbon::parse($data['issued_date']);
+
+        $forecast = Forecast::where('id_part', $part->id)
+            ->whereMonth('forecast_month', $issuedDate->month)
+            ->whereYear('forecast_month', $issuedDate->year)
+            ->first();
+
 
         if (!$forecast || $forecast->min == 0) {
-            return back()->with('error', 'Forecast untuk inventory ini belum diinputkan oleh admin.');
+            return back()->with('error', 'Forecast untuk inventory Bulan ini belum diinputkan oleh admin.');
         }
 
         // Hitung stock harian
@@ -71,8 +78,9 @@ class DailyReportController extends Controller
 
         // Hitung remark & note_remark
         $gap = $data['grand_total'] - $data['plan_stock'];
-        $remark = $gap === 0 ? 'normal' : 'abnormal';
-        $note_remark = $gap === 0 ? null : 'gap: ' . $gap;
+        $remark = $gap < 0 ? 'abnormal' : 'normal';
+        $note_remark = $gap < 0 ? 'gap: ' . $gap : null;
+
 
         // Simpan Inventory
         $inventory = Inventory::create([
@@ -195,7 +203,13 @@ class DailyReportController extends Controller
         $part = $inventory->part;
 
         // Ambil forecast
-        $forecast = Forecast::where('id_part', $part->id)->first();
+        $issuedDate = Carbon::parse($data['issued_date']);
+
+        $forecast = Forecast::where('id_part', $part->id)
+            ->whereMonth('forecast_month', $issuedDate->month)
+            ->whereYear('forecast_month', $issuedDate->year)
+            ->first();
+
 
         if (!$forecast || $forecast->min == 0) {
             return back()->with('error', 'Forecast untuk inventory ini belum diinputkan oleh admin.');
@@ -224,8 +238,10 @@ class DailyReportController extends Controller
 
         // Hitung remark
         $gap = $totalActual - $inventory->plan_stock;
-        $remark = ($gap === 0) ? 'normal' : 'abnormal';
-        $note_remark = ($gap === 0) ? null : 'gap: ' . $gap;
+
+        $remark = ($gap < 0) ? 'abnormal' : 'normal';
+        $note_remark = ($gap < 0) ? 'gap: ' . $gap : null;
+
 
         // Update inventory
         $inventory->update([

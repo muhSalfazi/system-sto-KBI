@@ -7,6 +7,9 @@ use App\Models\Part;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DailyStockExport;
+use Carbon\Carbon;
+
+
 class DailyStockLogController extends Controller
 {
     /**
@@ -14,19 +17,40 @@ class DailyStockLogController extends Controller
      */
     public function index(Request $request)
     {
+        // Ambil log harian stok dengan relasi terkait
         $query = DailyStockLog::with([
             'inventory.part.customer',
-            'inventory.part.forecast',
             'user'
         ]);
 
+        // Filter status jika ada
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
 
         $dailyStockLogs = $query->get();
 
-        $statuses = ['OK', 'NG', 'VIRGIN', 'FUNSAI']; // untuk dropdown filter
+        // Looping tiap log untuk ambil forecast bulan yang sesuai
+        foreach ($dailyStockLogs as $log) {
+            $part = optional(optional($log->inventory)->part);
+
+            if ($part && $log->created_at) {
+                $forecastMonth = Carbon::parse($log->created_at)->startOfMonth();
+
+                // Ambil forecast sesuai bulan created_at log
+                $forecast = $part->forecast()
+                    ->whereDate('forecast_month', $forecastMonth)
+                    ->first();
+
+                $log->forecast_min = $forecast->min ?? null;
+                $log->forecast_max = $forecast->max ?? null;
+            } else {
+                $log->forecast_min = null;
+                $log->forecast_max = null;
+            }
+        }
+
+        $statuses = ['OK', 'NG', 'VIRGIN', 'FUNSAI'];
 
         return view('Daily_stok.index', compact('dailyStockLogs', 'statuses'));
     }

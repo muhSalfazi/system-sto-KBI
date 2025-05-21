@@ -60,7 +60,8 @@ class Part extends Model
     }
 
     public function forecast()
-{
-    return $this->hasOne(Forecast::class, 'id_part')->latestOfMany(); // opsional
-}
+    {
+        return $this->hasMany(Forecast::class, 'id_part');
+    }
+
 }

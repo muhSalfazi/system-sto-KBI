@@ -137,17 +137,62 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Daily</h5>
+                        <h5 class="card-title">Weekly</h5>
+
+                        {{-- Filter Minggu --}}
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <select id="weekSelect" class="form-select">
+                                    <option value="1">Week 1 (1–7)</option>
+                                    <option value="2">Week 2 (8–14)</option>
+                                    <option value="3">Week 3 (15–21)</option>
+                                    <option value="4">Week 4 (22–28)</option>
+                                    <option value="5">Week 5 (29–31)</option>
+                                </select>
+                            </div>
+                        </div>
+
+
                         <div id="stockComparisonChart"></div>
+
                         <script>
                             document.addEventListener("DOMContentLoaded", () => {
                                 const chartContainer = document.querySelector("#stockComparisonChart");
+                                const weekSelect = document.getElementById("weekSelect");
+                                const monthSelect = document.getElementById("monthSelect");
+
+                                function updateWeekOptions() {
+                                    const selectedMonth = monthSelect.value; // format: yyyy-mm
+                                    const [year, month] = selectedMonth.split('-').map(Number);
+                                    const daysInMonth = new Date(year, month, 0).getDate();
+
+                                    const totalWeeks = Math.ceil(daysInMonth / 7);
+                                    const weekRanges = [];
+
+                                    for (let i = 0; i < totalWeeks; i++) {
+                                        const start = i * 7 + 1;
+                                        const end = Math.min((i + 1) * 7, daysInMonth);
+                                        weekRanges.push({
+                                            week: i + 1,
+                                            label: `Week ${i + 1} (${start}–${end})`
+                                        });
+                                    }
+
+                                    weekSelect.innerHTML = `<option value="">Select Week</option>`;
+                                    weekRanges.forEach(w => {
+                                        const opt = document.createElement('option');
+                                        opt.value = w.week;
+                                        opt.textContent = w.label;
+                                        weekSelect.appendChild(opt);
+                                    });
+                                }
 
                                 function loadStoChart() {
-                                    const month = document.getElementById("monthSelect").value;
+                                    const month = monthSelect.value;
                                     const customer = document.getElementById("custForecast").value;
+                                    const week = weekSelect.value;
 
-                                    fetch(`/dashboard/daily-chart-data?month=${month}&customer=${customer}`)
+                                    fetch(`/dashboard/daily-chart-data?month=${month}&customer=${customer}&week=${week}`)
                                         .then(res => res.json())
                                         .then(result => {
                                             if (!result.series || result.series[1].data.length === 0) {
@@ -161,24 +206,37 @@
                                             const yMax = Math.max(...allActual, ...allMax) + 10;
                                             const yMin = Math.min(...allMin, 0) - 5;
 
+                                            const invColors = {};
+                                            const colorPalette = ['#1f77b4', '#2ca02c', '#ff7f0e', '#d62728', '#9467bd', '#8c564b',
+                                                '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'
+                                            ];
+                                            let colorIndex = 0;
+
                                             const minMap = new Map();
                                             const maxMap = new Map();
 
-                                            result.series[0].data.forEach(d => {
-                                                const invId = d.x.split(" - ")[1];
-                                                minMap.set(`${d.x}`, d.y);
-                                            });
+                                            result.series[0].data.forEach(d => minMap.set(d.x, d.y));
+                                            result.series[2].data.forEach(d => maxMap.set(d.x, d.y));
 
-                                            result.series[2].data.forEach(d => {
-                                                const invId = d.x.split(" - ")[1];
-                                                maxMap.set(`${d.x}`, d.y);
+                                            const actualData = result.series[1].data.map((d, i) => {
+                                                const inv = String(d.x);
+                                                if (!invColors[inv]) {
+                                                    invColors[inv] = colorPalette[colorIndex % colorPalette.length];
+                                                    colorIndex++;
+                                                }
+
+                                                return {
+                                                    x: inv,
+                                                    y: d.y,
+                                                    inv: inv,
+                                                    label: inv,
+                                                    min: result.series[0].data[i]?.y || 0,
+                                                    max: result.series[2].data[i]?.y || 0
+                                                };
                                             });
 
                                             const annotations = [];
-
-                                            // Garis batas MIN & MAX
-                                            [...minMap.entries()].forEach(([label, val]) => {
-                                                const invId = label.split(" - ")[1];
+                                            [...minMap.entries()].forEach(([invId, val]) => {
                                                 annotations.push({
                                                     y: val,
                                                     borderColor: '#00BFFF',
@@ -194,8 +252,7 @@
                                                 });
                                             });
 
-                                            [...maxMap.entries()].forEach(([label, val]) => {
-                                                const invId = label.split(" - ")[1];
+                                            [...maxMap.entries()].forEach(([invId, val]) => {
                                                 annotations.push({
                                                     y: val,
                                                     borderColor: '#FF0000',
@@ -209,36 +266,6 @@
                                                         text: `Max (${invId})`
                                                     }
                                                 });
-                                            });
-
-                                            // Buat warna dinamis berdasarkan inv_id
-                                            const invColors = {};
-                                            const colorPalette = [
-                                                '#1f77b4', '#2ca02c', '#ff7f0e', '#d62728',
-                                                '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
-                                                '#bcbd22', '#17becf'
-                                            ];
-                                            let colorIndex = 0;
-
-                                            const actualData = result.series[1].data.map((d, i) => {
-                                                const tanggal = d.x.split(" - ")[0];
-                                                const inv = d.x.split(" - ")[1];
-                                                const fullKey = `${tanggal} - ${inv}`;
-
-                                                if (!invColors[inv]) {
-                                                    invColors[inv] = colorPalette[colorIndex % colorPalette.length];
-                                                    colorIndex++;
-                                                }
-
-                                                return {
-                                                    x: tanggal,
-                                                    y: d.y,
-                                                    fillColor: invColors[inv],
-                                                    inv: inv,
-                                                    label: fullKey,
-                                                    min: result.series[0].data[i]?.y || 0,
-                                                    max: result.series[2].data[i]?.y || 0
-                                                };
                                             });
 
                                             const chart = new ApexCharts(chartContainer, {
@@ -262,7 +289,7 @@
                                                 plotOptions: {
                                                     bar: {
                                                         columnWidth: '55%',
-                                                        distributed: true // penting agar warna per item aktif
+                                                        distributed: true
                                                     }
                                                 },
                                                 dataLabels: {
@@ -271,13 +298,13 @@
                                                 xaxis: {
                                                     type: 'category',
                                                     labels: {
-                                                        rotate: 0,
+                                                        rotate: -45,
                                                         style: {
                                                             fontSize: '10px'
                                                         }
                                                     },
                                                     title: {
-                                                        text: 'Days',
+                                                        text: 'Inventory ID',
                                                         style: {
                                                             fontWeight: 600
                                                         }
@@ -299,7 +326,7 @@
                                                 fill: {
                                                     type: 'solid'
                                                 },
-                                                colors: actualData.map(d => d.fillColor),
+                                                colors: actualData.map(d => invColors[d.inv]),
                                                 tooltip: {
                                                     shared: false,
                                                     intersect: true,
@@ -311,35 +338,29 @@
                                                     }) {
                                                         const data = w.config.series[seriesIndex].data[dataPointIndex];
                                                         return `
-                                                    <div style="
-                                                        background: white;
-                                                        padding: 10px 15px;
-                                                        border-radius: 8px;
-                                                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                                                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                                                        border-left: 4px solid #007bff;
-                                                        min-width: 200px;
-                                                    ">
-                                                        <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 6px;">
-                                                        ${data.label}
-                                                        </div>
-                                                        <div style="font-size: 13px; color: #555;">
-                                                        <span style="display: inline-block; width: 70px;">Min:</span> <strong style="color: #00BFFF;">${data.min} pcs</strong><br/>
-                                                        <span style="display: inline-block; width: 70px;">Actual:</span> <strong style="color: #FFA500;">${data.y} pcs</strong><br/>
-                                                        <span style="display: inline-block; width: 70px;">Max:</span> <strong style="color: #FF0000;">${data.max} pcs</strong>
-                                                        </div>
-                                                    </div>
-                                                    `;
+                                                            <div style="
+                                                                background: white;
+                                                                padding: 10px 15px;
+                                                                border-radius: 8px;
+                                                                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                                                font-family: 'Segoe UI';
+                                                                border-left: 4px solid #007bff;
+                                                                min-width: 200px;
+                                                            ">
+                                                                <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 6px;">
+                                                                    Inventory: ${data.label}
+                                                                </div>
+                                                                <div style="font-size: 13px; color: #555;">
+                                                                    <span style="display: inline-block; width: 70px;">Min:</span> <strong style="color: #00BFFF;">${data.min} pcs</strong><br/>
+                                                                    <span style="display: inline-block; width: 70px;">Act :</span> <strong style="color: #FFA500;">${data.y} pcs</strong><br/>
+                                                                    <span style="display: inline-block; width: 70px;">Max:</span> <strong style="color: #FF0000;">${data.max} pcs</strong>
+                                                                </div>
+                                                            </div>
+                                                        `;
                                                     }
                                                 },
                                                 legend: {
-                                                    show: false,
-                                                    position: 'top',
-                                                    horizontalAlign: 'center',
-                                                    formatter: function(seriesName, opts) {
-                                                        return opts.w.globals.initialSeries[0].data[opts.seriesIndex]
-                                                            ?.inv || seriesName;
-                                                    }
+                                                    show: false
                                                 },
                                                 grid: {
                                                     borderColor: '#e7e7e7',
@@ -350,21 +371,30 @@
                                                 }
                                             });
 
-                                            chartContainer.innerHTML = ''; // reset container
+                                            chartContainer.innerHTML = '';
                                             chart.render();
                                         });
                                 }
 
-                                // Load pertama kali
+                                // Init minggu dan grafik saat load
+                                updateWeekOptions();
                                 loadStoChart();
 
-                                // Auto-refresh setiap 10 detik
-                                setInterval(loadStoChart, 20000);
+                                // Event filter
+                                weekSelect.addEventListener("change", loadStoChart);
+                                document.getElementById("custForecast").addEventListener("change", loadStoChart);
+                                monthSelect.addEventListener("change", () => {
+                                    updateWeekOptions();
+                                    loadStoChart();
+                                });
                             });
                         </script>
 
-                    </div>
 
+
+                        </script>
+
+                    </div>
 
                 </div>
 
@@ -375,7 +405,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Daily Stock</h5>
+                        <h5 class="card-title">Today’s Stock</h5>
                         <div class="row mb-3">
                             {{-- filter buat Kategori --}}
                             <div class="col-md-4">
@@ -395,57 +425,80 @@
 
                         <!-- Bar Chart -->
                         <div id="stockPerDayChart" style="height: 400px;"></div>
-                        {{-- js buat daily stock --}}
+
                         <script>
                             document.addEventListener("DOMContentLoaded", function() {
                                 const chartContainer = document.querySelector("#stockPerDayChart");
-                                document.getElementById('categorySelect')?.addEventListener('change', loadStockPerDayChart);
+                                const categorySelect = document.getElementById("categorySelect");
+                                const monthSelect = document.getElementById("monthSelect");
+                                const customerSelect = document.getElementById("custForecast");
 
                                 function loadStockPerDayChart() {
-                                    const month = document.getElementById("monthSelect")?.value;
-                                    const customer = document.getElementById("custForecast")?.value;
-                                    const category = document.getElementById("categorySelect")?.value;
-
+                                    const month = monthSelect?.value;
+                                    const customer = customerSelect?.value;
+                                    const category = categorySelect?.value;
 
                                     fetch(`/dashboard/daily-stock-perday-data?month=${month}&customer=${customer}&category=${category}`)
                                         .then(res => res.json())
                                         .then(result => {
-                                            if (!result.series || result.series.length === 0) {
-                                                chartContainer.innerHTML = "<p class='text-center'>Data tidak tersedia.</p>";
+                                            chartContainer.innerHTML = ''; // bersihkan chart lama
+
+                                            if (!result.series || result.series.length === 0 || result.series.every(s => !s.data ||
+                                                    s.data.length === 0)) {
+                                                chartContainer.innerHTML =
+                                                    "<p class='text-center'>Tidak ada inventory untuk kategori ini.</p>";
                                                 return;
                                             }
 
                                             const chart = new ApexCharts(chartContainer, {
                                                 chart: {
-                                                    type: 'line',
-                                                    height: 400,
+                                                    type: 'bar',
+                                                    height: 500,
                                                     toolbar: {
                                                         show: true
                                                     }
                                                 },
+                                                plotOptions: {
+                                                    bar: {
+                                                        horizontal: true,
+                                                        barHeight: '60%',
+                                                        distributed: true
+                                                    }
+                                                },
+                                                dataLabels: {
+                                                    enabled: false
+                                                },
+                                                stroke: {
+                                                    show: true,
+                                                    width: 1,
+                                                    colors: ['transparent']
+                                                },
                                                 series: result.series,
                                                 xaxis: {
                                                     title: {
-                                                        text: 'Hari ke-',
+                                                        text: 'Act Day',
                                                         style: {
                                                             fontWeight: 600
                                                         }
                                                     },
                                                     labels: {
+                                                        formatter: val => `${val} day`,
                                                         style: {
                                                             fontSize: '10px'
                                                         }
                                                     }
                                                 },
                                                 yaxis: {
+                                                    labels: {
+                                                        style: {
+                                                            fontSize: '12px'
+                                                        }
+                                                    },
                                                     title: {
-                                                        text: 'Stock per Day',
+                                                        text: 'Inventory ID',
                                                         style: {
                                                             fontWeight: 600
                                                         }
-                                                    },
-                                                    labels: {
-                                                        formatter: val => `${val} `
                                                     }
                                                 },
                                                 tooltip: {
@@ -457,38 +510,48 @@
                                                         w
                                                     }) {
                                                         const point = w.config.series[seriesIndex].data[dataPointIndex];
+                                                        const label = point?.x ??
+                                                            `Inv: ${w.config.series[seriesIndex].name}`;
+
+                                                        const qty = point?.y ?? 0;
+
                                                         return `
-                                                        <div style="
+                                                            <div style="
                                                                 background: white;
                                                                 padding: 10px 15px;
                                                                 border-radius: 8px;
                                                                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                                                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                                                                font-family: 'Segoe UI';
                                                                 border-left: 4px solid #007bff;
                                                                 min-width: 200px;">
-                                                            <strong>${point.label}</strong><br/>
-                                                            Qty Stock: ${point.y}
-                                                        </div>`;
+                                                                <strong>${label}</strong><br/>
+                                                                Qty Day: ${qty}
+                                                            </div>`;
                                                     }
-                                                },
-                                                stroke: {
-                                                    curve: 'smooth'
-                                                },
-                                                dataLabels: {
-                                                    enabled: false
                                                 },
                                                 colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
                                             });
 
-                                            chartContainer.innerHTML = '';
                                             chart.render();
+                                        })
+                                        .catch(error => {
+                                            console.error("Error loading chart:", error);
+                                            chartContainer.innerHTML = "<p class='text-danger text-center'>Gagal memuat chart.</p>";
                                         });
                                 }
+
+                                categorySelect?.addEventListener('change', loadStockPerDayChart);
+                                monthSelect?.addEventListener('change', loadStockPerDayChart);
+                                customerSelect?.addEventListener('change', loadStockPerDayChart);
 
                                 loadStockPerDayChart();
                                 setInterval(loadStockPerDayChart, 20000);
                             });
                         </script>
+
+
+
+
                         <!-- End Bar Chart -->
                     </div>
                 </div>

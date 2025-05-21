@@ -95,11 +95,11 @@
                             <button type="button" class="btn btn-outline-secondary" id="togglePassword">
                                 <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
                             </button>
-                            <small class="text-muted">*Password default otomatis sesuai ID Card</small>
                             @error('password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        <small class="text-danger">*Password default otomatis sesuai ID Card</small>
 
                     </div>
                     <div class="col-6">

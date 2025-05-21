@@ -89,6 +89,10 @@
                                     </form>
                                 </div>
                             </div>
+                              <div class="last-update-text">
+                                Last Update: 21 Mei 2025
+                            </div>
+
 
                             <div class="credits">
                                 &copy; Sto Management System 2025

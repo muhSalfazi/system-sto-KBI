@@ -10,6 +10,7 @@ use App\Imports\StoImport;
 use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StoExport;
+use App\Models\PlanStock;
 
 class StoController extends Controller
 {
@@ -47,20 +48,36 @@ class StoController extends Controller
         return view('STO.create', compact('parts', 'categories'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'id_part' => 'required|exists:tbl_part,id',
-            'plan_stock' => 'required|string',
-        ]);
+  public function store(Request $request)
+{
+    $request->validate([
+        'id_part' => 'required|exists:tbl_part,id',
+        'plan_stock' => 'required|integer|min:0',
+    ]);
 
-        Inventory::create([
-            'id_part' => $request->id_part,
-            'plan_stock' => $request->plan_stock,
-        ]);
+    // Cek apakah inventory untuk part tersebut sudah ada
+    $existingInventory = Inventory::where('id_part', $request->id_part)->first();
 
-        return redirect()->route('sto.index')->with('success', 'Data STO berhasil ditambahkan.');
+    if ($existingInventory) {
+        return redirect()->back()->withErrors(['id_part' => 'Inventory untuk part ini sudah ada.']);
     }
+
+    // Simpan inventory baru
+    $inventory = Inventory::create([
+        'id_part' => $request->id_part,
+        'plan_stock' => $request->plan_stock,
+    ]);
+
+    // Simpan log awal plan_stock
+    PlanStock::create([
+        'id_inventory' => $inventory->id,
+        'plan_stock_before' => $request->plan_stock,
+        'plan_stock_after' => $request->plan_stock,
+    ]);
+
+    return redirect()->route('sto.index')->with('success', 'Data STO berhasil ditambahkan.');
+}
+
 
     public function edit($id)
     {

@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Customer;
 use App\Models\Category;
 use Illuminate\Support\Facades\DB;
+use App\Models\PlanStock;
 class DashboardController extends Controller
 {
     public function index(Request $request)
@@ -100,21 +101,21 @@ class DashboardController extends Controller
         $start = Carbon::parse($month)->startOfMonth();
         $end = Carbon::parse($month)->endOfMonth();
 
-        $query = Inventory::with('part.customer')
-            ->whereBetween('updated_at', [$start, $end]);
+        $query = PlanStock::with(['inventory.part.customer'])
+            ->whereBetween('created_at', [$start, $end]);
 
         if ($customer) {
-            $query->whereHas('part.customer', function ($q) use ($customer) {
+            $query->whereHas('inventory.part.customer', function ($q) use ($customer) {
                 $q->where('username', $customer);
             });
         }
 
-        $stoData = $query->get();
+        $logs = $query->get();
 
-        $stoChartData = $stoData->groupBy(function ($item) {
-            return $item->part->customer->username ?? 'Unknown';
+        $stoChartData = $logs->groupBy(function ($log) {
+            return $log->inventory->part->customer->username ?? 'Unknown';
         })->map(function ($group) {
-            return $group->sum('plan_stock');
+            return $group->sum('plan_stock_after');
         });
 
         return response()->json([
@@ -123,11 +124,13 @@ class DashboardController extends Controller
         ]);
     }
 
+
     // chart buat daily stock log
     public function getDailyChartData(Request $request)
     {
         $month = $request->query('month', now()->format('Y-m'));
         $customer = $request->query('customer');
+        $weekFilter = $request->query('week'); // bisa kosong
 
         $start = Carbon::parse($month)->startOfMonth();
         $end = Carbon::parse($month)->endOfMonth();
@@ -147,36 +150,55 @@ class DashboardController extends Controller
         $max = [];
 
         for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
-            $dayLabel = $date->format('d M');
+            $dayOfMonth = $date->day;
+            $currentWeek = ceil($dayOfMonth / 7);
+
+            // Hanya filter jika weekFilter tidak kosong
+            if (!empty($weekFilter) && $currentWeek != $weekFilter) {
+                continue;
+            }
 
             foreach ($parts as $part) {
-                $label = $dayLabel . ' - ' . $part->Inv_id;
-
-                $forecast = $part->forecast()
-                    ->whereMonth('forecast_month', $date->month)
-                    ->whereYear('forecast_month', $date->year)
-                    ->first();
-
-                $minVal = (int) ($forecast->min ?? 0);
-                $maxVal = (int) ($forecast->max ?? 0);
-
+                $invId = $part->Inv_id;
                 $inventoryIds = $part->inventories->pluck('id');
 
                 $actualVal = (int) DailyStockLog::whereIn('id_inventory', $inventoryIds)
                     ->whereDate('created_at', $date)
                     ->sum('Total_qty');
 
-                $min[] = ['x' => $label, 'y' => $minVal];
-                $actual[] = ['x' => $label, 'y' => $actualVal];
-                $max[] = ['x' => $label, 'y' => $maxVal];
+                if (!isset($actual[$invId])) {
+                    $actual[$invId] = 0;
+                }
+                $actual[$invId] += $actualVal;
+
+                if (!isset($min[$invId]) || !isset($max[$invId])) {
+                    $forecast = $part->forecast()
+                        ->whereMonth('forecast_month', $date->month)
+                        ->whereYear('forecast_month', $date->year)
+                        ->first();
+
+                    $min[$invId] = (int) ($forecast->min ?? 0);
+                    $max[$invId] = (int) ($forecast->max ?? 0);
+                }
             }
+        }
+
+        $minFormatted = [];
+        $actualFormatted = [];
+        $maxFormatted = [];
+
+        foreach ($actual as $invId => $actualVal) {
+            $invKey = (string) $invId;
+            $minFormatted[] = ['x' => $invKey, 'y' => $min[$invId]];
+            $actualFormatted[] = ['x' => $invKey, 'y' => $actualVal];
+            $maxFormatted[] = ['x' => $invKey, 'y' => $max[$invId]];
         }
 
         return response()->json([
             'series' => [
-                ['name' => 'Min', 'data' => $min],
-                ['name' => 'Actual', 'data' => $actual],
-                ['name' => 'Max', 'data' => $max],
+                ['name' => 'Min', 'data' => $minFormatted],
+                ['name' => 'Actual', 'data' => $actualFormatted],
+                ['name' => 'Max', 'data' => $maxFormatted],
             ]
         ]);
     }
@@ -185,59 +207,46 @@ class DashboardController extends Controller
     // chart buat stock daily
     public function getDailyStockPerDayData(Request $request)
     {
-        $month = $request->query('month', now()->format('Y-m'));
         $customer = $request->query('customer');
-        $category = $request->query('category'); // Tangkap query kategori
-
-        $start = Carbon::parse($month)->startOfMonth();
-        $end = Carbon::parse($month)->endOfMonth();
+        $category = $request->query('category');
+        $today = now()->toDateString();
 
         $partsQuery = Part::with(['forecast', 'inventories']);
 
-        // Filter customer jika dipilih
         if ($customer) {
             $partsQuery->whereHas('customer', function ($q) use ($customer) {
                 $q->where('username', $customer);
             });
         }
 
-        // ✅ Tambahkan filter kategori di sini
         if ($category) {
             $partsQuery->where('id_category', $category);
         }
 
         $parts = $partsQuery->get();
-
-        $series = [];
+        $data = [];
 
         foreach ($parts as $part) {
             $invId = $part->Inv_id;
             $inventoryIds = $part->inventories->pluck('id');
-            $data = [];
-            $i = 1;
 
-            for ($date = $start->copy(); $date->lte($end); $date->addDay(), $i++) {
-                $tooltip = $date->format('d M') . ' - ' . $invId;
+            $sumStockToday = DailyStockLog::whereIn('id_inventory', $inventoryIds)
+                ->whereDate('created_at', $today)
+                ->sum('stock_per_day');
 
-                $sumStockPerDay = DailyStockLog::whereIn('id_inventory', $inventoryIds)
-                    ->whereDate('created_at', $date)
-                    ->sum('stock_per_day');
-
-                $data[] = [
-                    'x' => $i,
-                    'y' => round($sumStockPerDay ?? 0, 2),
-                    'label' => $tooltip
-                ];
-            }
-
-            $series[] = [
-                'name' => $invId,
-                'data' => $data
+            $data[] = [
+                'x' => $invId,
+                'y' => round($sumStockToday ?? 0, 2)
             ];
         }
 
         return response()->json([
-            'series' => $series
+            'series' => [
+                [
+                    'name' => 'Stock Hari Ini',
+                    'data' => $data
+                ]
+            ]
         ]);
     }
 
