@@ -51,8 +51,8 @@ class PartController extends Controller
     {
         $validated = $request->validate([
             'Inv_id' => 'required|unique:tbl_part,Inv_id|',
-            'Part_name' => 'required|unique:tbl_part,Part_name',
-            'Part_number' => 'required|unique:tbl_part,Part_number',
+            'Part_name' => 'required',
+            'Part_number' => 'required',
             'id_customer' => 'required|exists:tbl_customer,id',
             'id_category' => 'required|exists:tbl_category,id',
             'id_plan' => 'required|exists:tbl_plan,id',
