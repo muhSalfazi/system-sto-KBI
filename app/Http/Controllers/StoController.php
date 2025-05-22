@@ -110,8 +110,8 @@ class StoController extends Controller
     // import
     public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|file|mimes:csv,txt'
+         $request->validate([
+            'file' => 'required|file|mimes:csv,xlsx,xls',
         ]);
 
         try {
@@ -124,7 +124,7 @@ class StoController extends Controller
                 Session::flash('import_logs', $logs);
             }
 
-            return redirect()->route('sto.index')->with('success', 'Import selesai. Periksa log untuk detailnya.');
+            return redirect()->route('sto.index')->with('success', 'Import selesai.');
         } catch (\Exception $e) {
             \Log::error('Import stok gagal', ['error' => $e->getMessage()]);
 

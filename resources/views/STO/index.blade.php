@@ -127,6 +127,7 @@
                                         <th class="text-center">Inv ID</th>
                                         <th class="text-center">Part Name</th>
                                         <th class="text-center">Part No</th>
+                                        <th class="text-center">Customer</th>
                                         <th class="text-center">Plan Stok</th>
                                         <th class="text-center">Act Stok</th>
                                         <th class="text-center">Category</th>
@@ -148,6 +149,7 @@
                                             <td class="text-center">{{ $part->part->Inv_id ?? '-' }}</td>
                                             <td class="text-center">{{ $part->part->Part_name ?? '-' }}</td>
                                             <td class="text-center">{{ $part->part->Part_number ?? '-' }}</td>
+                                            <td class="text-center">{{ $part->part->customer->username ?? '-' }}</td>
                                             <td class="text-center">{{ $part->plan_stock ?? '-' }}</td>
                                             <td class="text-center">{{ $part->act_stock ?? '-' }}</td>
                                             <td class="text-center">{{ $part->part->category->name ?? '-' }}</td>

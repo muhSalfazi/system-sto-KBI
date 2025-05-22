@@ -31,7 +31,7 @@
                 <h5 class="card-title">Form Input Part</h5>
                 <form method="POST" action="{{ route('parts.store') }}" class="row g-3 needs-validation" novalidate>
                     @csrf
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="Inv_id" class="form-label">Inventory ID</label>
                         <input type="text" name="Inv_id" id="inv_id"
                             class="form-control @error('Inv_id') is-invalid @enderror" value="{{ old('Inv_id') }}" required>
@@ -40,7 +40,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="Part_name" class="form-label">Part Name</label>
                         <input type="text" name="Part_name" id="Part_name"
                             class="form-control @error('Part_name') is-invalid @enderror" value="{{ old('Part_name') }}"
@@ -49,8 +49,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="Part_number" class="form-label">Part Number</label>
                         <input type="text" name="Part_number" id="Part_number"
                             class="form-control @error('Part_number') is-invalid @enderror" value="{{ old('Part_number') }}"
@@ -59,7 +58,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label for="id_category" class="form-label">Category</label>
                         <select name="id_category" id="id_category"
                             class="form-select @error('id_category') is-invalid @enderror" required>
@@ -72,7 +71,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label for="id_customer" class="form-label">Customer</label>
                         <select name="id_customer" id="id_customer"
                             class="form-select select2 @error('id_customer') is-invalid @enderror" required>
@@ -98,17 +97,17 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label for="id_area" class="form-label">Area</label>
-                        <select name="id_area" id="id_area" class="form-select" required>
-                            <option value="">Pilih Area</option>
-                        </select>
+                        <label for="nama_area" class="form-label">Area</label>
+                        <input type="text" name="nama_area" id="nama_area"
+                            class="form-control @error('nama_area') is-invalid @enderror" value="{{ old('nama_area') }}"
+                            required>
                     </div>
 
                     <div class="col-md-4">
-                        <label for="id_rak" class="form-label">Rak</label>
-                        <select name="id_rak" id="id_rak" class="form-select" required>
-                            <option value="">Pilih Rak</option>
-                        </select>
+                        <label for="nama_rak" class="form-label">Rak</label>
+                        <input type="text" name="nama_rak" id="nama_rak"
+                            class="form-control @error('nama_rak') is-invalid @enderror" value="{{ old('nama_rak') }}"
+                            required>
                     </div>
                     {{-- end --}}
                     {{-- Package --}}
@@ -139,45 +138,6 @@
             </div>
         </div>
     </section>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $('#id_plan').on('change', function() {
-                const plantId = $(this).val();
-                $('#id_area').html('<option value="">Loading...</option>');
-                $('#id_rak').html('<option value="">Pilih Rak</option>');
-
-                if (plantId) {
-                    fetch(`/get-areas/${plantId}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            let options = '<option value="">Pilih Area</option>';
-                            data.forEach(area => {
-                                options +=
-                                    `<option value="${area.id}">${area.nama_area}</option>`;
-                            });
-                            $('#id_area').html(options);
-                        });
-                }
-            });
-
-            $('#id_area').on('change', function() {
-                const areaId = $(this).val();
-                $('#id_rak').html('<option value="">Loading...</option>');
-
-                if (areaId) {
-                    fetch(`/get-raks/${areaId}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            let options = '<option value="">Pilih Rak</option>';
-                            data.forEach(rak => {
-                                options += `<option value="${rak.id}">${rak.nama_rak}</option>`;
-                            });
-                            $('#id_rak').html(options);
-                        });
-                }
-            });
-        });
-    </script>
 
     <script>
         $(document).ready(function() {

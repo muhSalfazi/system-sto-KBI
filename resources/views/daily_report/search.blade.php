@@ -24,6 +24,7 @@
               <th>ID Inventory</th>
               <th>Part Name</th>
               <th>Part Number</th>
+              <th>Customer</th>
             </tr>
           </thead>
           <tbody>
@@ -32,6 +33,7 @@
                 <td>{{ $result->inventory_id }}</td>
                 <td>{{ $result->part_name }}</td>
                 <td>{{ $result->part_number }}</td>
+                <td>{{ $result->customer->username }}</td>
               </tr>
             @endforeach
           </tbody>

@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 use App\Models\DailyStockLog;
 use App\Models\Inventory;
 use App\Models\Part;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DailyStockExport;
 use Carbon\Carbon;
+
 
 
 class DailyStockLogController extends Controller
@@ -27,6 +29,19 @@ class DailyStockLogController extends Controller
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
+        // Filter kategori
+        if ($request->has('category') && $request->category != '') {
+            $query->whereHas('inventory.part', function ($q) use ($request) {
+                $q->where('id_category', $request->category);
+            });
+        }
+
+        // Filter tanggal
+        if ($request->has('date') && $request->date != '') {
+            $query->whereDate('created_at', $request->date);
+        }
+        $categories = Category::all();
+
 
         $dailyStockLogs = $query->get();
 
@@ -52,7 +67,7 @@ class DailyStockLogController extends Controller
 
         $statuses = ['OK', 'NG', 'VIRGIN', 'FUNSAI'];
 
-        return view('Daily_stok.index', compact('dailyStockLogs', 'statuses'));
+        return view('Daily_stok.index', compact('dailyStockLogs', 'statuses', 'categories'));
     }
 
     public function destroy($id)
@@ -77,11 +92,20 @@ class DailyStockLogController extends Controller
         }
     }
 
-    // Export daily stock logs to Excel
+    // // Export daily stock logs to Excel
+    // public function export(Request $request)
+    // {
+    //     $status = $request->status;
+    //     return Excel::download(new DailyStockExport($status), 'daily_stock_logs.xlsx');
+    // }
     public function export(Request $request)
     {
-        $status = $request->status;
-        return Excel::download(new DailyStockExport($status), 'daily_stock_logs.xlsx');
+        return Excel::download(
+            new DailyStockExport($request->status, $request->category, $request->date),
+            'daily_stock_export.xlsx'
+        );
     }
+
 }
+
 

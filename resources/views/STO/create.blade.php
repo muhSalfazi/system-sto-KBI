@@ -36,7 +36,7 @@
                         <select name="id_part" id="id_part" class="form-select select2" required>
                             <option value="">-- Pilih Part --</option>
                             @foreach ($parts as $part)
-                                <option value="{{ $part->id }}">{{ $part->Inv_id }} - {{ $part->Part_name }} - {{ $part->Part_number }}
+                                <option value="{{ $part->id }}">{{ $part->Inv_id }} - {{ $part->Part_name }} - {{ $part->customer->username }}
                                 </option>
                             @endforeach
                         </select>

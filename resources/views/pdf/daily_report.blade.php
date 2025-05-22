@@ -79,6 +79,11 @@
                     <td>{{ $report->inventory->part->Part_number ?? '-' }}</td>
                 </tr>
                 <tr>
+                    <td><b>CUSTOMER</b></b></td>
+                    <td>:</td>
+                    <td>{{ $report->inventory->part->customer->username ?? '-' }}</td>
+                </tr>
+                <tr>
                     <td><b>MASTER TYPE</b></td>
                     <td>:</td>
                     <td>{{ $report->inventory->part->category->name ?? '-' }}</td>
@@ -115,7 +120,11 @@
                 </tr>
             </tbody>
         </table>
-
     </body>
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    </script>
 
     </html>

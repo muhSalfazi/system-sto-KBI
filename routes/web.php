@@ -57,15 +57,7 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::put('/parts/{part}', [PartController::class, 'update'])->name('parts.update');
     Route::delete('/parts/{part}', [PartController::class, 'destroy'])->name('parts.destroy');
     Route::post('/parts/import', [PartController::class, 'import'])->name('parts.import');
-    // detail lokasi
-    Route::get('/detail-lokasi', [DetailLokasiController::class, 'index'])->name('detail-lokasi.index');
-    Route::get('/create', [DetailLokasiController::class, 'create'])->name('create.detail-lokasi');
-    Route::post('/detail-lokasi-post', [DetailLokasiController::class, 'store'])->name('detail-lokasi.store');
-    Route::get('/{rak}/edit', [DetailLokasiController::class, 'edit'])->name('edit.detail-lokasi');
-    Route::put('/{rak}', [DetailLokasiController::class, 'update'])->name('update.detail-lokasi');
-    Route::delete('/{rak}', [DetailLokasiController::class, 'destroy'])->name('destroy.detail-lokasi');
-    Route::post('/detail-lokasi/import', [DetailLokasiController::class, 'import'])->name('detail-lokasi.import');
-    Route::get('/get-area-by-plan/{id}', [DetailLokasiController::class, 'getByPlan']);
+
     // sto
     Route::get('/sto', [StoController::class, 'index'])->name('sto.index');
     Route::get('/sto/create', [StoController::class, 'create'])->name('sto.create.get');
@@ -75,6 +67,7 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::delete('/sto/destroy/{id}', [StoController::class, 'destroy'])->name('sto.destroy');
     Route::post('/sto/import', [StoController::class, 'import'])->name('sto.import');
     Route::get('/sto/export', [StoController::class, 'export'])->name('sto.export');
+
     // daily stock log
     Route::get('/daily-stock', [DailyStockLogController::class, 'index'])->name('daily-stock.index');
     Route::delete('daily-stock/{id}', [DailyStockLogController::class, 'destroy'])->name('reports.destroy');

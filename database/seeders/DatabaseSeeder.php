@@ -17,9 +17,7 @@ class DatabaseSeeder extends Seeder
             SuperAdminSeeder::class,
             customerSeeder::class,
             PlanSeeder::class,
-            AreaSeeder::class,
             CategorySeeder::class,
-            // RakSeeder::class,
             AdminSeeder::class,
         ]);
     }

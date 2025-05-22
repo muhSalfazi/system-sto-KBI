@@ -130,7 +130,8 @@ class DailyReportController extends Controller
     // halaman untuk buat isi qty sto
     public function form($inventory_id)
     {
-        $inventory = Inventory::find($inventory_id); // langsung by ID
+        $inventory = Inventory::find($inventory_id);
+         // langsung by ID
 
         if ($inventory) {
             return view('daily_report.form', compact('inventory'));
@@ -140,30 +141,34 @@ class DailyReportController extends Controller
     }
 
     // Proses scan Inventory ID get daily report
-    public function scan(Request $request)
-    {
-        $request->validate([
-            'inventory_id' => 'required|string'
-        ]);
+   public function scan(Request $request)
+{
+    $request->validate([
+        'inventory_id' => 'required|string'
+    ]);
 
-        // 1. Cari Part berdasarkan Inv_id
-        $part = Part::where('Inv_id', $request->inventory_id)->first();
+    // Ambil semua part dengan Inv_id yang sesuai
+    $parts = Part::where('Inv_id', $request->inventory_id)
+        ->with(['customer', 'category', 'plant', 'area', 'inventories'])
+        ->get();
 
-        if (!$part) {
-            return back()->with('error', 'Inventory ID tidak ditemukan pada tabel Part.');
-        }
+    if ($parts->isEmpty()) {
+        return back()->with('error', 'Inventory ID tidak ditemukan pada tabel Part.');
+    }
 
-        // 2. Cari Inventory berdasarkan id_part dari Part yang ditemukan
-        $inventory = Inventory::where('id_part', $part->id)->latest()->first();
+    if ($parts->count() === 1) {
+        $inventory = $parts->first()->inventories()->latest()->first();
 
         if (!$inventory) {
             return back()->with('error', 'Inventory tidak ditemukan untuk Part tersebut.');
         }
 
-        // 3. Redirect ke halaman edit atau sesuai kebutuhan
         return redirect()->route('sto.edit.report', ['inventory_id' => $inventory->id]);
-
     }
+
+    // Jika lebih dari satu customer, tampilkan pilihan
+    return view('daily_report.select_part_modal', compact('parts'));
+}
 
     public function storecreate(Request $request, $inventory_id)
     {
@@ -264,6 +269,7 @@ class DailyReportController extends Controller
             'inventory.part.category',
             'inventory.part.plant',
             'inventory.part.area',
+             'inventory.part.customer',
             'user'
         ])->findOrFail($id);
 
@@ -288,10 +294,11 @@ class DailyReportController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
+    $results = Part::with('customer')
+    ->where('Part_name', 'like', '%' . $query . '%')
+    ->orWhere('Part_number', 'like', '%' . $query . '%')
+    ->get(['id', 'Inv_id as inventory_id', 'Part_name as part_name', 'Part_number as part_number', 'id_customer']);
 
-        $results = Part::where('Part_name', 'like', '%' . $query . '%')
-            ->orWhere('Part_number', 'like', '%' . $query . '%')
-            ->get(['Inv_id as inventory_id', 'Part_name as part_name', 'Part_number as part_number']);
 
         return view('daily_report.search', compact('results'));
     }

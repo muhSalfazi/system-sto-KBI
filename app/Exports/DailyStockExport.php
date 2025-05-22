@@ -16,11 +16,16 @@ use Carbon\Carbon;
 class DailyStockExport implements FromCollection, WithHeadings, WithStyles, WithTitle, WithColumnFormatting, WithCustomStartCell
 {
     protected $status;
+    protected $category;
+    protected $date;
 
-    public function __construct($status = null)
+    public function __construct($status = null, $category = null, $date = null)
     {
         $this->status = $status;
+        $this->category = $category;
+        $this->date = $date;
     }
+
 
     public function startCell(): string
     {
@@ -35,6 +40,16 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
             $query->where('status', $this->status);
         }
 
+        if ($this->category) {
+            $query->whereHas('inventory.part', function ($q) {
+                $q->where('id_category', $this->category);
+            });
+        }
+
+        if ($this->date) {
+            $query->whereDate('created_at', $this->date);
+        }
+
         return $query->get()->map(function ($log, $index) {
             $part = optional($log->inventory)->part;
             $forecastMin = '-';
@@ -42,9 +57,7 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
 
             if ($part && $log->created_at) {
                 $forecastMonth = Carbon::parse($log->created_at)->startOfMonth();
-                $forecast = $part->forecast()
-                    ->whereDate('forecast_month', $forecastMonth)
-                    ->first();
+                $forecast = $part->forecast()->whereDate('forecast_month', $forecastMonth)->first();
 
                 if ($forecast) {
                     $forecastMin = $forecast->min ?? '-';
@@ -69,16 +82,37 @@ class DailyStockExport implements FromCollection, WithHeadings, WithStyles, With
         });
     }
 
+
     public function headings(): array
     {
         return [
             [
-                'No', 'DateTime', 'Inv ID', 'Part Name', 'Part No',
-                'STO STOCK PCS', '', 'ACT STOCK', '', 'Customer', 'Status', 'Prepared By'
+                'No',
+                'DateTime',
+                'Inv ID',
+                'Part Name',
+                'Part No',
+                'STO STOCK PCS',
+                '',
+                'ACT STOCK',
+                '',
+                'Customer',
+                'Status',
+                'Prepared By'
             ],
             [
-                '', '', '', '', '',
-                'Min', 'Max', 'Qty', 'Day', '', '', ''
+                '',
+                '',
+                '',
+                '',
+                '',
+                'Min',
+                'Max',
+                'Qty',
+                'Day',
+                '',
+                '',
+                ''
             ]
         ];
     }

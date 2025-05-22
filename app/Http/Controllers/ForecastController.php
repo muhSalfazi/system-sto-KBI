@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Imports\ForecastImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Session;
 
 class ForecastController extends Controller
 {
@@ -37,12 +38,12 @@ class ForecastController extends Controller
 
         return view('Forecast.index', compact('forecasts', 'customers'));
     }
-
     public function create()
     {
-        $parts = Part::all();
+        $parts = Part::with('customer')->get();
         return view('Forecast.create', compact('parts'));
     }
+
     public function edit($id)
     {
         $forecast = Forecast::with('part')->findOrFail($id);
@@ -90,16 +91,16 @@ class ForecastController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'inv_id' => 'required|exists:tbl_part,Inv_id',
+            'id' => 'required|exists:tbl_part,id',
             'forecast_month' => 'required|date_format:Y-m',
             'po_pcs' => 'required|integer|min:1',
             'hari_kerja' => 'required|integer|min:1',
         ]);
 
-        $part = Part::where('Inv_id', $request->inv_id)->first();
+        $part = Part::where('id', $request->id)->first();
 
         if (!$part) {
-            return redirect()->back()->withErrors(['inv_id' => 'Part tidak ditemukan.']);
+            return redirect()->back()->withErrors(['id' => 'Part tidak ditemukan.']);
         }
 
         // Konversi forecast_month ke awal bulan
@@ -125,18 +126,30 @@ class ForecastController extends Controller
     }
 
 
-    // Mengimpor data forecast dari file Excel
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt',
+            'file' => 'required|file|mimes:csv,xlsx,xls',
         ]);
 
-        $import = new ForecastImport();
-        Excel::import($import, $request->file('file'));
+        try {
+            $importer = new ForecastImport();
+            Excel::import($importer, $request->file('file'));
 
-        return redirect()->route('forecast.index')
-            ->with('success', 'Import Forecast selesai.')
-            ->with('import_logs', $import->getLogs());
+            $logs = $importer->getLogs();
+
+            if (count($logs) > 0) {
+                Session::flash('import_logs', $logs);
+            }
+
+            return redirect()->route('forecast.index')->with('success', 'Import selesai.');
+        } catch (\Exception $e) {
+            \Log::error('Import forecast gagal', ['error' => $e->getMessage()]);
+
+            return redirect()->route('forecast.index')->with([
+                'error' => 'Terjadi kesalahan saat import: ' . $e->getMessage(),
+            ]);
+        }
     }
+
 }

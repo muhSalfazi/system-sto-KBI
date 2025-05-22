@@ -10,6 +10,7 @@ class Part extends Model
 
     protected $table = 'tbl_part';
     protected $fillable = [
+        'id',
         'Inv_id',
         'Part_name',
         'Part_number',

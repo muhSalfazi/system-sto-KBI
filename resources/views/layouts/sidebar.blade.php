@@ -40,13 +40,6 @@
                     <span>Part</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('detail-lokasi.index', 'create.detail-lokasi', 'edit.detail-lokasi') ? 'active' : 'collapsed' }}"
-                    href="{{ route('detail-lokasi.index') }}">
-                    <i class="bi bi-pin-map"></i>
-                    <span>Location Details</span>
-                </a>
-            </li>
         @endif
 
         @if (Auth::user()->role->name == 'SuperAdmin')

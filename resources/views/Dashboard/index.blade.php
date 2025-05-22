@@ -445,7 +445,7 @@
                                             if (!result.series || result.series.length === 0 || result.series.every(s => !s.data ||
                                                     s.data.length === 0)) {
                                                 chartContainer.innerHTML =
-                                                    "<p class='text-center'>Tidak ada inventory untuk kategori ini.</p>";
+                                                    "<p class='text-center'>Tidak ada inventory untuk kategori atau customer ini.</p>";
                                                 return;
                                             }
 

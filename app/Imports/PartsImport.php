@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Imports;
 
 use App\Models\Part;
@@ -9,7 +10,6 @@ use App\Models\Area;
 use App\Models\Rak;
 use App\Models\Category;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
@@ -25,49 +25,50 @@ class PartsImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            $logMsg = "";
-
-            // Log untuk data yang tidak lengkap
-            if (isset($row['customer']) && !isset($row['plan'])) {
-                $logMsg = "Kolom Plan tidak ditemukan pada baris: " . json_encode($row);
+            // Cek kolom penting
+            if (!isset($row['inv_id'], $row['part_name'], $row['part_number'], $row['customer'], $row['plan'], $row['area'], $row['rak'], $row['kategori'], $row['type_pkg'], $row['qty_kanban'])) {
+                $this->logs[] = "Baris tidak lengkap: " . json_encode($row);
+                continue;
+            }
+            // Cek duplikat berdasarkan kombinasi Inv_id dan Customer
+            $customer = Customer::where('username', $row['customer'])->first();
+            if (!$customer) {
+                $this->logs[] = "Customer tidak ditemukan: {$row['customer']}";
+                continue;
             }
 
-            if (isset($row['customer']) && !isset($row['rak'])) {
-                $logMsg = "Kolom Rak tidak ditemukan pada baris: " . json_encode($row);
-            }
-            if (isset($row['customer']) && !isset($row['kategori'])) {
-                $logMsg = "Kolom Rak tidak ditemukan pada baris: " . json_encode($row);
-            }
-
-            // Simpan log ke array logs
-            if ($logMsg) {
-                $this->logs[] = $logMsg;
-                continue; // Melewati baris jika ada error
-            }
-
-            // Proses bagian lainnya
-            // Cek apakah data sudah ada
             $existingPart = Part::where('Inv_id', $row['inv_id'])
+                ->where('id_customer', $customer->id)
                 ->first();
 
             if ($existingPart) {
-                $this->logs[] = "Data duplikat ditemukan: INV ID: {$row['inv_id']}";
+                $this->logs[] = "Duplikat: INV ID {$row['inv_id']} untuk Customer {$row['customer']}";
                 continue;
             }
 
-            // Cek relasi lainnya
+            // Ambil relasi lainnya
             $customer = Customer::where('username', $row['customer'])->first();
             $plant = Plant::where('name', $row['plan'])->first();
-            $area = Area::where('nama_area', $row['area'])->first();
-            $rak = Rak::where('nama_rak', $row['rak'])->first();
             $category = Category::where('name', $row['kategori'])->first();
 
-            if (!$customer || !$plant || !$area || !$rak || !$category) {
-                $this->logs[] = "Relasi tidak ditemukan pada baris: " . json_encode($row);
+            if (!$customer || !$plant || !$category) {
+                $this->logs[] = "Relasi tidak ditemukan (Customer/Plant/Kategori): " . json_encode($row);
                 continue;
             }
 
-            // Jika semua ditemukan, simpan ke database
+            // Create or Get Area
+            $area = Area::firstOrCreate([
+                'id_plan' => $plant->id,
+                'nama_area' => $row['area'],
+            ]);
+
+            // Create or Get Rak
+            $rak = Rak::firstOrCreate([
+                'id_area' => $area->id,
+                'nama_rak' => $row['rak'],
+            ]);
+
+            // Buat Part
             $part = Part::create([
                 'Inv_id' => $row['inv_id'],
                 'Part_name' => $row['part_name'],
@@ -79,13 +80,14 @@ class PartsImport implements ToCollection, WithHeadingRow
                 'id_category' => $category->id,
             ]);
 
+            // Buat Package
             Package::create([
                 'type_pkg' => $row['type_pkg'],
                 'qty' => $row['qty_kanban'],
                 'id_part' => $part->id,
             ]);
 
-            // $this->logs[] = "Data berhasil disimpan: INV ID: {$row['inv_id']}, Part Name: {$row['part_name']}";
+            $this->logs[] = "Berhasil simpan: INV ID {$row['inv_id']}";
         }
     }
 }

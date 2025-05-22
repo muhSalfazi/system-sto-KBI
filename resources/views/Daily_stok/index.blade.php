@@ -51,16 +51,20 @@
                         <div class="mb-2">
 
                             {{-- export excel --}}
-                            <a href="{{ route('daily-stock.export', ['status' => request('status')]) }}"
+                            <a href="{{ route('daily-stock.export', [
+                                'status' => request('status'),
+                                'category' => request('category'),
+                                'date' => request('date'),
+                            ]) }}"
                                 class="btn btn-warning btn-sm">
                                 <i class="bi bi-file-earmark-spreadsheet-fill"></i> Export Excel
                             </a>
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <form method="GET" action="{{ route('daily-stock.index') }}">
-                                        <label for="statusFilter" class="form-label">Filter Status:</label>
-                                        <select class="form-select" name="status" id="statusFilter"
-                                            onchange="this.form.submit()">
+
+                            <form method="GET" action="{{ route('daily-stock.index') }}">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label for="statusFilter" class="form-label">Status Filters:</label>
+                                        <select class="form-select" name="status" id="statusFilter">
                                             <option value="">-- Semua Status --</option>
                                             @foreach ($statuses as $status)
                                                 <option value="{{ $status }}"
@@ -69,77 +73,105 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="table-responsive animate__animated animate__fadeInUp">
-                            <table class="table table-striped table-bordered datatable mt-2">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center align-middle" rowspan="2">No</th>
-                                        <th class="text-center align-middle" rowspan="2">DateTime</th>
-                                        <th class="text-center align-middle" rowspan="2">Inv Id</th>
-                                        <th class="text-center align-middle" rowspan="2">Part Name</th>
-                                        <th class="text-center align-middle" rowspan="2">Part No</th>
-                                        <th class="text-center" colspan="2">Sto Stock Pcs</th>
-                                        <th class="text-center" colspan="2">Act Stock</th>
-                                        <th class="text-center align-middle" rowspan="2">Customer</th>
-                                        <th class="text-center align-middle" rowspan="2">Status</th>
-                                        <th class="text-center align-middle" rowspan="2">Prepared By</th>
-                                        @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
-                                            <th class="text-center align-middle" rowspan="2">Action</th>
-                                        @endif
-                                    </tr>
-                                    <tr>
-                                        <th class="text-center">Min</th>
-                                        <th class="text-center">Max</th>
-                                        <th class="text-center">Qty</th>
-                                        <th class="text-center">Day</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($dailyStockLogs as $key => $log)
-                                        <tr>
-                                            <td class="text-center">{{ $key + 1 }}</td>
-                                            <td class="text-center">{{ $log->created_at }}</td>
-                                            <td>{{ optional(optional($log->inventory)->part)->Inv_id ?? '-' }}</td>
-                                            <td>{{ optional(optional($log->inventory)->part)->Part_name ?? '-' }}</td>
-                                            <td>{{ optional(optional($log->inventory)->part)->Part_number ?? '-' }}</td>
-                                            <td class="text-center">
-                                                {{ $log->forecast_min ?? '-' }}
-                                            </td>
-                                            <td class="text-center">
-                                                {{ $log->forecast_max ?? '-' }}
-                                            </td>
+                                    </div>
 
-                                            <td class="text-center">{{ $log->Total_qty }}</td>
-                                            <td class="text-center">{{ $log->stock_per_day }}</td>
-                                            <td>{{ optional(optional(optional($log->inventory)->part)->customer)->username ?? '-' }}
-                                            </td>
-                                            <td class="text-center">{{ $log->status }}</td>
-                                            <td class="text-center">{{ $log->user->username }}</td>
+                                    <div class="col-md-3">
+                                        <label for="categoryFilter" class="form-label">Category Filters:</label>
+                                        <select class="form-select" name="category" id="categoryFilter">
+                                            <option value="">-- Semua Kategori --</option>
+                                            @foreach ($categories as $category)
+                                                <option value="{{ $category->id }}"
+                                                    {{ request('category') == $category->id ? 'selected' : '' }}>
+                                                    {{ $category->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="dateFilter" class="form-label">Date Filter:</label>
+                                        <input type="date" name="date" id="dateFilter" class="form-control"
+                                            value="{{ request('date') }}">
+                                    </div>
+
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary me-2 btn-sm"
+                                            style="font-size: 0.875rem; padding: 4px 8px;">Filter</button>
+                                        <a href="{{ route('daily-stock.index') }}" class="btn btn-secondary btn-sm"
+                                            style="font-size: 0.875rem; padding: 4px 8px;">Reset</a>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="table-responsive animate__animated animate__fadeInUp">
+                                <table class="table table-striped table-bordered datatable mt-2">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center align-middle" rowspan="2">No</th>
+                                            <th class="text-center align-middle" rowspan="2">DateTime</th>
+                                            <th class="text-center align-middle" rowspan="2">Inv Id</th>
+                                            <th class="text-center align-middle" rowspan="2">Part Name</th>
+                                            <th class="text-center align-middle" rowspan="2">Part No</th>
+                                            <th class="text-center" colspan="2">Sto Stock Pcs</th>
+                                            <th class="text-center" colspan="2">Act Stock</th>
+                                            <th class="text-center align-middle" rowspan="2">Customer</th>
+                                            <th class="text-center align-middle" rowspan="2">Status</th>
+                                            <th class="text-center align-middle" rowspan="2">Prepared By</th>
                                             @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
-                                                <td class="text-center">
-                                                    <form action="{{ route('reports.destroy', $log->id) }}" method="POST"
-                                                        onsubmit="return confirm('Are you sure you want to delete this report?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                            style="font-size: 0.875rem; padding: 4px 8px;">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
+                                                <th class="text-center align-middle" rowspan="2">Action</th>
                                             @endif
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                        <tr>
+                                            <th class="text-center">Min</th>
+                                            <th class="text-center">Max</th>
+                                            <th class="text-center">Qty</th>
+                                            <th class="text-center">Day</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($dailyStockLogs as $key => $log)
+                                            <tr>
+                                                <td class="text-center">{{ $key + 1 }}</td>
+                                                <td class="text-center">{{ $log->created_at }}</td>
+                                                <td>{{ optional(optional($log->inventory)->part)->Inv_id ?? '-' }}</td>
+                                                <td>{{ optional(optional($log->inventory)->part)->Part_name ?? '-' }}</td>
+                                                <td>{{ optional(optional($log->inventory)->part)->Part_number ?? '-' }}
+                                                </td>
+                                                <td class="text-center">
+                                                    {{ $log->forecast_min ?? '-' }}
+                                                </td>
+                                                <td class="text-center">
+                                                    {{ $log->forecast_max ?? '-' }}
+                                                </td>
 
+                                                <td class="text-center">{{ $log->Total_qty }}</td>
+                                                <td class="text-center">{{ $log->stock_per_day }}</td>
+                                                <td>{{ optional(optional(optional($log->inventory)->part)->customer)->username ?? '-' }}
+                                                </td>
+                                                <td class="text-center">{{ $log->status }}</td>
+                                                <td class="text-center">{{ $log->user->username }}</td>
+                                                @if (in_array(Auth::user()->role->name, ['SuperAdmin', 'admin']))
+                                                    <td class="text-center">
+                                                        <form action="{{ route('reports.destroy', $log->id) }}"
+                                                            method="POST"
+                                                            onsubmit="return confirm('Are you sure you want to delete this report?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                                style="font-size: 0.875rem; padding: 4px 8px;">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                @endif
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>

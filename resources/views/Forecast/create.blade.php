@@ -33,11 +33,11 @@
                     @csrf
 
                     <div class="mb-3">
-                        <label for="inv_id" class="form-label">Part (Inv ID)</label>
-                        <select name="inv_id" id="inv_id" class="form-select select2" required>
+                        <label for="id" class="form-label">Part (Inv ID)</label>
+                        <select name="id" id="id" class="form-select select2" required>
                             <option value="">-- Pilih Part --</option>
                             @foreach ($parts as $part)
-                                <option value="{{ $part->Inv_id }}">{{ $part->Inv_id }} - {{ $part->Part_name }}</option>
+                                <option value="{{ $part->id }}">{{ $part->Inv_id }} - {{ $part->customer->username }}</option>
                             @endforeach
                         </select>
                     </div>

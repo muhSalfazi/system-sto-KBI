@@ -14,7 +14,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class PartController extends Controller
-{public function index(Request $request)
+{
+    public function index(Request $request)
     {
         // Ambil semua kategori untuk filter
         $categories = Category::all();
@@ -31,7 +32,7 @@ class PartController extends Controller
         $parts = $query->get();
 
         // Kembalikan view dengan data yang sudah dipaginasi
-        return view('Part.index', compact('parts','categories'));
+        return view('Part.index', compact('parts', 'categories'));
     }
 
 
@@ -49,20 +50,53 @@ class PartController extends Controller
 
     public function store(Request $request)
     {
+        // Validasi awal untuk field umum (tanpa id_area dan id_rak karena akan dicari/dibuat manual)
         $validated = $request->validate([
-            'Inv_id' => 'required|unique:tbl_part,Inv_id|',
+            'Inv_id' => 'required',
             'Part_name' => 'required',
             'Part_number' => 'required',
             'id_customer' => 'required|exists:tbl_customer,id',
             'id_category' => 'required|exists:tbl_category,id',
             'id_plan' => 'required|exists:tbl_plan,id',
-            'id_area' => 'required|exists:tbl_area,id',
-            'id_rak' => 'required|exists:tbl_rak,id',
+            'nama_area' => 'required|string',
+            'nama_rak' => 'required|string',
             'type_pkg' => 'required',
             'qty' => 'required|integer'
         ]);
+        $duplicate = Part::where('Inv_id', $validated['Inv_id'])
+            ->where('id_customer', $validated['id_customer'])
+            ->first();
 
-        $part = Part::create($validated);
+        if ($duplicate) {
+            return redirect()->back()
+                ->withErrors(['Inv_id' => 'Part dengan INV ID dan Customer ini sudah ada.'])
+                ->withInput();
+        }
+
+
+        // Cari atau buat Area
+        $area = Area::firstOrCreate(
+            ['id_plan' => $validated['id_plan'], 'nama_area' => $validated['nama_area']]
+        );
+
+        // Cari atau buat Rak
+        $rak = Rak::firstOrCreate(
+            ['id_area' => $area->id, 'nama_rak' => $validated['nama_rak']]
+        );
+
+        // Buat part baru
+        $part = Part::create([
+            'Inv_id' => $validated['Inv_id'],
+            'Part_name' => $validated['Part_name'],
+            'Part_number' => $validated['Part_number'],
+            'id_customer' => $validated['id_customer'],
+            'id_category' => $validated['id_category'],
+            'id_plan' => $validated['id_plan'],
+            'id_area' => $area->id,
+            'id_rak' => $rak->id,
+        ]);
+
+        // Buat package-nya
         Package::create([
             'type_pkg' => $validated['type_pkg'],
             'qty' => $validated['qty'],
@@ -71,6 +105,7 @@ class PartController extends Controller
 
         return redirect()->route('parts.index')->with('success', 'Part created successfully.');
     }
+
 
     public function edit(Part $part)
     {
@@ -133,7 +168,7 @@ class PartController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-             'file' => 'required|file|mimes:xlsx,xls,csv|max:2048',
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:2048',
         ]);
 
         try {
