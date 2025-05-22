@@ -29,7 +29,7 @@ class StoImport implements ToCollection, WithHeadingRow
             $rowNumber++;
 
             // Validasi kolom
-            if (!isset($row['inv_id'],$row['part_name'], $row['part_number'],$row['customer'],$row['kategori'], $row['plan_stock'], $row['status'])) {
+            if (!isset($row['inv_id'], $row['part_name'], $row['part_number'], $row['customer'], $row['kategori'], $row['plan_stock'], $row['status'])) {
                 $this->logs[] = "Baris $rowNumber: Kolom tidak lengkap.";
                 continue;
             }

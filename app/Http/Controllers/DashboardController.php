@@ -94,14 +94,21 @@ class DashboardController extends Controller
 
     public function getStoChartData(Request $request)
     {
-        $month = $request->query('month', now()->format('Y-m'));
+        $month = $request->query('month');
+        $date = $request->query('date');
         $customer = $request->query('customer');
 
-        $start = Carbon::parse($month)->startOfMonth();
-        $end = Carbon::parse($month)->endOfMonth();
+        $query = DailyStockLog::with('inventory.part.customer');
 
-        $query = PlanStock::with(['inventory.part.customer'])
-            ->whereBetween('created_at', [$start, $end]);
+        if ($month) {
+            $start = Carbon::parse($month)->startOfMonth();
+            $end = Carbon::parse($month)->endOfMonth();
+            $query->whereBetween('created_at', [$start, $end]);
+        }
+
+        if ($month && $date) {
+            $query->whereDate('created_at', $date);
+        }
 
         if ($customer) {
             $query->whereHas('inventory.part.customer', function ($q) use ($customer) {
@@ -114,7 +121,7 @@ class DashboardController extends Controller
         $stoChartData = $logs->groupBy(function ($log) {
             return $log->inventory->part->customer->username ?? 'Unknown';
         })->map(function ($group) {
-            return $group->sum('plan_stock_after');
+            return $group->sum('Total_qty');
         });
 
         return response()->json([
@@ -122,6 +129,7 @@ class DashboardController extends Controller
             'data' => $stoChartData->values()
         ]);
     }
+
 
 
     // chart buat daily stock log

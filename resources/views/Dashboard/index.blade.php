@@ -20,7 +20,7 @@
                     <h5 class="card-title">Input Date & Customer</h5>
                     <div class="row mb-2">
                         <div class="col-md-6">
-                            <label for="monthSelect">Select Month</label>
+                            <label for="monthSelect">STO Report</label>
                             <select name="month" id="monthSelect" class="form-control">
                                 @for ($i = -5; $i <= 2; $i++)
                                     {{-- dari 5 bulan lalu sampai 2 bulan ke depan --}}
@@ -64,36 +64,54 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">STO Report</h5>
+                        <h5 class="card-title">Monthly Report Stock</h5>
+
+                        <div class="row g-2 align-items-end mb-3">
+                            <div class="col-md-4">
+                                <label for="dateSelect">Date Filter</label>
+                                <input type="date" id="dateSelect" class="form-control">
+                            </div>
+                        </div>
 
                         <!-- Bar Chart -->
                         <div id="dailychart"></div>
-                        {{-- js STO --}}
+
                         <script>
                             document.addEventListener("DOMContentLoaded", () => {
-                                function loadStoChart() {
-                                    const month = document.getElementById('monthSelect').value;
-                                    const customer = document.getElementById('custForecast').value;
+                                const dateInput = document.getElementById("dateSelect");
+                                const monthSelect = document.getElementById("monthSelect");
+                                const customerSelect = document.getElementById("custForecast");
+                                const chartContainer = document.querySelector("#dailychart");
 
-                                    fetch(`/dashboard/sto-chart-data?month=${month}&customer=${customer}`)
+                                function loadStoChart() {
+                                    const month = monthSelect.value;
+                                    const customer = customerSelect.value;
+                                    const date = dateInput.value;
+
+                                    let url = `/dashboard/sto-chart-data?customer=${customer}`;
+                                    if (month) {
+                                        url += `&month=${month}`;
+                                    }
+                                    if (month && date) {
+                                        url += `&date=${date}`;
+                                    }
+
+                                    fetch(url)
                                         .then(response => response.json())
                                         .then(result => {
-                                            const chartContainer = document.querySelector("#dailychart");
-                                            chartContainer.innerHTML = ""; // Clear existing content
+                                            chartContainer.innerHTML = "";
 
-                                            const hasData = result.data && result.data.length > 0;
-
-                                            if (!hasData) {
+                                            if (!result.data || result.data.length === 0) {
                                                 chartContainer.innerHTML = `
-                                                <div class="text-center text-muted mt-3">
-                                                    <p><strong>Data tidak tersedia</strong> untuk bulan atau customer yang dipilih.</p>
-                                                </div>`;
+                        <div class="text-center text-muted mt-3">
+                            <p><strong>Data tidak tersedia</strong> untuk filter yang dipilih.</p>
+                        </div>`;
                                                 return;
                                             }
 
                                             new ApexCharts(chartContainer, {
                                                 series: [{
-                                                    name: "Plan Stock",
+                                                    name: "Total Qty",
                                                     data: result.data
                                                 }],
                                                 chart: {
@@ -117,19 +135,24 @@
                                         })
                                         .catch(error => {
                                             console.error("Gagal memuat data chart:", error);
-                                            document.querySelector("#dailychart").innerHTML = `
-                                        <div class="text-center text-danger mt-3">
-                                        <p><strong>Terjadi kesalahan saat memuat data chart.</strong></p>
-                                        </div>`;
+                                            chartContainer.innerHTML = `
+                    <div class="text-center text-danger mt-3">
+                        <p><strong>Terjadi kesalahan saat memuat data chart.</strong></p>
+                    </div>`;
                                         });
                                 }
-                                // Load awal
-                                loadStoChart();
 
-                                // Auto-refresh tiap 10 detik
-                                setInterval(loadStoChart, 20000);
+                                // Event: perubahan filter langsung memuat grafik
+                                monthSelect.addEventListener("change", loadStoChart);
+                                customerSelect.addEventListener("change", loadStoChart);
+                                dateInput.addEventListener("change", loadStoChart);
+
+                                // Load awal (berdasarkan bulan & customer default)
+                                loadStoChart();
                             });
                         </script>
+
+
                         <!-- End Bar Chart -->
                     </div>
                 </div>
@@ -145,7 +168,7 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <select id="weekSelect" class="form-select">
-                                    <option value="1">Week 1 (1–7)</option>
+                                    <option value="1">Week 1 (1-7)</option>
                                     <option value="2">Week 2 (8–14)</option>
                                     <option value="3">Week 3 (15–21)</option>
                                     <option value="4">Week 4 (22–28)</option>
@@ -475,13 +498,13 @@
                                                 series: result.series,
                                                 xaxis: {
                                                     title: {
-                                                        text: 'Act Day',
+                                                        text: 'Day',
                                                         style: {
                                                             fontWeight: 600
                                                         }
                                                     },
                                                     labels: {
-                                                        formatter: val => `${val} day`,
+                                                        formatter: val => `${val}`,
                                                         style: {
                                                             fontSize: '10px'
                                                         }
