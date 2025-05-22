@@ -488,7 +488,7 @@
                                                     }
                                                 },
                                                 dataLabels: {
-                                                    enabled: false
+                                                    enabled: true
                                                 },
                                                 stroke: {
                                                     show: true,
