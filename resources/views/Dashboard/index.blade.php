@@ -448,6 +448,7 @@
                         <!-- Bar Chart -->
                         <div id="stockPerDayChart" style="height: 400px;"></div>
 
+
                         <script>
                             document.addEventListener("DOMContentLoaded", function() {
                                 const chartContainer = document.querySelector("#stockPerDayChart");
@@ -463,10 +464,10 @@
                                     fetch(`/dashboard/daily-stock-perday-data?month=${month}&customer=${customer}&category=${category}`)
                                         .then(res => res.json())
                                         .then(result => {
-                                            chartContainer.innerHTML = ''; // bersihkan chart lama
+                                            chartContainer.innerHTML = ''; // clear old chart
 
-                                            if (!result.series || result.series.length === 0 || result.series.every(s => !s.data ||
-                                                    s.data.length === 0)) {
+                                            if (!result.series || result.series.length === 0 || result.series[0].data.length ===
+                                                0) {
                                                 chartContainer.innerHTML =
                                                     "<p class='text-center'>Tidak ada inventory untuk kategori atau customer ini.</p>";
                                                 return;
@@ -504,22 +505,21 @@
                                                         }
                                                     },
                                                     labels: {
-                                                        formatter: val => `${val}`,
                                                         style: {
                                                             fontSize: '10px'
                                                         }
                                                     }
                                                 },
                                                 yaxis: {
+                                                    title: {
+                                                        text: 'Item',
+                                                        style: {
+                                                            fontWeight: 600
+                                                        }
+                                                    },
                                                     labels: {
                                                         style: {
                                                             fontSize: '12px'
-                                                        }
-                                                    },
-                                                    title: {
-                                                        text: 'Inventory ID',
-                                                        style: {
-                                                            fontWeight: 600
                                                         }
                                                     }
                                                 },
@@ -532,23 +532,22 @@
                                                         w
                                                     }) {
                                                         const point = w.config.series[seriesIndex].data[dataPointIndex];
-                                                        const label = point?.x ??
-                                                            `Inv: ${w.config.series[seriesIndex].name}`;
-
-                                                        const qty = point?.y ?? 0;
+                                                        const invId = point.meta ?? 'Unknown';
+                                                        const stock = point.x ?? 0;
+                                                        const partLabel = point.y ?? '-';
 
                                                         return `
-                                                            <div style="
-                                                                background: white;
-                                                                padding: 10px 15px;
-                                                                border-radius: 8px;
-                                                                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                                                                font-family: 'Segoe UI';
-                                                                border-left: 4px solid #007bff;
-                                                                min-width: 200px;">
-                                                                <strong>${label}</strong><br/>
-                                                                Qty Day: ${qty}
-                                                            </div>`;
+                                <div style="
+                                    background: white;
+                                    padding: 10px;
+                                    border-radius: 8px;
+                                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                    border-left: 4px solid #007bff;
+                                    min-width: 200px;
+                                    font-family: 'Segoe UI';
+                                "><strong>Inv ID: ${invId}</strong><br/>
+                                    Stock Day: ${partLabel}
+                                </div>`;
                                                     }
                                                 },
                                                 colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
@@ -570,6 +569,9 @@
                                 setInterval(loadStockPerDayChart, 20000);
                             });
                         </script>
+
+
+
 
                         <!-- End Bar Chart -->
                     </div>

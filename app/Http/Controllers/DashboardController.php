@@ -216,7 +216,7 @@ class DashboardController extends Controller
     {
         $customer = $request->query('customer');
         $category = $request->query('category');
-        $today = now()->toDateString();
+        $today = Carbon::now('Asia/Jakarta')->toDateString();
 
         $partsQuery = Part::with(['forecast', 'inventories']);
 
@@ -234,6 +234,7 @@ class DashboardController extends Controller
         $data = [];
 
         foreach ($parts as $part) {
+            $partId = $part->id;
             $invId = $part->Inv_id;
             $inventoryIds = $part->inventories->pluck('id');
 
@@ -242,8 +243,9 @@ class DashboardController extends Controller
                 ->sum('stock_per_day');
 
             $data[] = [
-                'x' => $invId,
-                'y' => round($sumStockToday ?? 0, 2)
+                'x' => '' . $part->id,
+                'y' => round($sumStockToday),
+                'meta' => $invId
             ];
         }
 
@@ -256,6 +258,8 @@ class DashboardController extends Controller
             ]
         ]);
     }
+
+
 
 
 }
