@@ -90,7 +90,7 @@
                                 </div>
                             </div>
                             <div class="last-update-text">
-                                Last Update: 22 Mei 2025
+                                Last Update: 26 Mei 2025
                             </div>
 
 
