@@ -386,7 +386,7 @@
                                                     }
                                                 },
                                                 legend: {
-                                                    show: true,
+                                                    show: false,
                                                     position: 'bottom',
                                                     labels: {
                                                         colors: '#000',
