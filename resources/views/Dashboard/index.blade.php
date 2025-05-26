@@ -17,7 +17,7 @@
             {{-- form buat form filter bulan+customer --}}
             <form method="GET" action="{{ route('dashboard') }}" id="filterForm">
                 <div class="col-12">
-                    <h5 class="card-title">Input Date & Customer</h5>
+                    <h5 class="card-title">Input STO & Customer</h5>
                     <div class="row mb-2">
                         <div class="col-md-6">
                             <label for="monthSelect">STO Report</label>
@@ -103,9 +103,9 @@
 
                                             if (!result.data || result.data.length === 0) {
                                                 chartContainer.innerHTML = `
-                        <div class="text-center text-muted mt-3">
-                            <p><strong>Data tidak tersedia</strong> untuk filter yang dipilih.</p>
-                        </div>`;
+                                                    <div class="text-center text-muted mt-3">
+                                                        <p><strong>Data tidak tersedia</strong> untuk filter yang dipilih.</p>
+                                                    </div>`;
                                                 return;
                                             }
 
@@ -126,7 +126,7 @@
                                                     }
                                                 },
                                                 dataLabels: {
-                                                    enabled: false
+                                                    enabled: true
                                                 },
                                                 xaxis: {
                                                     categories: result.categories
@@ -136,9 +136,9 @@
                                         .catch(error => {
                                             console.error("Gagal memuat data chart:", error);
                                             chartContainer.innerHTML = `
-                    <div class="text-center text-danger mt-3">
-                        <p><strong>Terjadi kesalahan saat memuat data chart.</strong></p>
-                    </div>`;
+                                                <div class="text-center text-danger mt-3">
+                                                    <p><strong>Terjadi kesalahan saat memuat data chart.</strong></p>
+                                                </div>`;
                                         });
                                 }
 
@@ -179,7 +179,7 @@
 
 
                         <div id="stockComparisonChart"></div>
-
+                        {{-- js --}}
                         <script>
                             document.addEventListener("DOMContentLoaded", () => {
                                 const chartContainer = document.querySelector("#stockComparisonChart");
@@ -319,7 +319,7 @@
                                                     }
                                                 },
                                                 dataLabels: {
-                                                    enabled: false
+                                                    enabled: true
                                                 },
                                                 xaxis: {
                                                     type: 'category',
@@ -386,7 +386,22 @@
                                                     }
                                                 },
                                                 legend: {
-                                                    show: false
+                                                    show: true,
+                                                    position: 'bottom',
+                                                    labels: {
+                                                        colors: '#000',
+                                                        useSeriesColors: false
+                                                    },
+                                                    itemMargin: {
+                                                        horizontal: 10,
+                                                        vertical: 5
+                                                    },
+                                                    onItemClick: {
+                                                        toggleDataSeries: true
+                                                    },
+                                                    onItemHover: {
+                                                        highlightDataSeries: true
+                                                    }
                                                 },
                                                 grid: {
                                                     borderColor: '#e7e7e7',
@@ -415,14 +430,10 @@
                                 });
                             });
                         </script>
-
                     </div>
-
                 </div>
-
             </div>
             <!-- Bar Chart -->
-
             {{-- daily stock --}}
             <div class="col-lg-12">
                 <div class="card">
@@ -479,17 +490,20 @@
                                                     height: 500,
                                                     toolbar: {
                                                         show: true
-                                                    }
+                                                    },
                                                 },
                                                 plotOptions: {
                                                     bar: {
                                                         horizontal: true,
                                                         barHeight: '60%',
-                                                        distributed: true
+                                                        distributed: false
                                                     }
                                                 },
                                                 dataLabels: {
-                                                    enabled: true
+                                                    enabled: true,
+                                                    formatter: function(val) {
+                                                        return parseInt(val);
+                                                    }
                                                 },
                                                 stroke: {
                                                     show: true,
@@ -498,6 +512,7 @@
                                                 },
                                                 series: result.series,
                                                 xaxis: {
+                                                    min: 0,
                                                     title: {
                                                         text: 'Day',
                                                         style: {
@@ -507,6 +522,9 @@
                                                     labels: {
                                                         style: {
                                                             fontSize: '10px'
+                                                        },
+                                                        formatter: function(val) {
+                                                            return parseInt(val);
                                                         }
                                                     }
                                                 },
@@ -519,7 +537,10 @@
                                                     },
                                                     labels: {
                                                         style: {
-                                                            fontSize: '12px'
+                                                            fontSize: '10px'
+                                                        },
+                                                        formatter: function(val) {
+                                                            return parseInt(val);
                                                         }
                                                     }
                                                 },
@@ -537,17 +558,17 @@
                                                         const partLabel = point.y ?? '-';
 
                                                         return `
-                                <div style="
-                                    background: white;
-                                    padding: 10px;
-                                    border-radius: 8px;
-                                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                                    border-left: 4px solid #007bff;
-                                    min-width: 200px;
-                                    font-family: 'Segoe UI';
-                                "><strong>Inv ID: ${invId}</strong><br/>
-                                    Stock Day: ${partLabel}
-                                </div>`;
+                                                            <div style="
+                                                                background: white;
+                                                                padding: 10px;
+                                                                border-radius: 8px;
+                                                                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                                                border-left: 4px solid #007bff;
+                                                                min-width: 200px;
+                                                                font-family: 'Segoe UI';
+                                                            "><strong>Inv ID: ${invId}</strong><br/>
+                                                                Stock Day: ${partLabel}
+                                                            </div>`;
                                                     }
                                                 },
                                                 colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
@@ -569,10 +590,6 @@
                                 setInterval(loadStockPerDayChart, 20000);
                             });
                         </script>
-
-
-
-
                         <!-- End Bar Chart -->
                     </div>
                 </div>

@@ -37,7 +37,7 @@
                     <div class="mb-3">
                         <label for="forecast_month" class="form-label">Forecast Bulan</label>
                         <input type="month" name="forecast_month" class="form-control"
-                            value="{{ \Carbon\Carbon::parse($forecast->forecast_month)->format('m-Y') }}" required>
+                            value="{{ \Carbon\Carbon::parse($forecast->forecast_month)}}" required>
                     </div>
 
                     <div class="mb-3">
@@ -47,7 +47,7 @@
 
                     <div class="mb-3">
                         <label for="po_pcs" class="form-label">Jumlah PO (pcs)</label>
-                        <input type="number" name="po_pcs" class="form-control" value="{{ $forecast->po_pcs }}" required>
+                        <input type="number" name="po_pcs" class="form-control" value="{{ $forecast->PO_pcs }}" required>
                     </div>
 
                     <div class="mb-3">
