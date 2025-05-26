@@ -13,6 +13,7 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
+
 class PartsImport implements ToCollection, WithHeadingRow
 {
     protected $logs = [];
@@ -87,7 +88,7 @@ class PartsImport implements ToCollection, WithHeadingRow
                 'id_part' => $part->id,
             ]);
 
-            $this->logs[] = "Berhasil simpan: INV ID {$row['inv_id']}";
+            // $this->logs[] = "Berhasil simpan: INV ID {$row['inv_id']}";
         }
     }
 }

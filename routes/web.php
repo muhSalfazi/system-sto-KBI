@@ -72,6 +72,7 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::get('/daily-stock', [DailyStockLogController::class, 'index'])->name('daily-stock.index');
     Route::delete('daily-stock/{id}', [DailyStockLogController::class, 'destroy'])->name('reports.destroy');
     Route::get('/daily-stock/export', [DailyStockLogController::class, 'export'])->name('daily-stock.export');
+
     // dynamic select
     Route::get('/get-areas/{plantId}', [PartController::class, 'getAreas']);
     Route::get('/get-raks/{areaId}', [PartController::class, 'getRaks']);
