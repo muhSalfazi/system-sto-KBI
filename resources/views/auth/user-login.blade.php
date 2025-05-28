@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title>Login Admin</title>
+    <title>Login User</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
