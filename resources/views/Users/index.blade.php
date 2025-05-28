@@ -87,4 +87,31 @@
             </div>
         </div>
     </section>
+    {{-- confirm delete --}}
+    <script>
+        function confirmDelete(userId) {
+            Swal.fire({
+                title: 'Apakah kamu yakin?',
+                text: "Data ini akan dihapus secara permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal',
+                width: '50%', // Atur lebar
+                showClass: {
+                    popup: 'animate__animated animate__jackInTheBox', // Animasi saat popup muncul
+                    icon: 'animate__animated animate__shakeY' // Animasi pada ikon peringatan
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp' // Animasi saat popup menghilang
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + userId).submit();
+                }
+            });
+        }
+    </script>
 @endsection

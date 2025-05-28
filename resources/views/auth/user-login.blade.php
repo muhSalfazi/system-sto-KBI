@@ -4,6 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
     <title>Login Admin</title>
     <meta content="" name="description">
@@ -11,19 +13,13 @@
 
     <!-- Favicons -->
     <link rel="icon" href="{{ asset('assets/img/icon-kbi.png') }}" loading="lazy" alt="logo" type="image/png">
-    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-        rel="stylesheet">
-    <link href="{{ asset('assets/vendor/font-awesome/css/all.min.css') }}" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <!-- Vendor CSS Files -->
     <link href="{{ asset('assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
 
     <!-- Template Main CSS File -->
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet">
@@ -44,7 +40,7 @@
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
                             <div class="logo-wrapper text-center py-3">
                                 <img src="{{ asset('assets/img/kyoraku-baru.png') }}" alt="Logo Kyoraku"
-                                    class="logo-auth">
+                                    class="logo-auth" loading="lazy">
                             </div>
                             <!-- End Logo -->
 
@@ -66,11 +62,16 @@
                                             <label for="yournik" class="form-label">Id Card Number</label>
                                             <div class="input-group has-validation">
                                                 <span class="input-group-text" id="inputGroupPrepend">
-                                                    <i class="bi bi-person"></i>
+                                                    <i class="bi bi-person-vcard-fill"></i>
                                                 </span>
-                                                <input type="text" name="nik" class="form-control" id="yournik"
-                                                    value="{{ old('nik') }}" required>
-                                                <div class="invalid-feedback">Please enter your nik.</div>
+                                                <input type="text" name="nik"
+                                                    class="form-control @error('nik') is-invalid @enderror"
+                                                    id="yournik" value="{{ old('nik') }}" autocomplete="off">
+                                                @error('nik')
+                                                    <div class="invalid-feedback">
+                                                        {{ $message }}
+                                                    </div>
+                                                @enderror
                                             </div>
                                         </div>
 
@@ -80,8 +81,7 @@
                                                 style="font-size: 0.875rem; padding: 4px 8px;">Login</button>
                                         </div>
                                         <div class="col-12">
-                                            <a href="{{ route('admin.login') }}"
-                                                class="btn btn-outline-secondary w-100"
+                                            <a href="{{ route('admin.login') }}" class="btn btn-outline-secondary w-100"
                                                 style="font-size: 0.875rem; padding: 4px 8px;">
                                                 <i class="bi bi-box-arrow-in-right"></i> Login Admin
                                             </a>
@@ -90,7 +90,7 @@
                                 </div>
                             </div>
                             <div class="last-update-text">
-                                Last Update: 26 Mei 2025
+                                Last Update: 28 Mei 2025
                             </div>
 
 
@@ -112,23 +112,25 @@
 
     <!-- Vendor JS Files -->
     <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-
     <!-- Template Main JS File -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
 
     <!-- SweetAlert JS -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    @if (session('error'))
+    @if (session('warning'))
         <script>
             Swal.fire({
-                icon: 'error',
+                icon: 'warning',
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown' // Menambahkan animasi muncul
+                },
                 title: 'Gagal Login',
-                text: '{{ session('error') }}',
+                text: '{{ session('warning') }}',
             });
         </script>
     @endif
-    <script>
+    {{-- <script>
         // SweetAlert for validation errors
         const validationErrors = @json($errors->all());
         if (validationErrors.length > 0) {
@@ -138,7 +140,7 @@
                 html: validationErrors.join('<br>'),
             });
         }
-    </script>
+    </script> --}}
 </body>
 
 </html>

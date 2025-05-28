@@ -13,8 +13,7 @@
     <meta content="" name="keywords">
 
     <!-- Favicons -->
-    <link href="{{ asset('assets/img/icon-kbi.png') }}" rel="icon">
-
+    <link href="{{ asset('assets/img/icon-kbi.png') }}" loading="lazy" rel="icon">
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
     <link
@@ -59,34 +58,6 @@
     <script src="{{ asset('assets/js/main.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" defer></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" defer></script>
-
-    {{-- confirm logout --}}
-    <script>
-        function confirmDelete(userId) {
-            Swal.fire({
-                title: 'Apakah kamu yakin?',
-                text: "Data ini akan dihapus secara permanen!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal',
-                width: '50%', // Atur lebar
-                showClass: {
-                    popup: 'animate__animated animate__jackInTheBox', // Animasi saat popup muncul
-                    icon: 'animate__animated animate__shakeY' // Animasi pada ikon peringatan
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp' // Animasi saat popup menghilang
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('delete-form-' + userId).submit();
-                }
-            });
-        }
-    </script>
 
     {{-- sweetalert login Berhasil --}}
     <script>

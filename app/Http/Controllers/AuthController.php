@@ -22,10 +22,18 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         // Validasi input
-        $request->validate([
-            'username' => 'required|string|max:255',
-            'password' => 'required|string|min:3',
-        ]);
+        $request->validate(
+            [
+                'username' => 'required|string|max:255',
+                'password' => 'required|string',
+            ],
+
+            // [
+            //     'username.required' => 'Username harus diisi',
+            //     'password.required' => 'Password harus diisi',
+            //     'password.min' => 'Password minimal 3 karakter',
+            // ]
+        );
 
         $credentials = [
             'username' => $request->username,
@@ -37,9 +45,9 @@ class AuthController extends Controller
             $user = Auth::user();
 
             // Cek apakah role-nya adalah 'user'
-            if ($user->role?->name=== 'User') {
+            if ($user->role?->name === 'User') {
                 Auth::logout(); // logout langsung
-                return redirect()->back()->with('error', 'Akses tidak diperbolehkan untuk user biasa.');
+                return redirect()->back()->with('warning', 'Akses tidak diperbolehkan untuk user biasa.');
             }
 
             // Jika bukan user biasa, lanjut ke dashboard
@@ -53,16 +61,21 @@ class AuthController extends Controller
 
     public function userLogin(Request $request)
     {
-        $request->validate([
-            'nik' => 'required|string|min:2',
-        ]);
+        $request->validate(
+            [
+                'nik' => 'required|string',
+            ],
+            // [
+            //     'nik.required' => 'ID Card harus diisi',
+            // ]
+        );
 
         $user = User::where('nik', $request->nik)->first();
 
         if ($user) {
             // Cek role
             if ($user->role?->name !== 'User') {
-                return redirect()->back()->with('error', 'Akses hanya diperbolehkan untuk user role.');
+                return redirect()->back()->with('warning', 'Akses hanya diperbolehkan untuk user role.');
             }
 
 
@@ -72,7 +85,6 @@ class AuthController extends Controller
 
         return redirect()->back()->with('error', 'ID Card tidak ditemukan');
     }
-
 
     public function logout()
     {
