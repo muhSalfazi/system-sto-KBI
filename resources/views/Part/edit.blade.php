@@ -67,7 +67,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="id_plan" class="form-label">Plant</label>
                         <select name="id_plan" id="id_plan" class="form-select" required>
                             <option value="">Pilih Plant</option>
@@ -76,20 +76,13 @@
                                     {{ $plant->name }}</option>
                             @endforeach
                         </select>
-                        <small class="text-danger">*Pilih Plant sebelum Area dan Rak</small>
+                        <small class="text-danger">*Pilih Plant sebelum Area</small>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="id_area" class="form-label">Area</label>
                         <select name="id_area" id="id_area" class="form-select" required>
                             <option value="{{ $part->id_area }}">{{ $part->area->nama_area ?? '-' }}</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="id_rak" class="form-label">Rak</label>
-                        <select name="id_rak" id="id_rak" class="form-select" required>
-                            <option value="{{ $part->id_rak }}">{{ $part->rak->nama_rak ?? '-' }}</option>
                         </select>
                     </div>
 
@@ -118,12 +111,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             const planSelect = document.getElementById('id_plan');
             const areaSelect = document.getElementById('id_area');
-            const rakSelect = document.getElementById('id_rak');
 
             planSelect.addEventListener('change', function() {
                 const plantId = this.value;
                 areaSelect.innerHTML = '<option value="">Loading...</option>';
-                rakSelect.innerHTML = '<option value="">Pilih Rak</option>';
 
                 if (plantId) {
                     fetch(`/get-areas/${plantId}`)
@@ -139,22 +130,6 @@
                 }
             });
 
-            areaSelect.addEventListener('change', function() {
-                const areaId = this.value;
-                rakSelect.innerHTML = '<option value="">Loading...</option>';
-
-                if (areaId) {
-                    fetch(`/get-raks/${areaId}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            let options = '<option value="">Pilih Rak</option>';
-                            data.forEach(rak => {
-                                options += `<option value="${rak.id}">${rak.nama_rak}</option>`;
-                            });
-                            rakSelect.innerHTML = options;
-                        });
-                }
-            });
         });
     </script>
 @endsection

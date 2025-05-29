@@ -457,8 +457,7 @@
                         </div>
 
                         <!-- Bar Chart -->
-                        <div id="stockPerDayChart" style="height: 400px;"></div>
-
+                        <div id="stockPerDayChart" style="height: 500px;"></div>
 
                         <script>
                             document.addEventListener("DOMContentLoaded", function() {
@@ -472,15 +471,21 @@
                                     const customer = customerSelect?.value;
                                     const category = categorySelect?.value;
 
-                                    fetch(`/dashboard/daily-stock-perday-data?month=${month}&customer=${customer}&category=${category}`)
+                                    fetch(
+                                            `/dashboard/daily-stock-classification?month=${month}&customer=${customer}&category=${category}`)
                                         .then(res => res.json())
                                         .then(result => {
-                                            chartContainer.innerHTML = ''; // clear old chart
+                                            chartContainer.innerHTML = ''; // clear chart
 
-                                            if (!result.series || result.series.length === 0 || result.series[0].data.length ===
-                                                0) {
+                                            // ✅ Periksa data dengan aman
+                                            if (
+                                                !result.series ||
+                                                result.series.length === 0 ||
+                                                result.series[0].data.length === 0 ||
+                                                result.series[0].data.every(item => item.y === 0)
+                                            ) {
                                                 chartContainer.innerHTML =
-                                                    "<p class='text-center'>Tidak ada inventory untuk kategori atau customer ini.</p>";
+                                                    "<p class='text-center text-muted mt-3'>Tidak ada data stok harian untuk kategori atau customer ini.</p>";
                                                 return;
                                             }
 
@@ -490,7 +495,7 @@
                                                     height: 500,
                                                     toolbar: {
                                                         show: true
-                                                    },
+                                                    }
                                                 },
                                                 plotOptions: {
                                                     bar: {
@@ -501,9 +506,7 @@
                                                 },
                                                 dataLabels: {
                                                     enabled: true,
-                                                    formatter: function(val) {
-                                                        return parseInt(val);
-                                                    }
+                                                    formatter: val => parseInt(val)
                                                 },
                                                 stroke: {
                                                     show: true,
@@ -512,7 +515,6 @@
                                                 },
                                                 series: result.series,
                                                 xaxis: {
-                                                    min: 0,
                                                     title: {
                                                         text: 'Day',
                                                         style: {
@@ -523,9 +525,7 @@
                                                         style: {
                                                             fontSize: '10px'
                                                         },
-                                                        formatter: function(val) {
-                                                            return parseInt(val);
-                                                        }
+                                                        formatter: val => parseInt(val)
                                                     }
                                                 },
                                                 yaxis: {
@@ -538,11 +538,9 @@
                                                     labels: {
                                                         style: {
                                                             fontSize: '10px'
-                                                        },
-                                                        formatter: function(val) {
-                                                            return parseInt(val);
                                                         }
-                                                    }
+                                                    },
+                                                    categories: result.series[0].data.map(d => d.x)
                                                 },
                                                 tooltip: {
                                                     shared: false,
@@ -553,32 +551,33 @@
                                                         w
                                                     }) {
                                                         const point = w.config.series[seriesIndex].data[dataPointIndex];
-                                                        const invId = point.meta ?? 'Unknown';
-                                                        const stock = point.x ?? 0;
-                                                        const partLabel = point.y ?? '-';
-
                                                         return `
-                                                            <div style="
-                                                                background: white;
-                                                                padding: 10px;
-                                                                border-radius: 8px;
-                                                                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                                                                border-left: 4px solid #007bff;
-                                                                min-width: 200px;
-                                                                font-family: 'Segoe UI';
-                                                            "><strong>Inv ID: ${invId}</strong><br/>
-                                                                Stock Day: ${partLabel}
-                                                            </div>`;
+                                    <div style="
+                                        background: white;
+                                        padding: 10px;
+                                        border-radius: 8px;
+                                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                        border-left: 4px solid #007bff;
+                                        min-width: 220px;
+                                        font-family: 'Segoe UI';
+                                    ">
+                                        <strong>Kategori: ${point.x}</strong><br/>
+                                        Total Part: ${point.y}<br/>
+                                        Inv ID(s): ${point.meta}
+                                    </div>`;
                                                     }
                                                 },
-                                                colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
+                                                colors: ['#1f77b4']
                                             });
 
                                             chart.render();
                                         })
                                         .catch(error => {
                                             console.error("Error loading chart:", error);
-                                            chartContainer.innerHTML = "<p class='text-danger text-center'>Gagal memuat chart.</p>";
+                                            chartContainer.innerHTML = `
+                        <p class='text-danger text-center mt-3'>
+                            Gagal memuat chart.
+                        </p>`;
                                         });
                                 }
 
@@ -587,9 +586,12 @@
                                 customerSelect?.addEventListener('change', loadStockPerDayChart);
 
                                 loadStockPerDayChart();
-                                setInterval(loadStockPerDayChart, 20000);
+                                setInterval(loadStockPerDayChart, 20000); // Optional refresh
                             });
                         </script>
+
+
+
                         <!-- End Bar Chart -->
                     </div>
                 </div>

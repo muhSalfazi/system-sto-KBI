@@ -137,7 +137,7 @@ class DashboardController extends Controller
     {
         $month = $request->query('month', now()->format('Y-m'));
         $customer = $request->query('customer');
-        $weekFilter = $request->query('week'); // bisa kosong
+        $weekFilter = $request->query('week');
 
         $start = Carbon::parse($month)->startOfMonth();
         $end = Carbon::parse($month)->endOfMonth();
@@ -150,6 +150,9 @@ class DashboardController extends Controller
             });
         }
 
+        // ✅ Hanya ambil part yang punya inventory
+        $partsQuery->whereHas('inventories');
+
         $parts = $partsQuery->get();
 
         $min = [];
@@ -160,7 +163,6 @@ class DashboardController extends Controller
             $dayOfMonth = $date->day;
             $currentWeek = ceil($dayOfMonth / 7);
 
-            // Hanya filter jika weekFilter tidak kosong
             if (!empty($weekFilter) && $currentWeek != $weekFilter) {
                 continue;
             }
@@ -211,8 +213,7 @@ class DashboardController extends Controller
     }
 
 
-    // chart buat stock daily
-    public function getDailyStockPerDayData(Request $request)
+    public function getDailyStockClassification(Request $request)
     {
         $customer = $request->query('customer');
         $category = $request->query('category');
@@ -230,11 +231,14 @@ class DashboardController extends Controller
             $partsQuery->where('id_category', $category);
         }
 
+        // ✅ Hanya ambil part yang punya inventory
+        $partsQuery->whereHas('inventories');
+
         $parts = $partsQuery->get();
-        $data = [];
+
+        $groupData = [];
 
         foreach ($parts as $part) {
-            $partId = $part->id;
             $invId = $part->Inv_id;
             $inventoryIds = $part->inventories->pluck('id');
 
@@ -242,20 +246,41 @@ class DashboardController extends Controller
                 ->whereDate('created_at', $today)
                 ->sum('stock_per_day');
 
+            $categoryKey = match (true) {
+                $sumStockToday > 3 => '>3',
+                $sumStockToday == 3 => '3',
+                $sumStockToday >= 2.5 => '2.5',
+                $sumStockToday >= 2 => '2',
+                $sumStockToday >= 1.5 => '1.5',
+                $sumStockToday >= 1 => '1',
+                $sumStockToday >= 0.5 => '0.5',
+                default => '0',
+            };
+
+            $groupData[$categoryKey][] = $invId;
+        }
+
+        $sortedKeys = ['0', '0.5', '1', '1.5', '2', '2.5', '3', '>3'];
+        $data = [];
+
+        foreach ($sortedKeys as $key) {
             $data[] = [
-                'x' => '' . $part->id,
-                'y' => round($sumStockToday),
-                'meta' => $invId
+                'x' => $key,
+                'y' => isset($groupData[$key]) ? count($groupData[$key]) : 0,
+                'meta' => isset($groupData[$key]) ? implode(', ', $groupData[$key]) : '-'
             ];
         }
 
         return response()->json([
             'series' => [
                 [
-                    'name' => 'Stock Hari Ini',
+                    'name' => 'Stock per Day Classification',
                     'data' => $data
                 ]
             ]
         ]);
     }
+
+
+
 }

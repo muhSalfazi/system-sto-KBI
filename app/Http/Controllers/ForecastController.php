@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use App\Imports\ForecastImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Log;
 
 class ForecastController extends Controller
 {
@@ -144,7 +145,7 @@ class ForecastController extends Controller
 
             return redirect()->route('forecast.index')->with('success', 'Import selesai.');
         } catch (\Exception $e) {
-            \Log::error('Import forecast gagal', ['error' => $e->getMessage()]);
+            Log::error('Import forecast gagal', ['error' => $e->getMessage()]);
 
             return redirect()->route('forecast.index')->with([
                 'error' => 'Terjadi kesalahan saat import: ' . $e->getMessage(),

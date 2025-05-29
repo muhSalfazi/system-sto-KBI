@@ -99,7 +99,6 @@
                                         <th class="text-center">Qty/Box</th>
                                         <th class="text-center">Plant</th>
                                         <th class="text-center">Area</th>
-                                        <th class="text-center">Rack</th>
                                         <th class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -116,7 +115,6 @@
                                             <td class="text-center">{{ $part->package->qty ?? '-' }}</td>
                                             <td class="text-center">{{ $part->plant->name ?? '-' }}</td>
                                             <td class="text-center">{{ $part->area->nama_area ?? '-' }}</td>
-                                            <td class="text-center">{{ $part->rak->nama_rak ?? '-' }}</td>
                                             <td class="text-center">
                                                 <a href="{{ route('parts.edit', $part->id) }}"
                                                     class="btn btn-success btn-sm"

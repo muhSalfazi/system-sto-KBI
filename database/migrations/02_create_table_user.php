@@ -14,13 +14,17 @@ return new class extends Migration
         Schema::create('tbl_user', function (Blueprint $table) {
             $table->id();
             $table->string('username')->unique();
+            $table->string('nik')->nullable();
             $table->unsignedBigInteger('id_role')->nullable();
-            // index
-            $table->index(['id_role'], 'idx_role');
             $table->string('first_name');
             $table->string('last_name');
             $table->string('password');
-            $table->string('nik')->nullable();
+
+            // index
+            $table->index('username');
+            $table->index('nik');
+            $table->index(['id_role'], 'idx_role');
+
 
             $table->foreign('id_role')->references('id')->on('tbl_role')->onDelete('cascade');
             $table->timestamps();

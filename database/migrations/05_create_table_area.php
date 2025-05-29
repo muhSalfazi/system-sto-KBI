@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('tbl_area', function (Blueprint $table) {
             $table->id();
             $table->string('nama_area');
-            // Foreign key constraints
             $table->unsignedBigInteger('id_plan')->nullable();
+            $table->timestamps();
+
             // index
             $table->index(['id_plan'], 'idx_plan');
+            // Foreign key constraints
             $table->foreign('id_plan')->references('id')->on('tbl_plan')->onDelete('cascade');
-            $table->timestamps();
         });
     }
 

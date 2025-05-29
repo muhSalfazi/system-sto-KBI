@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Session;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\StoExport;
 use App\Models\PlanStock;
+use Illuminate\Support\Facades\Log;
 
 class StoController extends Controller
 {
@@ -20,7 +21,7 @@ class StoController extends Controller
         $categories = Category::all();
 
         // Query untuk mengambil data STO, dengan filter kategori jika ada
-        $query = Inventory::with('part.plant', 'part.area', 'part.rak', 'part.category');
+        $query = Inventory::with('part.plant', 'part.area', 'part.category');
 
 
         // Jika ada kategori yang dipilih, filter berdasarkan kategori dari relasi part
@@ -126,7 +127,7 @@ class StoController extends Controller
 
             return redirect()->route('sto.index')->with('success', 'Import selesai.');
         } catch (\Exception $e) {
-            \Log::error('Import stok gagal', ['error' => $e->getMessage()]);
+            Log::error('Import stok gagal', ['error' => $e->getMessage()]);
 
             return redirect()->route('sto.index')->with([
                 'error' => 'Terjadi kesalahan saat import: ' . $e->getMessage(),

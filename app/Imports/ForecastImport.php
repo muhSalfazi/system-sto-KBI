@@ -9,55 +9,56 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class ForecastImport implements ToCollection, WithHeadingRow
 {
     public array $logs = [];
 
+    public function getLogs(): array
+    {
+        return $this->logs;
+    }
+
     public function collection(Collection $rows)
     {
+        $customers = Customer::all()->keyBy('username');
+        $parts = Part::all()->keyBy(fn($p) => $p->Inv_id . '|' . $p->id_customer);
+
         foreach ($rows as $index => $row) {
             $no = $index + 2;
-
-            // Normalisasi kolom
             $inv_id = trim($row['inv_id'] ?? '');
             $customer_name = trim($row['customer'] ?? $row['Customer'] ?? '');
-            $hari_kerja = $row['hari_kerja'] ?? null;
-            $forecast_month_raw = $row['forecast_month'] ?? null;
-            $po_pcs = $row['po_pcs'] ?? null;
 
-            // Validasi kolom
-            if (!$inv_id || !$customer_name || !$hari_kerja || !$forecast_month_raw || !$po_pcs) {
+            if (!$inv_id || !$customer_name || empty($row['hari_kerja']) || empty($row['forecast_month']) || empty($row['po_pcs'])) {
                 $this->logs[] = "Baris $no: Kolom tidak lengkap.";
                 continue;
             }
 
-            // Cari customer
-            $customer = Customer::where('username', $customer_name)->first();
+            $customer = $customers[$customer_name] ?? null;
             if (!$customer) {
                 $this->logs[] = "Baris $no: Customer '{$customer_name}' tidak ditemukan.";
                 continue;
             }
 
-            // Cari part berdasarkan inv_id + id_customer
-            $part = Part::where('Inv_id', $inv_id)
-                        ->where('id_customer', $customer->id)
-                        ->first();
-
+            $key = $inv_id . '|' . $customer->id;
+            $part = $parts[$key] ?? null;
             if (!$part) {
-                $this->logs[] = "Baris $no: Part dengan INV ID '{$inv_id}' untuk customer '{$customer_name}' tidak ditemukan.";
+                $this->logs[] = "Baris $no: Part '{$inv_id}' tidak ditemukan.";
                 continue;
             }
 
             try {
-                $forecastMonth = Carbon::parse($forecast_month_raw)->startOfMonth();
+                $forecastMonth = is_numeric($row['forecast_month'])
+                    ? Carbon::instance(Date::excelToDateTimeObject($row['forecast_month']))->startOfMonth()
+                    : Carbon::parse($row['forecast_month'])->startOfMonth();
             } catch (\Exception $e) {
                 $this->logs[] = "Baris $no: Format tanggal tidak valid.";
                 continue;
             }
 
-            $hariKerja = (int) $hari_kerja;
-            $poPcs = (int) $po_pcs;
+            $hariKerja = (int) $row['hari_kerja'];
+            $poPcs = (int) $row['po_pcs'];
             $min = (int) ceil($poPcs / max($hariKerja, 1));
             $max = $min * 3;
 
@@ -70,13 +71,7 @@ class ForecastImport implements ToCollection, WithHeadingRow
                     'max' => $max,
                 ]
             );
-
-            // $this->logs[] = "Baris $no: Forecast berhasil disimpan untuk INV ID '{$inv_id}' customer '{$customer_name}'.";
         }
     }
 
-    public function getLogs(): array
-    {
-        return $this->logs;
-    }
 }

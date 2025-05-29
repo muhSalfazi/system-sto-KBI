@@ -19,7 +19,6 @@ class Part extends Model
         'id_pkg',
         'id_plan',
         'id_area',
-        'id_rak'
     ];
 
     public function customer()
@@ -42,10 +41,6 @@ class Part extends Model
         return $this->belongsTo(Area::class, 'id_area');
     }
 
-    public function rak()
-    {
-        return $this->belongsTo(Rak::class, 'id_rak');
-    }
 
     public function inventories()
     {

@@ -13,10 +13,10 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-
 class PartsImport implements ToCollection, WithHeadingRow
 {
     protected $logs = [];
+    protected $processedKeys = [];
 
     public function getLogs()
     {
@@ -25,70 +25,66 @@ class PartsImport implements ToCollection, WithHeadingRow
 
     public function collection(Collection $rows)
     {
-        foreach ($rows as $row) {
-            // Cek kolom penting
-            if (!isset($row['inv_id'], $row['part_name'], $row['part_number'], $row['customer'], $row['plan'], $row['area'], $row['rak'], $row['kategori'], $row['type_pkg'], $row['qty_kanban'])) {
-                $this->logs[] = "Baris tidak lengkap: " . json_encode($row);
-                continue;
-            }
-            // Cek duplikat berdasarkan kombinasi Inv_id dan Customer
-            $customer = Customer::where('username', $row['customer'])->first();
-            if (!$customer) {
-                $this->logs[] = "Customer tidak ditemukan: {$row['customer']}";
+        $customers = Customer::all()->keyBy('username');
+        $plants = Plant::all()->keyBy('name');
+        $categories = Category::all()->keyBy('name');
+
+        foreach ($rows as $index => $row) {
+            if (
+                empty($row['inv_id']) ||
+                empty($row['part_name']) ||
+                empty($row['part_number']) ||
+                empty($row['customer']) ||
+                empty($row['plan']) ||
+                empty($row['area']) ||
+                empty($row['kategori'])
+            ) {
+                if (collect($row)->filter()->isEmpty())
+                    continue;
+                $this->logs[] = "Baris " . ($index + 2) . " tidak lengkap.";
                 continue;
             }
 
-            $existingPart = Part::where('Inv_id', $row['inv_id'])
-                ->where('id_customer', $customer->id)
-                ->first();
-
-            if ($existingPart) {
-                $this->logs[] = "Duplikat: INV ID {$row['inv_id']} untuk Customer {$row['customer']}";
+            $key = $row['inv_id'] . '|' . $row['customer'];
+            if (in_array($key, $this->processedKeys))
                 continue;
-            }
+            $this->processedKeys[] = $key;
 
-            // Ambil relasi lainnya
-            $customer = Customer::where('username', $row['customer'])->first();
-            $plant = Plant::where('name', $row['plan'])->first();
-            $category = Category::where('name', $row['kategori'])->first();
+            $customer = $customers[$row['customer']] ?? null;
+            $plant = $plants[$row['plan']] ?? null;
+            $category = $categories[$row['kategori']] ?? null;
 
             if (!$customer || !$plant || !$category) {
-                $this->logs[] = "Relasi tidak ditemukan (Customer/Plant/Kategori): " . json_encode($row);
+                $this->logs[] = "Baris " . ($index + 2) . ": Customer/Plant/Category tidak ditemukan.";
                 continue;
             }
 
-            // Create or Get Area
             $area = Area::firstOrCreate([
                 'id_plan' => $plant->id,
                 'nama_area' => $row['area'],
             ]);
 
-            // Create or Get Rak
-            $rak = Rak::firstOrCreate([
-                'id_area' => $area->id,
-                'nama_rak' => $row['rak'],
-            ]);
-
-            // Buat Part
-            $part = Part::create([
+            $part = Part::firstOrNew([
                 'Inv_id' => $row['inv_id'],
+                'id_customer' => $customer->id,
+            ]);
+            $part->fill([
                 'Part_name' => $row['part_name'],
                 'Part_number' => $row['part_number'],
-                'id_customer' => $customer->id,
                 'id_plan' => $plant->id,
                 'id_area' => $area->id,
-                'id_rak' => $rak->id,
                 'id_category' => $category->id,
             ]);
+            $part->save();
 
-            // Buat Package
-            Package::create([
-                'type_pkg' => $row['type_pkg'],
-                'qty' => $row['qty_kanban'],
-                'id_part' => $part->id,
-            ]);
-
-            // $this->logs[] = "Berhasil simpan: INV ID {$row['inv_id']}";
+            if (!empty($row['type_pkg']) && !empty($row['qty_kanban'])) {
+                $package = Package::firstOrNew(['id_part' => $part->id]);
+                $package->fill([
+                    'type_pkg' => $row['type_pkg'],
+                    'qty' => $row['qty_kanban'],
+                ])->save();
+            }
         }
     }
+
 }

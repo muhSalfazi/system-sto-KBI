@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->index('id_part');
             $table->index('plan_stock');
             $table->index('act_stock');
+            $table->index('created_at');
 
             // fk
             $table->foreign('id_part')->references('id')->on('tbl_part')->onDelete('cascade');

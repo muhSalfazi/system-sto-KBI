@@ -103,12 +103,6 @@
                             required>
                     </div>
 
-                    <div class="col-md-4">
-                        <label for="nama_rak" class="form-label">Rak</label>
-                        <input type="text" name="nama_rak" id="nama_rak"
-                            class="form-control @error('nama_rak') is-invalid @enderror" value="{{ old('nama_rak') }}"
-                            required>
-                    </div>
                     {{-- end --}}
                     {{-- Package --}}
                     <div class="col-md-6">

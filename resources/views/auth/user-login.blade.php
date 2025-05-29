@@ -81,7 +81,8 @@
                                                 style="font-size: 0.875rem; padding: 4px 8px;">Login</button>
                                         </div>
                                         <div class="col-12">
-                                            <a href="{{ route('admin.login') }}" class="btn btn-outline-secondary w-100"
+                                            <a href="{{ route('admin.login') }}"
+                                                class="btn btn-outline-secondary w-100"
                                                 style="font-size: 0.875rem; padding: 4px 8px;">
                                                 <i class="bi bi-box-arrow-in-right"></i> Login Admin
                                             </a>
@@ -90,7 +91,7 @@
                                 </div>
                             </div>
                             <div class="last-update-text">
-                                Last Update: 28 Mei 2025
+                                Last Update: 29 Mei 2025
                             </div>
 
 

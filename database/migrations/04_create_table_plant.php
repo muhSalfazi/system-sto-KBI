@@ -16,6 +16,9 @@ return new class extends Migration
             // index
             $table->index('id');
             $table->string('name')->unique();
+
+            // index
+            $table->index('name');
         });
     }
 

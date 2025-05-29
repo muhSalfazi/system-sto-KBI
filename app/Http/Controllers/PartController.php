@@ -6,8 +6,7 @@ use App\Models\Customer;
 use App\Models\Package;
 use App\Models\Plant;
 use App\Models\Area;
-use App\Models\Rak;
-use App\Models\Category;    
+use App\Models\Category;
 use App\Imports\PartsImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
@@ -21,7 +20,7 @@ class PartController extends Controller
         $categories = Category::all();
 
         // Query untuk mengambil data Part, dengan filter kategori jika ada
-        $query = Part::with(['customer', 'package', 'plant', 'area', 'rak', 'category']);
+        $query = Part::with(['customer', 'package', 'plant', 'area', 'category']);
 
         // Jika ada kategori yang dipilih, filter berdasarkan kategori
         if ($request->has('category_id') && $request->category_id != '') {
@@ -42,7 +41,6 @@ class PartController extends Controller
             'customers' => Customer::all(),
             'plants' => Plant::all(),
             'areas' => Area::all(),
-            'raks' => Rak::all(),
             'categories' => Category::all(),
         ]);
     }
@@ -50,7 +48,7 @@ class PartController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi awal untuk field umum (tanpa id_area dan id_rak karena akan dicari/dibuat manual)
+        // Validasi awal untuk field umum (tanpa id_area karena akan dicari/dibuat manual)
         $validated = $request->validate([
             'Inv_id' => 'required',
             'Part_name' => 'required',
@@ -59,7 +57,6 @@ class PartController extends Controller
             'id_category' => 'required|exists:tbl_category,id',
             'id_plan' => 'required|exists:tbl_plan,id',
             'nama_area' => 'required|string',
-            'nama_rak' => 'required|string',
             'type_pkg' => 'required',
             'qty' => 'required|integer'
         ]);
@@ -79,10 +76,6 @@ class PartController extends Controller
             ['id_plan' => $validated['id_plan'], 'nama_area' => $validated['nama_area']]
         );
 
-        // Cari atau buat Rak
-        $rak = Rak::firstOrCreate(
-            ['id_area' => $area->id, 'nama_rak' => $validated['nama_rak']]
-        );
 
         // Buat part baru
         $part = Part::create([
@@ -93,7 +86,6 @@ class PartController extends Controller
             'id_category' => $validated['id_category'],
             'id_plan' => $validated['id_plan'],
             'id_area' => $area->id,
-            'id_rak' => $rak->id,
         ]);
 
         // Buat package-nya
@@ -114,7 +106,6 @@ class PartController extends Controller
             'customers' => Customer::all(),
             'plants' => Plant::all(),
             'areas' => Area::all(),
-            'raks' => Rak::all(),
         ]);
     }
 
@@ -124,21 +115,31 @@ class PartController extends Controller
             'id_customer' => 'sometimes|exists:tbl_customer,id',
             'id_plan' => 'sometimes|exists:tbl_plan,id',
             'id_area' => 'sometimes|exists:tbl_area,id',
-            'id_rak' => 'sometimes|exists:tbl_rak,id',
             'type_pkg' => 'sometimes',
             'qty' => 'sometimes|integer'
         ]);
+
+        // Update data utama Part
         $part->update([
-            'id_customer' => $validated['id_customer'],
-            'id_plan' => $validated['id_plan'],
-            'id_area' => $validated['id_area'],
-            'id_rak' => $validated['id_rak'],
+            'id_customer' => $validated['id_customer'] ?? $part->id_customer,
+            'id_plan' => $validated['id_plan'] ?? $part->id_plan,
+            'id_area' => $validated['id_area'] ?? $part->id_area,
         ]);
 
-        $part->package()->update([
-            'type_pkg' => $validated['type_pkg'],
-            'qty' => $validated['qty'],
-        ]);
+        // Cek apakah relasi package sudah ada
+        if ($part->package) {
+            // ✅ Update existing package
+            $part->package->update([
+                'type_pkg' => $validated['type_pkg'] ?? $part->package->type_pkg,
+                'qty' => $validated['qty'] ?? $part->package->qty,
+            ]);
+        } else {
+            // ✅ Create new package if not exists
+            $part->package()->create([
+                'type_pkg' => $validated['type_pkg'] ?? '',
+                'qty' => $validated['qty'] ?? 0,
+            ]);
+        }
 
         return redirect()->route('parts.index')->with('success', 'Part updated successfully.');
     }
@@ -159,11 +160,6 @@ class PartController extends Controller
         return response()->json($areas);
     }
 
-    public function getRaks($areaId)
-    {
-        $raks = Rak::where('id_area', $areaId)->get();
-        return response()->json($raks);
-    }
 
     public function import(Request $request)
     {

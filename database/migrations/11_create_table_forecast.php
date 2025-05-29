@@ -24,6 +24,7 @@ return new class extends Migration
             $table->index('id_part');
             $table->index('min');
             $table->index('max');
+            $table->index('hari_kerja');
             // fk
             $table->foreign('id_part')->references('id')->on('tbl_part')->onDelete('cascade');
             $table->timestamps();
