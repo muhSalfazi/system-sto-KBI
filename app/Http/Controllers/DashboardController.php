@@ -130,8 +130,6 @@ class DashboardController extends Controller
         ]);
     }
 
-
-
     // chart buat daily stock log
     public function getDailyChartData(Request $request)
     {
@@ -211,7 +209,6 @@ class DashboardController extends Controller
             ]
         ]);
     }
-
 
     public function getDailyStockClassification(Request $request)
     {

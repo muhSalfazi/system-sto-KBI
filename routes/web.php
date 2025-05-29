@@ -26,7 +26,6 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
 
     // dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/fetch-daily-stock', [DashboardController::class, 'dailyStockSummary']);
     Route::get('/dashboard/sto-chart-data', [DashboardController::class, 'getStoChartData']);
     Route::get('/dashboard/daily-chart-data', [DashboardController::class, 'getDailyChartData'])->name('dashboard.dailyChartData');
     Route::get('/dashboard/daily-stock-classification', [DashboardController::class, 'getDailyStockClassification']);
