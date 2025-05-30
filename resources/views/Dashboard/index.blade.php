@@ -552,19 +552,19 @@
                                                     }) {
                                                         const point = w.config.series[seriesIndex].data[dataPointIndex];
                                                         return `
-                                    <div style="
-                                        background: white;
-                                        padding: 10px;
-                                        border-radius: 8px;
-                                        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                                        border-left: 4px solid #007bff;
-                                        min-width: 220px;
-                                        font-family: 'Segoe UI';
-                                    ">
-                                        <strong>Kategori: ${point.x}</strong><br/>
-                                        Total Part: ${point.y}<br/>
-                                        Inv ID(s): ${point.meta}
-                                    </div>`;
+                                                        <div style="
+                                                            background: white;
+                                                            padding: 10px;
+                                                            border-radius: 8px;
+                                                            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                                                            border-left: 4px solid #007bff;
+                                                            min-width: 220px;
+                                                            font-family: 'Segoe UI';
+                                                        ">
+                                                            <strong>Item: ${point.x}</strong><br/>
+                                                            Act: ${point.y}<br/>
+                                                            Inv ID(s): ${point.meta}
+                                                        </div>`;
                                                     }
                                                 },
                                                 colors: ['#1f77b4']

@@ -148,7 +148,7 @@ class DashboardController extends Controller
             });
         }
 
-        // ✅ Hanya ambil part yang punya inventory
+        //Hanya ambil part yang punya inventory
         $partsQuery->whereHas('inventories');
 
         $parts = $partsQuery->get();
@@ -228,7 +228,7 @@ class DashboardController extends Controller
             $partsQuery->where('id_category', $category);
         }
 
-        // ✅ Hanya ambil part yang punya inventory
+        // Hanya ambil part yang punya inventory
         $partsQuery->whereHas('inventories');
 
         $parts = $partsQuery->get();

@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DailyStockExport;
 use Carbon\Carbon;
-
-
+use Illuminate\Support\Facades\Log;
 
 class DailyStockLogController extends Controller
 {
     /**
      * Menampilkan daftar daily stock logs.
      */
+
     public function index(Request $request)
     {
         // Ambil log harian stok dengan relasi terkait
@@ -87,7 +87,7 @@ class DailyStockLogController extends Controller
 
             return redirect()->route('daily-stock.index')->with('success', 'Laporan stok berhasil dihapus dan Act stok dikurangi.');
         } catch (\Exception $e) {
-            \Log::error('Gagal menghapus laporan stok harian: ' . $e->getMessage());
+            Log::error('Gagal menghapus laporan stok harian: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan saat menghapus data.');
         }
     }

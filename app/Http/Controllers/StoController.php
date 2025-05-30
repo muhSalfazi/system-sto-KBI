@@ -49,35 +49,35 @@ class StoController extends Controller
         return view('STO.create', compact('parts', 'categories'));
     }
 
-  public function store(Request $request)
-{
-    $request->validate([
-        'id_part' => 'required|exists:tbl_part,id',
-        'plan_stock' => 'required|integer|min:0',
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'id_part' => 'required|exists:tbl_part,id',
+            'plan_stock' => 'required|integer|min:0',
+        ]);
 
-    // Cek apakah inventory untuk part tersebut sudah ada
-    $existingInventory = Inventory::where('id_part', $request->id_part)->first();
+        // Cek apakah inventory untuk part tersebut sudah ada
+        $existingInventory = Inventory::where('id_part', $request->id_part)->first();
 
-    if ($existingInventory) {
-        return redirect()->back()->withErrors(['id_part' => 'Inventory untuk part ini sudah ada.']);
+        if ($existingInventory) {
+            return redirect()->back()->withErrors(['id_part' => 'Inventory untuk part ini sudah ada.']);
+        }
+
+        // Simpan inventory baru
+        $inventory = Inventory::create([
+            'id_part' => $request->id_part,
+            'plan_stock' => $request->plan_stock,
+        ]);
+
+        // Simpan log awal plan_stock
+        PlanStock::create([
+            'id_inventory' => $inventory->id,
+            'plan_stock_before' => $request->plan_stock,
+            'plan_stock_after' => $request->plan_stock,
+        ]);
+
+        return redirect()->route('sto.index')->with('success', 'Data STO berhasil ditambahkan.');
     }
-
-    // Simpan inventory baru
-    $inventory = Inventory::create([
-        'id_part' => $request->id_part,
-        'plan_stock' => $request->plan_stock,
-    ]);
-
-    // Simpan log awal plan_stock
-    PlanStock::create([
-        'id_inventory' => $inventory->id,
-        'plan_stock_before' => $request->plan_stock,
-        'plan_stock_after' => $request->plan_stock,
-    ]);
-
-    return redirect()->route('sto.index')->with('success', 'Data STO berhasil ditambahkan.');
-}
 
 
     public function edit($id)
@@ -111,7 +111,7 @@ class StoController extends Controller
     // import
     public function import(Request $request)
     {
-         $request->validate([
+        $request->validate([
             'file' => 'required|file|mimes:csv,xlsx,xls',
         ]);
 
